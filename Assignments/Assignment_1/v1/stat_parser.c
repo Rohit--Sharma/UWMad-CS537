@@ -8,17 +8,8 @@ typedef struct {
 	unsigned int proc_utime;
 	unsigned int proc_stime;
 	int proc_virtual_mem_size;
+	char cmdline[1000];
 } stat_statm_fields;
-
-int no_of_digits(int num)
-{
-	int res = 0;
-	while (num) {
-		res++;
-		num /= 10;
-	}
-	return res;
-}
 
 stat_statm_fields stat_statm_parser(int proc_id)
 {
@@ -29,10 +20,14 @@ stat_statm_fields stat_statm_parser(int proc_id)
 	sprintf(proc_id_str, "%d", proc_id);
 	char stat_path[256] = "/proc/";
 	char statm_path[256] = "/proc/";
+	char cmdline_path[256] = "/proc/";
 	char stat_file[7] = "/stat";
 	char statm_file[8] = "/statm";
+	char cmdline_file[10] = "/cmdline";
 	strcat(stat_path, proc_id_str);
 	strcat(stat_path, stat_file);
+	strcat(cmdline_path, proc_id_str);
+	strcat(cmdline_path, cmdline_file);
 	strcat(statm_path, proc_id_str);
 	strcat(statm_path, statm_file);
 
@@ -57,6 +52,15 @@ stat_statm_fields stat_statm_parser(int proc_id)
 	// printf("\nProc virtual mem size: %d\n", my_fields.proc_virtual_mem_size);
 
 	fclose(statm_file_pointer);
+
+	FILE* cmdline_file_pointer = fopen(cmdline_path, "r");
+	if (cmdline_file_pointer == NULL) {
+		printf("No such file exists");
+		return my_fields;
+	}
+	
+	fscanf(cmdline_file_pointer, "%[^\n]", &(my_fields.cmdline));
+	fclose(cmdline_file_pointer);
 
 	return my_fields;
 }

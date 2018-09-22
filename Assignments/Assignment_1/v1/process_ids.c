@@ -3,7 +3,8 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <unistd.h>
+#include <string.h>
 struct pid_entry {
 
     int pid;
@@ -20,6 +21,8 @@ struct pid_entry* return_all_processes() {
     struct pid_entry* tail = NULL;
     struct pid_entry* process_ptr = NULL;
     
+    int user_id = getuid();
+
     DIR *dir;
     struct dirent *entry;
     
@@ -29,24 +32,53 @@ struct pid_entry* return_all_processes() {
     else {
         // puts("contents of root:");
         while ((entry = readdir(dir)) != NULL) {
-	    // printf("  %s\n", entry->d_name);
+	    //printf("  %s\n", entry->d_name);
 	    if (atoi(entry->d_name)!=0) {
-		if (head == NULL) {
-    		    head = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-    		    tail = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-    	 	    process_ptr = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-		    head->pid = atoi(entry->d_name);
-		    head->next = NULL;
-		    tail = head;
-		    process_ptr = head;
+		char proc_id_str[100];
+		sprintf(proc_id_str, "%d", atoi(entry->d_name));
+		char status_path[256] = "/proc/";
+		char status_file[9] = "/status";
+		strcat(status_path, proc_id_str);
+		strcat(status_path, status_file);
+		//printf("%s\n", status_path);
+		char line[1000];
+		int u_id;
+		
+		FILE* status_file_pointer = fopen(status_path, "r");
+		if (status_file_pointer == NULL) {
+			printf("No such file exists");
+			return 0;
 		}
-		else {
-		    struct pid_entry* temp;
-		    temp = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-		    temp->pid = atoi(entry->d_name);
-		    temp->next = NULL;
-		    tail->next = temp;
-		    tail = temp;
+		fgets(line, 1000, status_file_pointer);
+		fgets(line, 1000, status_file_pointer);
+		fgets(line, 1000, status_file_pointer);
+		fgets(line, 1000, status_file_pointer);
+		fgets(line, 1000, status_file_pointer);
+		fgets(line, 1000, status_file_pointer);
+		fgets(line, 1000, status_file_pointer);
+		fgets(line, 1000, status_file_pointer);
+		fscanf(status_file_pointer, "%*s %d", &(u_id));
+		fclose(status_file_pointer);
+		//printf("UID is %d\n", u_id);
+		
+		if (u_id==user_id) {
+		    if (head == NULL) {
+    		        head = (struct pid_entry*)malloc(sizeof(struct pid_entry));
+    		        tail = (struct pid_entry*)malloc(sizeof(struct pid_entry));
+    	 	        process_ptr = (struct pid_entry*)malloc(sizeof(struct pid_entry));
+		        head->pid = atoi(entry->d_name);
+		        head->next = NULL;
+		        tail = head;
+		        process_ptr = head;
+		    }
+		    else {
+		        struct pid_entry* temp;
+		        temp = (struct pid_entry*)malloc(sizeof(struct pid_entry));
+		        temp->pid = atoi(entry->d_name);
+		        temp->next = NULL;
+		        tail->next = temp;
+		        tail = temp;
+		    }
 		}
 	    }	
         }

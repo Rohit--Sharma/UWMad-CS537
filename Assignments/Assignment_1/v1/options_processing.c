@@ -8,6 +8,7 @@ typedef struct {
 	unsigned int proc_utime;
 	unsigned int proc_stime;
 	int proc_virtual_mem_size;
+	char cmdline[1000];
 } stat_statm_fields;
 
 typedef struct pid_entry {
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
 	// opterr = 0;
 	int c;
 
-	while ((c = getopt(argc, argv, "p:sUSvc")) != -1)
+	while ((c = getopt(argc, argv, "p:s::U::S::v::c::")) != -1)
 		switch (c)
 		{
 			case 'p':
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 				get_state = 1;
 				break;
 			case 'U':
-				get_utime = 0;
+				get_utime = 1;
 				break;
 			case 'S':
 				get_stime = 1;
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
 				get_vmem = 1;
 				break;
 			case 'c':
-				get_cmdline = 0;
+				get_cmdline = 1;
 				break;
 			case '?':
 				if (optopt == 'p')
@@ -71,7 +72,7 @@ int main(int argc, char *argv[])
 				abort();
 		}
 
-	printf("Get all proc ids: %d\nProc id: %d\nGet state: %d\nGet Utime: %d\nGet stime: %d\nGet vmem: %d\nGet cmdline: %d\n", get_all_proc_ids, proc_id, get_state, get_utime, get_stime, get_vmem, get_cmdline);
+	//printf("Get all proc ids: %d\nProc id: %d\nGet state: %d\nGet Utime: %d\nGet stime: %d\nGet vmem: %d\nGet cmdline: %d\n", get_all_proc_ids, proc_id, get_state, get_utime, get_stime, get_vmem, get_cmdline);
 
 	int index;
 	for (index = optind; index < argc; index++)
@@ -81,20 +82,21 @@ int main(int argc, char *argv[])
 		pid_entry *head = return_all_processes();
 		while (head != NULL) {
 			stat_statm_fields proc_info = stat_statm_parser(head->pid);
+				printf("%d: ", head->pid);
 			if (get_state) {
 				printf("%c ", proc_info.proc_state);
 			}
 			if (get_utime) {
-				printf("%u ", proc_info.proc_utime);
+				printf("utime=%u ", proc_info.proc_utime);
 			}
 			if (get_stime) {
-				printf("%u ", proc_info.proc_stime);
+				printf("stime=%u ", proc_info.proc_stime);
 			}
 			if (get_vmem) {
-				printf("%d ", proc_info.proc_virtual_mem_size);
+				printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
 			}
 			if (get_cmdline) {
-				//printf("%d ", proc_info.proc_virtual_mem_size);
+				printf("[%s] ", proc_info.cmdline);
 			}
 			printf("\n");
 
@@ -103,20 +105,21 @@ int main(int argc, char *argv[])
 	}
 	else {
 		stat_statm_fields proc_info = stat_statm_parser(proc_id);
+			printf("%d: ", proc_id);
 		if (get_state) {
 			printf("%c ", proc_info.proc_state);
 		}
 		if (get_utime) {
-			printf("%u ", proc_info.proc_utime);
+			printf("utime=%u ", proc_info.proc_utime);
 		}
 		if (get_stime) {
-			printf("%u ", proc_info.proc_stime);
+			printf("stime=%u ", proc_info.proc_stime);
 		}
 		if (get_vmem) {
-			printf("%d ", proc_info.proc_virtual_mem_size);
+			printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
 		}
 		if (get_cmdline) {
-			//printf("%d ", proc_info.proc_virtual_mem_size);
+			printf("[%s] ", proc_info.cmdline);
 		}
 		printf("\n");
 	}
