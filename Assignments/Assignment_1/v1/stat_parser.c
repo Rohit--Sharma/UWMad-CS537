@@ -3,27 +3,30 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define BUFFER_SIZE 1000
+#define SMALL_BUFFER 10
+
 typedef struct {
 	char proc_state;
 	unsigned int proc_utime;
 	unsigned int proc_stime;
 	int proc_virtual_mem_size;
-	char cmdline[1000];
-} stat_statm_fields;
+	char cmdline[BUFFER_SIZE];
+} stat_statm_cmdline_fields;
 
-stat_statm_fields stat_statm_parser(int proc_id)
+stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 {
-	stat_statm_fields my_fields;
+	stat_statm_cmdline_fields my_fields;
 
 	//char *proc_id_str = (char *)malloc((int)((ceil(log10(proc_id)) + 1) * sizeof(char)));
-	char proc_id_str[100];
+	char proc_id_str[BUFFER_SIZE];
 	sprintf(proc_id_str, "%d", proc_id);
-	char stat_path[256] = "/proc/";
-	char statm_path[256] = "/proc/";
-	char cmdline_path[256] = "/proc/";
-	char stat_file[7] = "/stat";
-	char statm_file[8] = "/statm";
-	char cmdline_file[10] = "/cmdline";
+	char stat_path[BUFFER_SIZE] = "/proc/";
+	char statm_path[BUFFER_SIZE] = "/proc/";
+	char cmdline_path[BUFFER_SIZE] = "/proc/";
+	char stat_file[SMALL_BUFFER] = "/stat";
+	char statm_file[SMALL_BUFFER] = "/statm";
+	char cmdline_file[SMALL_BUFFER] = "/cmdline";
 	strcat(stat_path, proc_id_str);
 	strcat(stat_path, stat_file);
 	strcat(cmdline_path, proc_id_str);
@@ -59,21 +62,10 @@ stat_statm_fields stat_statm_parser(int proc_id)
 		return my_fields;
 	}
 	
-	fscanf(cmdline_file_pointer, "%[^\n]", &(my_fields.cmdline));
+	fscanf(cmdline_file_pointer, "%[^\n]", my_fields.cmdline);
 	fclose(cmdline_file_pointer);
 
 	return my_fields;
 }
 
-int main1()
-{
-	int proc_id;
-	printf("Enter the process id to get stats: ");
-	scanf("%d", &proc_id);
 
-	stat_statm_fields process_stats = stat_statm_parser(proc_id);
-	printf("Proc State: %c\nProc utime: %u\nProcess stime: %u\n", process_stats.proc_state, process_stats.proc_utime, process_stats.proc_stime);
-	printf("Proc virtual mem size: %d\n", process_stats.proc_virtual_mem_size);
-
-	return 0;
-}

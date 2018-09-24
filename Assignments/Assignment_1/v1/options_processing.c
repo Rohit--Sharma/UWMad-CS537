@@ -2,14 +2,19 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+
+#define TRUE 1
+#define FALSE 0
+#define BUFFER_SIZE 1000
 
 typedef struct {
 	char proc_state;
 	unsigned int proc_utime;
 	unsigned int proc_stime;
 	int proc_virtual_mem_size;
-	char cmdline[1000];
-} stat_statm_fields;
+	char cmdline[BUFFER_SIZE];
+} stat_statm_cmdline_fields;
 
 typedef struct pid_entry {
 
@@ -18,7 +23,7 @@ typedef struct pid_entry {
 
 } pid_entry;
 
-stat_statm_fields stat_statm_parser(int proc_id);
+stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id);
 struct pid_entry* return_all_processes();
 
 int main(int argc, char *argv[])
@@ -27,13 +32,13 @@ int main(int argc, char *argv[])
 	extern int optind;
 	extern int optopt;
 
-	int get_all_proc_ids = 1;
+	int get_all_proc_ids = TRUE;
 	int proc_id = 0;
-	int get_state = 0;
-	int get_utime = 1;
-	int get_stime = 0;
-	int get_vmem = 0;
-	int get_cmdline = 1;
+	int get_state = FALSE;
+	int get_utime = TRUE;
+	int get_stime = FALSE;
+	int get_vmem = FALSE;
+	int get_cmdline = TRUE;
 
 	// opterr = 0;
 	int c;
@@ -42,23 +47,25 @@ int main(int argc, char *argv[])
 		switch (c)
 		{
 			case 'p':
-				get_all_proc_ids = 0;
+				get_all_proc_ids = FALSE;
 				proc_id = atoi(optarg);
 				break;
 			case 's':
-				get_state = 1;
+				get_state = TRUE;
 				break;
 			case 'U':
-				get_utime = 1;
+				if (optarg != NULL)
+					get_utime = ((strcmp(optarg, "-") == 0) ? FALSE : TRUE);
 				break;
 			case 'S':
-				get_stime = 1;
+				get_stime = TRUE;
 				break;
 			case 'v':
-				get_vmem = 1;
+				get_vmem = TRUE;
 				break;
 			case 'c':
-				get_cmdline = 1;
+				if (optarg != NULL)
+					get_cmdline = ((strcmp(optarg, "-") == 0) ? FALSE : TRUE);
 				break;
 			case '?':
 				if (optopt == 'p')
@@ -81,7 +88,7 @@ int main(int argc, char *argv[])
 	if (get_all_proc_ids) {
 		pid_entry *head = return_all_processes();
 		while (head != NULL) {
-			stat_statm_fields proc_info = stat_statm_parser(head->pid);
+			stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(head->pid);
 				printf("%d: ", head->pid);
 			if (get_state) {
 				printf("%c ", proc_info.proc_state);
@@ -104,7 +111,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	else {
-		stat_statm_fields proc_info = stat_statm_parser(proc_id);
+		stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(proc_id);
 			printf("%d: ", proc_id);
 		if (get_state) {
 			printf("%c ", proc_info.proc_state);
