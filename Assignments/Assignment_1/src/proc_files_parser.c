@@ -2,17 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
-#define BUFFER_SIZE 1000
-#define SMALL_BUFFER 10
-
-typedef struct {
-	char proc_state;
-	unsigned int proc_utime;
-	unsigned int proc_stime;
-	int proc_virtual_mem_size;
-	char cmdline[BUFFER_SIZE];
-} stat_statm_cmdline_fields;
+#include "537ps_header.h"
 
 stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 {

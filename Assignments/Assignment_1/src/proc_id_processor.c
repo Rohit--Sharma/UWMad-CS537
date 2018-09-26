@@ -5,16 +5,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "537ps_header.h"
 
 #define BUFFER_SIZE 1000
 #define UIDLINENUM 8
-
-struct pid_entry {
-    int pid;
-    struct pid_entry *next;
-};
-
-struct pid_entry* return_all_processes();
 
 struct pid_entry* return_all_processes() {
     struct pid_entry* head = NULL;

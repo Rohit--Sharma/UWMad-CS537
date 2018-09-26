@@ -3,31 +3,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "537ps_header.h"
 
-#define TRUE 1
-#define FALSE 0
-#define BUFFER_SIZE 1000
-
-typedef struct {
-	char proc_state;
-	unsigned int proc_utime;
-	unsigned int proc_stime;
-	int proc_virtual_mem_size;
-	char cmdline[BUFFER_SIZE];
-} stat_statm_cmdline_fields;
-
-typedef struct pid_entry {
-
-    int pid;
-    struct pid_entry *next;
-
-} pid_entry;
-
-stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id);
-struct pid_entry* return_all_processes();
-
-int main(int argc, char *argv[])
+void options_processor(int argc, char *argv[])
 {
+
 	extern char *optarg;
 	extern int optind;
 	extern int optopt;
@@ -40,7 +20,6 @@ int main(int argc, char *argv[])
 	int get_vmem = FALSE;
 	int get_cmdline = TRUE;
 
-	// opterr = 0;
 	int c;
 
 	while ((c = getopt(argc, argv, "p:s::U::S::v::c::")) != -1)
@@ -49,6 +28,7 @@ int main(int argc, char *argv[])
 			case 'p':
 				get_all_proc_ids = FALSE;
 				proc_id = atoi(optarg);
+				printf("proc id is %d", proc_id); 
 				break;
 			case 's':
 				get_state = TRUE;
@@ -74,12 +54,9 @@ int main(int argc, char *argv[])
 					fprintf(stderr, "Unknown option '-%c'.\n", optopt);
 				else
 					fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
-				return 1;
 			default:
 				abort();
 		}
-
-	//printf("Get all proc ids: %d\nProc id: %d\nGet state: %d\nGet Utime: %d\nGet stime: %d\nGet vmem: %d\nGet cmdline: %d\n", get_all_proc_ids, proc_id, get_state, get_utime, get_stime, get_vmem, get_cmdline);
 
 	int index;
 	for (index = optind; index < argc; index++)
@@ -131,5 +108,4 @@ int main(int argc, char *argv[])
 		printf("\n");
 	}
 
-	return 0;
 }

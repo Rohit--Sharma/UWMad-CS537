@@ -2,17 +2,20 @@ CC = gcc
 WFLAGS = -Wall -Wextra
 EXE = 537ps
 
-$(EXE): options_processing.o stat_parser.o process_ids.o
-	$(CC) $(WFLAGS) -o $(EXE) options_processing.o stat_parser.o process_ids.o
+$(EXE): options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
+	$(CC) $(WFLAGS) -o $(EXE) options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
 
-options_processing.o: options_processing.c
-	$(CC) $(WFLAGS) -c options_processing.c
+options_processor.o: options_processor.c 537ps_header.h
+	$(CC) $(WFLAGS) -c options_processor.c
 
-stat_parser.o: stat_parser.c
-	$(CC) $(WFLAGS) -c stat_parser.c
+proc_files_parser.o: proc_files_parser.c 537ps_header.h
+	$(CC) $(WFLAGS) -c proc_files_parser.c
 
-process_ids.o: process_ids.c
-	$(CC) $(WFLAGS) -c process_ids.c
+proc_id_processor.o: proc_id_processor.c 537ps_header.h
+	$(CC) $(WFLAGS) -c proc_id_processor.c
+
+537ps_driver.o: 537ps_driver.c 537ps_header.h
+	$(CC) $(WFLAGS) -c 537ps_driver.c
 
 clean:
 	rm -f *.o $(EXE)
