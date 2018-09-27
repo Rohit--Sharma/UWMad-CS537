@@ -27,3 +27,4 @@ typedef struct pid_entry {
 stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id);
 struct pid_entry* return_all_processes();
 void options_processor(int argc, char *argv[]);
+int isUserProcess(int proc_id);

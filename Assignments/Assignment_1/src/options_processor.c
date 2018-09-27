@@ -28,9 +28,10 @@ void options_processor(int argc, char *argv[])
 			case 'p':
 				get_all_proc_ids = FALSE;
 				proc_id = atoi(optarg);
-				if (proc_id == 0)
+				if (proc_id == 0) {
 					fprintf(stderr, "Option -p requires a valid proc id.\n");
 					return;
+				}
 				break;
 			case 's':
 				get_state = TRUE;
@@ -94,24 +95,28 @@ void options_processor(int argc, char *argv[])
 		}
 	}
 	else {
-		stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(proc_id);
-			printf("%d: ", proc_id);
-		if (get_state) {
-			printf("%c ", proc_info.proc_state);
+		if (isUserProcess(proc_id)) {
+			stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(proc_id);
+				printf("%d: ", proc_id);
+			if (get_state) {
+				printf("%c ", proc_info.proc_state);
+			}
+			if (get_utime) {
+				printf("utime=%u ", proc_info.proc_utime);
+			}
+			if (get_stime) {
+				printf("stime=%u ", proc_info.proc_stime);
+			}
+			if (get_vmem) {
+				printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
+			}
+			if (get_cmdline) {
+				printf("[%s] ", proc_info.cmdline);
+			}
+			printf("\n");
 		}
-		if (get_utime) {
-			printf("utime=%u ", proc_info.proc_utime);
+		else {
+			printf("The proc id %d does not correspond to a user process\n", proc_id);
 		}
-		if (get_stime) {
-			printf("stime=%u ", proc_info.proc_stime);
-		}
-		if (get_vmem) {
-			printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
-		}
-		if (get_cmdline) {
-			printf("[%s] ", proc_info.cmdline);
-		}
-		printf("\n");
 	}
-
 }
