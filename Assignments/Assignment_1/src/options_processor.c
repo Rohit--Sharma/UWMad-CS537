@@ -74,19 +74,19 @@ void options_processor(int argc, char *argv[])
 			if (proc_info.ERROR_NO_SUCH_FILE == FALSE) {
 				printf("%d:\t", head->pid);
 				if (get_state) {
-					printf("%c\t", proc_info.proc_state);
+					printf("%c ", proc_info.proc_state);
 				}
 				if (get_utime) {
-					printf("utime=%u\t", proc_info.proc_utime);
+					printf("utime=%u\t\t", proc_info.proc_utime);
 				}
 				if (get_stime) {
-					printf("stime=%u\t", proc_info.proc_stime);
+					printf("stime=%u\t\t", proc_info.proc_stime);
 				}
 				if (get_vmem) {
-					printf("vmemory=%d\t", proc_info.proc_virtual_mem_size);
+					printf("vmemory=%d\t\t", proc_info.proc_virtual_mem_size);
 				}
 				if (get_cmdline) {
-					printf("[%s]\t", proc_info.cmdline);
+					printf("[%s]", proc_info.cmdline);
 				}
 				printf("\n");
 
@@ -99,19 +99,19 @@ void options_processor(int argc, char *argv[])
 		if (proc_info.ERROR_NO_SUCH_FILE == FALSE) {
 			printf("%d:\t", proc_id);
 			if (get_state) {
-				printf("%c\t", proc_info.proc_state);
+				printf("%c ", proc_info.proc_state);
 			}
 			if (get_utime) {
-				printf("utime=%u\t", proc_info.proc_utime);
+				printf("utime=%u\t\t", proc_info.proc_utime);
 			}
 			if (get_stime) {
-				printf("stime=%u\t", proc_info.proc_stime);
+				printf("stime=%u\t\t", proc_info.proc_stime);
 			}
 			if (get_vmem) {
-				printf("vmemory=%d\t", proc_info.proc_virtual_mem_size);
+				printf("vmemory=%d\t\t", proc_info.proc_virtual_mem_size);
 			}
 			if (get_cmdline) {
-				printf("[%s]\t", proc_info.cmdline);
+				printf("[%s]", proc_info.cmdline);
 			}
 			printf("\n");
 		}
