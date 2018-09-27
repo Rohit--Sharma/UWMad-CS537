@@ -58,7 +58,7 @@ void options_processor(int argc, char *argv[])
 				get_state = TRUE;
 				if (optarg != NULL) {
 					if (strcmp(optarg, "-") == 0) {
-						get_stime = TRUE;
+						get_state = TRUE;
 					}
 					else {
 						printf("Unknown option passed to s\n");
@@ -69,8 +69,18 @@ void options_processor(int argc, char *argv[])
 			case 'U':
 				// Check if -U- was passed. 
 				// In such a case, optarg will be set to '-'
-				if (optarg != NULL)
-					get_utime = ((strcmp(optarg, "-") == 0) ? FALSE : TRUE);
+				if (optarg != NULL) {
+					if (strcmp(optarg, "-") == 0) {
+						get_utime = FALSE;
+					}
+					else {
+						printf("Unknown option passed to U\n");
+						return;	
+					}
+				}
+				else {
+					get_utime = TRUE;
+				}
 				break;
 			case 'S':
 				get_stime = TRUE;
@@ -88,7 +98,7 @@ void options_processor(int argc, char *argv[])
 				get_vmem = TRUE;
 				if (optarg != NULL) {
 					if (strcmp(optarg, "-") == 0) {
-						get_stime = TRUE;
+						get_vmem = TRUE;
 					}
 					else {
 						printf("Unknown option passed to v\n");
@@ -97,8 +107,18 @@ void options_processor(int argc, char *argv[])
 				}
 				break;
 			case 'c':
-				if (optarg != NULL)
-					get_cmdline = ((strcmp(optarg, "-") == 0) ? FALSE : TRUE);
+				if (optarg != NULL) {
+					if (strcmp(optarg, "-") == 0) {
+						get_cmdline = FALSE;
+					}
+					else {
+						printf("Unknown option passed to c\n");
+						return;	
+					}
+				}
+				else {
+					get_cmdline = TRUE;
+				}
 				break;
 			case '?':	// When an unknown option is encountered, this case gets triggered
 				if (optopt == 'p')
