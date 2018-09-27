@@ -71,45 +71,52 @@ void options_processor(int argc, char *argv[])
 		pid_entry *head = return_all_processes();
 		while (head != NULL) {
 			stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(head->pid);
-				printf("%d: ", head->pid);
-			if (get_state) {
-				printf("%c ", proc_info.proc_state);
-			}
-			if (get_utime) {
-				printf("utime=%u ", proc_info.proc_utime);
-			}
-			if (get_stime) {
-				printf("stime=%u ", proc_info.proc_stime);
-			}
-			if (get_vmem) {
-				printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
-			}
-			if (get_cmdline) {
-				printf("[%s] ", proc_info.cmdline);
-			}
-			printf("\n");
+			if (proc_info.ERROR_NO_SUCH_FILE == FALSE) {
+				printf("%d:\t", head->pid);
+				if (get_state) {
+					printf("%c\t", proc_info.proc_state);
+				}
+				if (get_utime) {
+					printf("utime=%u\t", proc_info.proc_utime);
+				}
+				if (get_stime) {
+					printf("stime=%u\t", proc_info.proc_stime);
+				}
+				if (get_vmem) {
+					printf("vmemory=%d\t", proc_info.proc_virtual_mem_size);
+				}
+				if (get_cmdline) {
+					printf("[%s]\t", proc_info.cmdline);
+				}
+				printf("\n");
 
-			head = head->next;
+				head = head->next;
+			}
 		}
 	}
 	else {
 		stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(proc_id);
-			printf("%d: ", proc_id);
-		if (get_state) {
-			printf("%c ", proc_info.proc_state);
+		if (proc_info.ERROR_NO_SUCH_FILE == FALSE) {
+			printf("%d:\t", proc_id);
+			if (get_state) {
+				printf("%c\t", proc_info.proc_state);
+			}
+			if (get_utime) {
+				printf("utime=%u\t", proc_info.proc_utime);
+			}
+			if (get_stime) {
+				printf("stime=%u\t", proc_info.proc_stime);
+			}
+			if (get_vmem) {
+				printf("vmemory=%d\t", proc_info.proc_virtual_mem_size);
+			}
+			if (get_cmdline) {
+				printf("[%s]\t", proc_info.cmdline);
+			}
+			printf("\n");
 		}
-		if (get_utime) {
-			printf("utime=%u ", proc_info.proc_utime);
+		else {
+			return;
 		}
-		if (get_stime) {
-			printf("stime=%u ", proc_info.proc_stime);
-		}
-		if (get_vmem) {
-			printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
-		}
-		if (get_cmdline) {
-			printf("[%s] ", proc_info.cmdline);
-		}
-		printf("\n");
 	}
 }

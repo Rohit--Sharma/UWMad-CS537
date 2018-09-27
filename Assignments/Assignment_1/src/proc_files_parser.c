@@ -25,7 +25,8 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 
 	FILE* stat_file_pointer = fopen(stat_path, "r");
 	if (stat_file_pointer == NULL) {
-		printf("No such file exists");
+		printf("No such process exists\n");
+		my_fields.ERROR_NO_SUCH_FILE = TRUE;
 		return my_fields;
 	}
 
@@ -35,7 +36,8 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 
 	FILE* statm_file_pointer = fopen(statm_path, "r");
 	if (statm_file_pointer == NULL) {
-		printf("No such file exists");
+		printf("No such process exists\n");
+		my_fields.ERROR_NO_SUCH_FILE = TRUE;
 		return my_fields;
 	}
 
@@ -45,7 +47,8 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 
 	FILE* cmdline_file_pointer = fopen(cmdline_path, "r");
 	if (cmdline_file_pointer == NULL) {
-		printf("No such file exists");
+		printf("No such process exists\n");
+		my_fields.ERROR_NO_SUCH_FILE = TRUE;
 		return my_fields;
 	}
 	

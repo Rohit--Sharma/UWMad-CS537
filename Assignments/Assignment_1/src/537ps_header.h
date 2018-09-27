@@ -12,6 +12,7 @@ typedef struct {
 	unsigned int proc_stime;
 	int proc_virtual_mem_size;
 	char cmdline[BUFFER_SIZE];
+	int ERROR_NO_SUCH_FILE;
 } stat_statm_cmdline_fields;
 #endif
 
@@ -20,7 +21,6 @@ typedef struct {
 typedef struct pid_entry {
     int pid;
     struct pid_entry *next;
-
 } pid_entry;
 #endif
 
