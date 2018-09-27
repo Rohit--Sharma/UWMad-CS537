@@ -56,6 +56,15 @@ void options_processor(int argc, char *argv[])
 				break;
 			case 's':
 				get_state = TRUE;
+				if (optarg != NULL) {
+					if (strcmp(optarg, "-") == 0) {
+						get_stime = TRUE;
+					}
+					else {
+						printf("Unknown option passed to s\n");
+						return;	
+					}
+				}
 				break;
 			case 'U':
 				// Check if -U- was passed. 
@@ -65,9 +74,27 @@ void options_processor(int argc, char *argv[])
 				break;
 			case 'S':
 				get_stime = TRUE;
+				if (optarg != NULL) {
+					if (strcmp(optarg, "-") == 0) {
+						get_stime = TRUE;
+					}
+					else {
+						printf("Unknown option passed to S\n");
+						return;	
+					}
+				}
 				break;
 			case 'v':
 				get_vmem = TRUE;
+				if (optarg != NULL) {
+					if (strcmp(optarg, "-") == 0) {
+						get_stime = TRUE;
+					}
+					else {
+						printf("Unknown option passed to v\n");
+						return;	
+					}
+				}
 				break;
 			case 'c':
 				if (optarg != NULL)
