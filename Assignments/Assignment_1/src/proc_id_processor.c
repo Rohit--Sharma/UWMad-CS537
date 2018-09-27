@@ -9,7 +9,6 @@
 
 // Returns if the process with process id "proc_id" is a user process or not
 int isUserProcess(int proc_id) {
-	printf ("%d %d\n", proc_id, getuid());
 	char proc_id_str[BUFFER_SIZE];
 	sprintf(proc_id_str, "%d", proc_id);
 	char status_path[BUFFER_SIZE] = "/proc/";
@@ -21,7 +20,7 @@ int isUserProcess(int proc_id) {
 	FILE *status_file_pointer = fopen(status_path, "r");
 
 	if (status_file_pointer == NULL) {
-		printf("No such file exists");
+		printf("No such file exists\n");
 		return 0;
 	}
 
@@ -31,9 +30,16 @@ int isUserProcess(int proc_id) {
 	}
 
 	fscanf(status_file_pointer, "%*s %d", &(u_id));
-	printf("%d\n", u_id);
 	fclose(status_file_pointer);
-	return (u_id == getuid()) ? 1 : 0;
+
+	int is_user_process = u_id == getuid();
+	if (is_user_process) {
+		return 1;
+	}
+	else {
+		printf("The proc id %d does not correspond to a user process\n", proc_id);
+		return 0;
+	}
 }
 
 struct pid_entry *return_all_processes() {

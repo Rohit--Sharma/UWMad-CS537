@@ -115,8 +115,5 @@ void options_processor(int argc, char *argv[])
 			}
 			printf("\n");
 		}
-		else {
-			printf("The proc id %d does not correspond to a user process\n", proc_id);
-		}
 	}
 }
