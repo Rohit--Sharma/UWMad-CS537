@@ -23,12 +23,12 @@ It executes all the source codes and creates the object files and the final exec
 Now, the command *537ps* can be called using various combinations of commandline arguments for the output desired. Below are a few examples to run the same along with sample outputs:
 ```
 $ ./537ps -p <proc-id> -U- -s
-adsfasdf
+<proc-id>:  S [-bash]
 
 $ ./537ps -c
-dasf
-asdfasdf
-asdf
+2663:   utime=113     [nautilus-desktop]
+14408:  utime=55      [-bash]
+22666:  utime=0       [./537ps]
 ...
 ```
 
