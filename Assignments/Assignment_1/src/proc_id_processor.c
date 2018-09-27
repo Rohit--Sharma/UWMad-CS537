@@ -7,76 +7,74 @@
 #include <string.h>
 #include "537ps_header.h"
 
-#define BUFFER_SIZE 1000
-#define UIDLINENUM 8
+// Returns if the process with process id "proc_id" is a user process or not
+int isUserProcess(int proc_id) {
+	printf ("%d %d\n", proc_id, getuid());
+	char proc_id_str[BUFFER_SIZE];
+	sprintf(proc_id_str, "%d", proc_id);
+	char status_path[BUFFER_SIZE] = "/proc/";
+	char status_file[BUFFER_SIZE] = "/status";
+	strcat(status_path, proc_id_str);
+	strcat(status_path, status_file);
+	char line[BUFFER_SIZE];
+	unsigned int u_id;
+	FILE *status_file_pointer = fopen(status_path, "r");
 
-struct pid_entry* return_all_processes() {
-    struct pid_entry* head = NULL;
-    struct pid_entry* tail = NULL;
-    struct pid_entry* process_ptr = NULL;
-    
-    int user_id = getuid();
+	if (status_file_pointer == NULL) {
+		printf("No such file exists");
+		return 0;
+	}
 
-    DIR *dir;
-    struct dirent *entry;
-    
-    //int array_index = 0;
-    if ((dir = opendir("/proc")) == NULL)
-        perror("opendir() error");
-    else {
-        // puts("contents of root:");
-        while ((entry = readdir(dir)) != NULL) {
-			//printf("  %s\n", entry->d_name);
-			if (atoi(entry->d_name) != 0) {
-			char proc_id_str[BUFFER_SIZE];
-			sprintf(proc_id_str, "%d", atoi(entry->d_name));
-			char status_path[BUFFER_SIZE] = "/proc/";
-			char status_file[BUFFER_SIZE] = "/status";
-			strcat(status_path, proc_id_str);
-			strcat(status_path, status_file);
-			//printf("%s\n", status_path);
-			char line[BUFFER_SIZE];
-			int u_id;
-			
-			FILE* status_file_pointer = fopen(status_path, "r");
-			if (status_file_pointer == NULL) {
-				printf("No such file exists");
-				return 0;
-			}
+	int uidLineNum = UIDLINENUM;
+	while (uidLineNum--) {
+		fgets(line, BUFFER_SIZE, status_file_pointer);
+	}
 
-			int uidLineNum = UIDLINENUM;
-			while (uidLineNum--) {
-				fgets(line, BUFFER_SIZE, status_file_pointer);
-			}
-
-			fscanf(status_file_pointer, "%*s %d", &(u_id));
-			fclose(status_file_pointer);
-			//printf("UID is %d\n", u_id);
-			
-			if (u_id==user_id) {
-				if (head == NULL) {
-				        head = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-				        tail = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-			 	        process_ptr = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-				    head->pid = atoi(entry->d_name);
-				    head->next = NULL;
-				    tail = head;
-				    process_ptr = head;
-				}
-				else {
-				    struct pid_entry* temp;
-				    temp = (struct pid_entry*)malloc(sizeof(struct pid_entry));
-				    temp->pid = atoi(entry->d_name);
-				    temp->next = NULL;
-				    tail->next = temp;
-				    tail = temp;
-				}
-			}
-	    }	
-        }
-        closedir(dir);
-    }
-	
-    return process_ptr;
+	fscanf(status_file_pointer, "%*s %d", &(u_id));
+	printf("%d\n", u_id);
+	fclose(status_file_pointer);
+	return (u_id == getuid()) ? 1 : 0;
 }
 
+struct pid_entry *return_all_processes() {
+	struct pid_entry *head = NULL;
+	struct pid_entry *tail = NULL;
+	struct pid_entry *process_ptr = NULL;
+
+	DIR *dir;
+	struct dirent *entry;
+
+	//int array_index = 0;
+	if ((dir = opendir("/proc")) == NULL)
+		perror("opendir() error");
+	else {
+		// puts("contents of root:");
+		while ((entry = readdir(dir)) != NULL) {
+			//printf("  %s\n", entry->d_name);
+			if (atoi(entry->d_name) != 0) {
+				if (isUserProcess(atoi(entry->d_name))) { // if (u_id == user_id) {
+					if (head == NULL) {
+						head = (struct pid_entry *)malloc(sizeof(struct pid_entry));
+						tail = (struct pid_entry *)malloc(sizeof(struct pid_entry));
+						process_ptr = (struct pid_entry *)malloc(sizeof(struct pid_entry));
+						head->pid = atoi(entry->d_name);
+						head->next = NULL;
+						tail = head;
+						process_ptr = head;
+					}
+					else {
+						struct pid_entry *temp;
+						temp = (struct pid_entry *)malloc(sizeof(struct pid_entry));
+						temp->pid = atoi(entry->d_name);
+						temp->next = NULL;
+						tail->next = temp;
+						tail = temp;
+					}
+				}
+			}
+		}
+		closedir(dir);
+	}
+
+	return process_ptr;
+}

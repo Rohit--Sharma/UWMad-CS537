@@ -28,7 +28,9 @@ void options_processor(int argc, char *argv[])
 			case 'p':
 				get_all_proc_ids = FALSE;
 				proc_id = atoi(optarg);
-				printf("proc id is %d", proc_id); 
+				if (proc_id == 0)
+					fprintf(stderr, "Option -p requires a valid proc id.\n");
+					return;
 				break;
 			case 's':
 				get_state = TRUE;
@@ -54,13 +56,17 @@ void options_processor(int argc, char *argv[])
 					fprintf(stderr, "Unknown option '-%c'.\n", optopt);
 				else
 					fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
+				return;
 			default:
 				abort();
+				return;
 		}
 
 	int index;
 	for (index = optind; index < argc; index++)
 		printf("Non-option argument %s\n", argv[index]);
+	if (argc > optind)
+		return;
 
 	if (get_all_proc_ids) {
 		pid_entry *head = return_all_processes();
