@@ -1,9 +1,28 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// Description:     Extracts process details from stat, statm, cmdline files
+// Course:          CS537 - Introduction to Operating Systems (Fall-2018)
+// Organization:    University of Wisconsin-Madison
+//
+// Authors:         Rohit Kumar Sharma, M. Giri Prasanna
+// Email:           rsharma@cs.wisc.edu, mugundakrish@wisc.edu
+// Created on:      September 26, 2018
+//
+///////////////////////////////////////////////////////////////////////////////
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include "537ps_header.h"
 
+/** Extracts process details from stat, statm and cmdline files 
+ * 		present at the /proc/<proc-id> location.
+ * 	A structure datastructure called stat_statm_cmdline_fields is 
+ * 		used to store the needed statistics of the process
+ *  :param proc_id: process id that is to be analyzed
+ *  :return: A structure with required proc stats initialized
+ */
 stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 {
 	stat_statm_cmdline_fields my_fields;
@@ -30,6 +49,7 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 		return my_fields;
 	}
 
+	// Saving necessary information from the stat file and ignoring the rest
 	fscanf(stat_file_pointer, "%*d %*s %c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %u %u", &(my_fields.proc_state), &(my_fields.proc_utime), &(my_fields.proc_stime));
 
 	fclose(stat_file_pointer);
@@ -41,10 +61,12 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 		return my_fields;
 	}
 
+	// Reading virtual memory size from statm file
 	fscanf(statm_file_pointer, "%d", &(my_fields.proc_virtual_mem_size));
 
 	fclose(statm_file_pointer);
 
+	// Extracting cmdline args of the process from cmdline file
 	FILE* cmdline_file_pointer = fopen(cmdline_path, "r");
 	if (cmdline_file_pointer == NULL) {
 		printf("No such process exists\n");
