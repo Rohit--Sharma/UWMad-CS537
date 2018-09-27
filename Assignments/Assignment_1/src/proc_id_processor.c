@@ -37,7 +37,7 @@ int isUserProcess(int proc_id) {
 		return 1;
 	}
 	else {
-		printf("The proc id %d does not correspond to a user process\n", proc_id);
+		// printf("The proc id %d does not correspond to a user process\n", proc_id);
 		return 0;
 	}
 }

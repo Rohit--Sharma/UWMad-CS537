@@ -7,7 +7,6 @@
 
 void options_processor(int argc, char *argv[])
 {
-
 	extern char *optarg;
 	extern int optind;
 	extern int optopt;
@@ -21,7 +20,6 @@ void options_processor(int argc, char *argv[])
 	int get_cmdline = TRUE;
 
 	int c;
-
 	while ((c = getopt(argc, argv, "p:s::U::S::v::c::")) != -1)
 		switch (c)
 		{
@@ -95,25 +93,23 @@ void options_processor(int argc, char *argv[])
 		}
 	}
 	else {
-		if (isUserProcess(proc_id)) {
-			stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(proc_id);
-				printf("%d: ", proc_id);
-			if (get_state) {
-				printf("%c ", proc_info.proc_state);
-			}
-			if (get_utime) {
-				printf("utime=%u ", proc_info.proc_utime);
-			}
-			if (get_stime) {
-				printf("stime=%u ", proc_info.proc_stime);
-			}
-			if (get_vmem) {
-				printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
-			}
-			if (get_cmdline) {
-				printf("[%s] ", proc_info.cmdline);
-			}
-			printf("\n");
+		stat_statm_cmdline_fields proc_info = stat_statm_cmdline_parser(proc_id);
+			printf("%d: ", proc_id);
+		if (get_state) {
+			printf("%c ", proc_info.proc_state);
 		}
+		if (get_utime) {
+			printf("utime=%u ", proc_info.proc_utime);
+		}
+		if (get_stime) {
+			printf("stime=%u ", proc_info.proc_stime);
+		}
+		if (get_vmem) {
+			printf("vmemory=%d ", proc_info.proc_virtual_mem_size);
+		}
+		if (get_cmdline) {
+			printf("[%s] ", proc_info.cmdline);
+		}
+		printf("\n");
 	}
 }

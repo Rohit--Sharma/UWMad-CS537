@@ -8,7 +8,6 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 {
 	stat_statm_cmdline_fields my_fields;
 
-	//char *proc_id_str = (char *)malloc((int)((ceil(log10(proc_id)) + 1) * sizeof(char)));
 	char proc_id_str[BUFFER_SIZE];
 	sprintf(proc_id_str, "%d", proc_id);
 	char stat_path[BUFFER_SIZE] = "/proc/";
@@ -31,7 +30,6 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 	}
 
 	fscanf(stat_file_pointer, "%*d %*s %c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %u %u", &(my_fields.proc_state), &(my_fields.proc_utime), &(my_fields.proc_stime));
-	// printf("Proc State: %c\nProc utime: %u\nProcess stime: %u\n", my_fields.proc_state, my_fields.proc_utime, my_fields.proc_stime);
 
 	fclose(stat_file_pointer);
 
@@ -42,7 +40,6 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 	}
 
 	fscanf(statm_file_pointer, "%d", &(my_fields.proc_virtual_mem_size));
-	// printf("\nProc virtual mem size: %d\n", my_fields.proc_virtual_mem_size);
 
 	fclose(statm_file_pointer);
 
@@ -57,5 +54,3 @@ stat_statm_cmdline_fields stat_statm_cmdline_parser(int proc_id)
 
 	return my_fields;
 }
-
-
