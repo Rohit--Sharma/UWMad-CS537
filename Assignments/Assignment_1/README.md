@@ -43,6 +43,7 @@ The program files are organized in the following manner:
 		- proc_id_processor.c
 		- proc_files_parser.c
 		- Makefile
+
 The *537ps_driver.c* file contains the main method to drive the program. Files *options_processor.c*, *proc_id_processor.c* and *proc_files_parser.c* are responsible for parsing the commandline arguments, fetching the current user's process id's, and extracting the details of the process such as virtual memory, status, etc., respectively. The *537ps_header.h* file contains the method definitions and data structures of the various methods and structures used throughtout the program.
 
 The *Makefile* contains the rules to compile and link all the source code files and create the executable *537ps*.
