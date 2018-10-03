@@ -86,7 +86,7 @@ struct pid_entry *return_all_processes() {
 						head->next = NULL;
 						
 						tail = head;
-						free(process_ptr);
+						// free(process_ptr);
 						process_ptr = head;
 					}
 					else {

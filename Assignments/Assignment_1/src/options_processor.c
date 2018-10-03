@@ -48,10 +48,12 @@ void options_processor(int argc, char *argv[])
 		{
 			case 'p':
 				get_all_proc_ids = FALSE;
-				proc_id = atoi(optarg);
-				if (proc_id == 0) {
-					fprintf(stderr, "Option -p requires a valid proc id.\n");
-					return;
+				if (optarg != NULL) {
+					proc_id = atoi(optarg);
+					if (proc_id == 0) {
+						fprintf(stderr, "Option -p requires a valid proc id.\n");
+						return;
+					}
 				}
 				break;
 			case 's':
