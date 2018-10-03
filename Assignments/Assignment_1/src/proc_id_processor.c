@@ -80,11 +80,13 @@ struct pid_entry *return_all_processes() {
 				if (isUserProcess(atoi(entry->d_name))) {
 					if (head == NULL) {
 						head = (struct pid_entry *)malloc(sizeof(struct pid_entry));
-						tail = (struct pid_entry *)malloc(sizeof(struct pid_entry));
-						process_ptr = (struct pid_entry *)malloc(sizeof(struct pid_entry));
+						//tail = (struct pid_entry *)malloc(sizeof(struct pid_entry));
+						//process_ptr = (struct pid_entry *)malloc(sizeof(struct pid_entry));
 						head->pid = atoi(entry->d_name);
 						head->next = NULL;
+						
 						tail = head;
+						free(process_ptr);
 						process_ptr = head;
 					}
 					else {
