@@ -15,14 +15,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <pthread.h>
+#include <semaphore.h>
 
-/** The entry point of code. It just creates the threads and calls 
- * 		where rest of the processing happens
- *  :param argc: number of commandline arguments passed
- *  :param argv: array of all the argc commandline arguments
- */
+
 int main(int argc, char *argv[])
 {
-	// TODO: Call the processing logic
-	return 0;
+    	
+return 0;
 }
+
+void *munch1(){
+    Queue q1, q2;
+
