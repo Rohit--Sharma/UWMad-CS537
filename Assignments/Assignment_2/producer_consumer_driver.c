@@ -21,10 +21,19 @@
 
 int main(int argc, char *argv[])
 {
-    	
-return 0;
+    pthread_t reader_t, munch1_t, munch2_t, writer_t;
+    Queue *Q1, *Q2, *Q3;
+    Q1 = createQueue(QUEUE_SIZE);
+    Q2 = createQueue(QUEUE_SIZE);
+    Q3 = createQueue(QUEUE_SIZE);
+
+    pthread_create(&reader_t, NULL, reader, Q1);
+    pthread_create(&munch1_t, NULL, munch1, Q1, Q2);
+    pthread_create(&munch2_t, NULL, munch2, Q2, Q3);
+    pthread_create(&writer_t, NULL, writer, Q3);
+    pthread_join(reader_t, NULL);
+    pthread_join(munch1_t, NULL);
+    pthread_join(munch2_t, NULL);
+    pthread_join(writer_t, NULL);
+    return 0;
 }
-
-void *munch1(){
-    Queue q1, q2;
-
