@@ -17,6 +17,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include "producer_consumer_header.h"
 
 
 int main(int argc, char *argv[])
@@ -28,6 +29,14 @@ int main(int argc, char *argv[])
     Q3 = createQueue(QUEUE_SIZE);
 
     pthread_create(&reader_t, NULL, reader, Q1);
+
+    pthread_param *munch1_param = (pthread_param *) malloc(sizeof(pthread_param)), 
+        *munch2_param = (pthread_param *) malloc(sizeof(pthread_param));
+    munch1_param->input = Q1;
+    munch1_param->output = Q2;
+    munch2_param->input = Q2;
+    munch2_param->output = Q3;
+
     pthread_create(&munch1_t, NULL, munch1, Q1, Q2);
     pthread_create(&munch2_t, NULL, munch2, Q2, Q3);
     pthread_create(&writer_t, NULL, writer, Q3);
