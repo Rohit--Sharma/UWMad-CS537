@@ -40,9 +40,15 @@ int main()
     pthread_create(&munch1_t, NULL, munch1, (void *) munch1_param);
     pthread_create(&munch2_t, NULL, munch2, (void *) munch2_param);
     pthread_create(&writer_t, NULL, writer, (void *) Q3);
+
     pthread_join(reader_t, NULL);
     pthread_join(munch1_t, NULL);
     pthread_join(munch2_t, NULL);
     pthread_join(writer_t, NULL);
+
+    PrintQueueStats(Q1);
+    PrintQueueStats(Q2);
+    PrintQueueStats(Q3);
+
     return 0;
 }

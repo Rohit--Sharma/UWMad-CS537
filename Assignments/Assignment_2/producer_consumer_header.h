@@ -26,6 +26,7 @@ typedef struct pthred_param
 Queue* createQueue(int capacity);
 void EnqueueString(Queue* queue, char *string);
 char* DequeueString(Queue* queue);
+void PrintQueueStats(Queue *queue);
 
 void *reader(void *out_queue);
 void *munch1(void *queues);

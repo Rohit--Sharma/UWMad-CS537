@@ -65,6 +65,5 @@ char* DequeueString(Queue* queue)
 
 void PrintQueueStats(Queue *q)
 {
-	printf("Queue Statistics:\n1. Enqueue Count: %d\n2.Dequeue Count: %d\n3. Enqueue Block Count: %d\n4.Dequeue Block Count: %d", q->enqueueCount, q->dequeueCount, q->enqueueBlockCount, q->dequeueBlockCount);
+	printf("Queue Statistics:\n1. Enqueue Count: %d\n2.Dequeue Count: %d\n3. Enqueue Block Count: %d\n4.Dequeue Block Count: %d\n", q->enqueueCount, q->dequeueCount, q->enqueueBlockCount, q->dequeueBlockCount);
 }
-
