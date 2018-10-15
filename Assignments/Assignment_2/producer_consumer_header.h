@@ -15,13 +15,19 @@ typedef struct Queue
 #endif
 
 #ifndef STRUCT_PTHREAD_PARAM
-    #define STRUCT_PTHREAD_PARAM typedef struct pthred_param
-    {
-        Queue *input;
-        Queue *output;
-    } pthread_param;
+#define STRUCT_PTHREAD_PARAM 
+typedef struct pthred_param
+{
+    Queue *input;
+    Queue *output;
+} pthread_param;
 #endif
 
 Queue* createQueue(int capacity);
 void EnqueueString(Queue* queue, char *string);
 char* DequeueString(Queue* queue);
+
+void *reader(void *out_queue);
+void *munch1(void *queues);
+void *munch2(void *queues);
+void *writer(void *in_queue);

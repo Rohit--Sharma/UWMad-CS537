@@ -20,7 +20,7 @@
 #include "producer_consumer_header.h"
 
 
-int main(int argc, char *argv[])
+int main()
 {
     pthread_t reader_t, munch1_t, munch2_t, writer_t;
     Queue *Q1, *Q2, *Q3;
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     Q2 = createQueue(QUEUE_SIZE);
     Q3 = createQueue(QUEUE_SIZE);
 
-    pthread_create(&reader_t, NULL, reader, Q1);
+    pthread_create(&reader_t, NULL, reader, (void *) Q1);
 
     pthread_param *munch1_param = (pthread_param *) malloc(sizeof(pthread_param)), 
         *munch2_param = (pthread_param *) malloc(sizeof(pthread_param));
@@ -37,9 +37,9 @@ int main(int argc, char *argv[])
     munch2_param->input = Q2;
     munch2_param->output = Q3;
 
-    pthread_create(&munch1_t, NULL, munch1, Q1, Q2);
-    pthread_create(&munch2_t, NULL, munch2, Q2, Q3);
-    pthread_create(&writer_t, NULL, writer, Q3);
+    pthread_create(&munch1_t, NULL, munch1, (void *) munch1_param);
+    pthread_create(&munch2_t, NULL, munch2, (void *) munch2_param);
+    pthread_create(&writer_t, NULL, writer, (void *) Q3);
     pthread_join(reader_t, NULL);
     pthread_join(munch1_t, NULL);
     pthread_join(munch2_t, NULL);

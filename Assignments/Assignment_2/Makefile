@@ -1,22 +1,22 @@
 CC = gcc
 WFLAGS = -Wall -Wextra
-EXE = 537ps
+EXE = prod_consumer
 SCAN_BUILD_DIR = scan-build-out
 
-$(EXE): options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
-	$(CC) $(WFLAGS) -o $(EXE) options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
+$(EXE): queue.o thread.o producer_consumer_driver.o
+	$(CC) $(WFLAGS) -o $(EXE) queue.o thread.o producer_consumer_driver.o -lpthread
 
-options_processor.o: options_processor.c 537ps_header.h
-	$(CC) $(WFLAGS) -c options_processor.c
+queue.o: queue.c producer_consumer_header.h
+	$(CC) $(WFLAGS) -c queue.c
 
-proc_files_parser.o: proc_files_parser.c 537ps_header.h
-	$(CC) $(WFLAGS) -c proc_files_parser.c
+thread.o: thread.c producer_consumer_header.h
+	$(CC) $(WFLAGS) -c thread.c
 
-proc_id_processor.o: proc_id_processor.c 537ps_header.h
+proc_id_processor.o: proc_id_processor.c producer_consumer_header.h
 	$(CC) $(WFLAGS) -c proc_id_processor.c
 
-537ps_driver.o: 537ps_driver.c 537ps_header.h
-	$(CC) $(WFLAGS) -c 537ps_driver.c
+producer_consumer_driver.o: producer_consumer_driver.c producer_consumer_header.h
+	$(CC) $(WFLAGS) -c producer_consumer_driver.c
 
 clean:
 	rm -f *.o $(EXE)

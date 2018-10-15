@@ -7,47 +7,51 @@
 #include <semaphore.h>
 #include "producer_consumer_header.h"
 
-void *reader(Queue *out_queue)
+void *reader(void *out_queue)
 {
     char *line = NULL;
     size_t max_line_len = MAX_LINE_LEN + 1;
     while (getline(&line, &max_line_len, stdin) != -1) {
-        // printf("%s\n", line);
-        EnqueueString(out_queue, line);
+        printf("Reading: %s", line);
+        EnqueueString((Queue *)out_queue, line);
     }
+    return NULL;
 }
 
-void *munch1(Queue *queue1, Queue *queue2)
+void *munch1(void *queues)
 {
     char *string;
-    string = DequeueString(queue1);
+    string = DequeueString(((pthread_param *)queues)->input);
     
     for (int i=0; string[i] != '\0'; i++) {
         if (string[i] == ' ')
             string[i] = '*';
     }
 
-    EnqueueString(queue2, string);
+    EnqueueString(((pthread_param *)queues)->output, string);
+    return NULL;
 }
 
-void *munch2(Queue *queue2, Queue *queue3)
+void *munch2(void *queues)
 {
     char *string;
-    string = DequeueString(queue2);
+    string = DequeueString(((pthread_param *)queues)->input);
     
     for (int i=0; string[i] != '\0'; i++) {
 	    string[i] = toupper(string[i]);
     }
 
-    EnqueueString(queue3, string);
+    EnqueueString(((pthread_param *)queues)->output, string);
+    return NULL;
 }
 
-void *write_queue(Queue *in_queue)
+void *writer(void *in_queue)
 {
     char *string;
-    string = DequeueString(in_queue);
+    string = DequeueString((Queue *)in_queue);
 
-    printf("%s\n", string);
+    printf("Writing: %s", string);
+    return NULL;
 }
 
 /*
