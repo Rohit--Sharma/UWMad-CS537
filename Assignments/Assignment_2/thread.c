@@ -101,6 +101,14 @@ void *writer(void *in_queue)
         printf("Writing: %s", string);
     } while (string != NULL);
     
+    /**
+     * string = Dequeue(queue)
+     * while(string != null) {
+     *     // print
+     *     // free
+     *     // string = Dequeue(queue)
+     * }
+     */
     pthread_exit(NULL);
     return NULL;
 }
