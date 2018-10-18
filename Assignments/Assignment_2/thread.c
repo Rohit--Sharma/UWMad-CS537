@@ -7,6 +7,9 @@
 #include <semaphore.h>
 #include "producer_consumer_header.h"
 
+extern const int MAX_LINE_LEN;
+extern const int QUEUE_SIZE;
+
 char *read_line(int buff_size)
 {
     char *new_line = NULL;

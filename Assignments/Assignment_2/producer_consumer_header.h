@@ -1,7 +1,6 @@
 #include <semaphore.h>
 
-#define MAX_LINE_LEN 20
-#define QUEUE_SIZE 10
+extern const int QUEUE_SIZE;
 
 #ifndef STRUCT_STAT_STATM_CMDLINE
 #define STRUCT_STAT_STATM_CMDLINE
@@ -9,8 +8,8 @@ typedef struct Queue
 {
     int head, tail, size, no_of_elements;
     int enqueueCount, dequeueCount, enqueueBlockCount, dequeueBlockCount;
-    char *string[QUEUE_SIZE];
-    sem_t mutex, full, empty;
+    char **string;
+    sem_t mutex, full, empty, stat_block_mutex;
 } Queue;
 #endif
 
