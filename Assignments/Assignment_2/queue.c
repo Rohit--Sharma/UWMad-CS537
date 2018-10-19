@@ -5,6 +5,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <errno.h>
 #include "producer_consumer_header.h"
 
 extern const int MAX_LINE_LEN;
@@ -12,7 +13,12 @@ extern const int QUEUE_SIZE;
 
 Queue* createQueue(int capacity) 
 { 
-    struct Queue* queue = (struct Queue*) malloc(sizeof(struct Queue)); 
+    struct Queue* queue = (struct Queue*) malloc(sizeof(struct Queue));
+    if (errno == ENOMEM) {
+        fprintf(stderr, "No enough memory for malloc\n");
+        return NULL;
+    }
+
     queue->size = capacity; 
     queue->no_of_elements = 0;
     queue->head = 0;  
@@ -22,13 +28,26 @@ Queue* createQueue(int capacity)
     queue->enqueueBlockCount = 0;
     queue->dequeueBlockCount = 0;
     queue->string = (char **) malloc(sizeof(char *) * capacity);
+    if (errno == ENOMEM) {
+        fprintf(stderr, "No enough memory for malloc\n");
+        return NULL;
+    }
+
     for (int i = 0; i < capacity; i++)    
 	    queue->string[i] = NULL;
     
-    sem_init(&(queue->stat_block_mutex), 0, 1);
-    sem_init(&(queue->mutex), 0, 1);
-    sem_init(&(queue->full), 0, 0);
-    sem_init(&(queue->empty), 0, capacity);
+    if (sem_init(&(queue->stat_block_mutex), 0, 1) == -1 || sem_init(&(queue->mutex), 0, 1) == -1 || 
+        sem_init(&(queue->full), 0, 0) == -1 || sem_init(&(queue->empty), 0, capacity) == -1) {
+        fprintf(stderr, "Error in initializing the semaphore\n");
+        if (errno == EINVAL) {
+            fprintf(stderr, "Semaphore value exceeds SEM_VALUE_MAX\n");
+        }
+        else if (errno == ENOSYS) {
+            fprintf(stderr, "pshared is nonzero, but the system does not support process-shared semaphores\n");
+        }
+        return NULL;
+    }
+
     return queue;
 }
 
