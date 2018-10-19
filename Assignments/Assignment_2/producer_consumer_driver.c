@@ -44,6 +44,8 @@ int main()
         *munch2_param = (pthread_param *) malloc(sizeof(pthread_param));
     if (errno == ENOMEM) {
         fprintf(stderr, "Not enough memory for malloc\nExiting...\n");
+        free(munch1_param);
+        free(munch2_param);
         return -1;
     }
 
@@ -64,6 +66,8 @@ int main()
             fprintf(stderr, "Invalid settings in attr.\nExiting...\n");
         else if (error_num == EPERM)
             fprintf(stderr, "No permission to set the scheduling policy and parameters specified in attr.\nExiting...\n");
+        free(munch1_param);
+        free(munch2_param);
         return -1;
     }
 

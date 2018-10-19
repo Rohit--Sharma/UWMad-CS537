@@ -25,6 +25,7 @@ Queue *CreateStringQueue(int size)
     struct Queue* queue = (struct Queue*) malloc(sizeof(struct Queue));
     if (errno == ENOMEM) {
         fprintf(stderr, "Not enough memory for malloc\n");
+        free(queue);
         return NULL;
     }
 
@@ -39,6 +40,7 @@ Queue *CreateStringQueue(int size)
     queue->string = (char **) malloc(sizeof(char *) * size);
     if (errno == ENOMEM) {
         fprintf(stderr, "Not enough memory for malloc\n");
+        free(queue);
         return NULL;
     }
 
@@ -55,6 +57,7 @@ Queue *CreateStringQueue(int size)
         else if (errno == ENOSYS) {
             fprintf(stderr, "pshared is nonzero, but the system does not support process-shared semaphores\n");
         }
+        free(queue);
         return NULL;
     }
 
