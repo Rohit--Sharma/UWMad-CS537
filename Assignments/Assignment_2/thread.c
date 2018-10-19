@@ -151,11 +151,3 @@ void *writer(void *in_queue)
     pthread_exit(NULL);
     return NULL;
 }
-
-/*
-int main()
-{
-    reader(NULL);
-    return 0;
-}
-*/

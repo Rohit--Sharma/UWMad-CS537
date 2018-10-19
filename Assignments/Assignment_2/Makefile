@@ -12,9 +12,6 @@ queue.o: queue.c producer_consumer_header.h
 thread.o: thread.c producer_consumer_header.h
 	$(CC) $(WFLAGS) -c thread.c
 
-proc_id_processor.o: proc_id_processor.c producer_consumer_header.h
-	$(CC) $(WFLAGS) -c proc_id_processor.c
-
 producer_consumer_driver.o: producer_consumer_driver.c producer_consumer_header.h
 	$(CC) $(WFLAGS) -c producer_consumer_driver.c
 
