@@ -30,6 +30,7 @@ int main()
     Q1 = createQueue(QUEUE_SIZE);
     Q2 = createQueue(QUEUE_SIZE);
     Q3 = createQueue(QUEUE_SIZE);
+    int error_num = 0;
 
     pthread_param *munch1_param = (pthread_param *) malloc(sizeof(pthread_param)), 
         *munch2_param = (pthread_param *) malloc(sizeof(pthread_param));
@@ -43,18 +44,33 @@ int main()
     munch2_param->input = Q2;
     munch2_param->output = Q3;
 
-    if (pthread_create(&reader_t, NULL, reader, (void *) Q1) != 0 || 
-        pthread_create(&munch1_t, NULL, munch1, (void *) munch1_param) != 0 ||
-        pthread_create(&munch2_t, NULL, munch2, (void *) munch2_param) != 0 ||
-        pthread_create(&writer_t, NULL, writer, (void *) Q3) != 0) {
-        fprintf(stderr, "One or more thread(s) couldn't be created successfully.\nExiting...\n");
+    if ((error_num = pthread_create(&reader_t, NULL, reader, (void *) Q1)) != 0 || 
+      (error_num = pthread_create(&munch1_t, NULL, munch1, (void *) munch1_param)) != 0 ||
+      (error_num = pthread_create(&munch2_t, NULL, munch2, (void *) munch2_param)) != 0 ||
+      (error_num = pthread_create(&writer_t, NULL, writer, (void *) Q3)) != 0) {
+        fprintf(stderr, "One or more thread(s) couldn't be created successfully.\n");
+        if (error_num == EAGAIN)
+            fprintf(stderr, "Insufficient resources to create a thread.\nExiting...\n");
+        else if (error_num == EINVAL)
+            fprintf(stderr, "Invalid settings in attr.\nExiting...\n");
+        else if (error_num == EPERM)
+            fprintf(stderr, "No permission to set the scheduling policy and parameters specified in attr.\nExiting...\n");
         return -1;
     }
 
-    pthread_join(reader_t, NULL);
-    pthread_join(munch1_t, NULL);
-    pthread_join(munch2_t, NULL);
-    pthread_join(writer_t, NULL);
+    if ((error_num = pthread_join(reader_t, NULL)) != 0 || 
+      (error_num = pthread_join(munch1_t, NULL)) != 0 || 
+      (error_num = pthread_join(munch2_t, NULL)) != 0 || 
+      (error_num = pthread_join(writer_t, NULL)) != 0) {
+        fprintf(stderr, "One or more thread(s) couldn't be joined successfully.\n");
+        if (error_num == EDEADLK)
+            fprintf(stderr, "A deadlock was detected.\nExiting...\n");
+        else if (error_num == EINVAL)
+            fprintf(stderr, "The thread is not a joinable thread.\nExiting...\n");
+        else if (error_num == ESRCH)
+            fprintf(stderr, "No thread with thread id could be found.\nExiting...\n");
+        return -1;
+    }
 
     fprintf(stderr, "\n\nQueue Statistics:\n");
     fprintf(stderr, "\nQueue 1 (Reader to Munch1):\n");
