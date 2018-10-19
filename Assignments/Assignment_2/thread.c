@@ -13,6 +13,7 @@ extern const int QUEUE_SIZE;
 typedef struct {
     char *read_str;
     int has_eof;
+    int buff_size_exceeding;
 } read_line_val;
 
 read_line_val *read_line(int buff_size)
@@ -28,17 +29,26 @@ read_line_val *read_line(int buff_size)
             new_line[i] = '\0';
             new_line_val->read_str = new_line;
             new_line_val->has_eof = 0;
+            new_line_val->buff_size_exceeding = 0;
             return new_line_val;
         } else {
             new_line[i] = '\0';
             new_line_val->read_str = new_line;
             new_line_val->has_eof = 1;
+            new_line_val->buff_size_exceeding = 0;
             return new_line_val;
         }
     }
+    new_line_val->buff_size_exceeding = 1;
     new_line[buff_size - 1] = '\0';
     new_line_val->read_str = new_line;
     new_line_val->has_eof = 0;
+
+    // Flush the rest of the line
+    while ((c = getchar()) != '\n' && c != EOF);
+    if (c == EOF)
+        new_line_val->has_eof = 1;
+
     return new_line_val;
 }
 
@@ -49,6 +59,10 @@ void *reader(void *out_queue)
     char *line;
     do {
         read_line_val *line_struct = read_line(max_line_len);
+        if (line_struct->buff_size_exceeding == 1) {
+            fprintf(stderr, "Line size exceeds the buffer size %d\n", max_line_len);
+            continue;
+        }
         if (line_struct->has_eof == 1) {
             if (line_struct->read_str[0] != '\0') {
                 line = line_struct->read_str;
@@ -128,23 +142,12 @@ void *munch2(void *queues)
 
 void *writer(void *in_queue)
 {
-    char *string;
-    do {
-        string = DequeueString((Queue *)in_queue);
-        if (string == NULL)
-            break;
-
+    char *string = DequeueString((Queue *)in_queue);
+    while (string != NULL) {
         printf("Writing: %s\n", string);
-    } while (string != NULL);
-    
-    /**
-     * string = Dequeue(queue)
-     * while(string != null) {
-     *     // print
-     *     // free
-     *     // string = Dequeue(queue)
-     * }
-     */
+        free(string);
+        string = DequeueString((Queue *)in_queue);
+    }
     pthread_exit(NULL);
     return NULL;
 }
