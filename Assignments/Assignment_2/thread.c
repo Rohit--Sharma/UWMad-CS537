@@ -10,24 +10,57 @@
 extern const int MAX_LINE_LEN;
 extern const int QUEUE_SIZE;
 
-char *read_line(int buff_size)
+typedef struct {
+    char *read_str;
+    int has_eof;
+} read_line_val;
+
+read_line_val *read_line(int buff_size)
 {
-    char *new_line = NULL;
-    if (getline(&new_line, &buff_size, stdin) != -1)
-        return new_line;
-    return NULL;
+    read_line_val *new_line_val = (read_line_val *) malloc(sizeof(read_line_val));
+    char *new_line = (char *) malloc(sizeof(char) * buff_size);
+    char c = '\0';
+    for (int i = 0; i < buff_size; i++) {
+        c = getchar();
+        if (c != EOF && c != '\n') {
+            new_line[i] = c;
+        } else if (c == '\n') {
+            new_line[i] = '\0';
+            new_line_val->read_str = new_line;
+            new_line_val->has_eof = 0;
+            return new_line_val;
+        } else {
+            new_line[i] = '\0';
+            new_line_val->read_str = new_line;
+            new_line_val->has_eof = 1;
+            return new_line_val;
+        }
+    }
+    new_line[buff_size - 1] = '\0';
+    new_line_val->read_str = new_line;
+    new_line_val->has_eof = 0;
+    return new_line_val;
 }
 
 void *reader(void *out_queue)
 {
-    size_t max_line_len = MAX_LINE_LEN + 1;
+    size_t max_line_len = MAX_LINE_LEN;
 
     char *line;
     do {
-        line = read_line(max_line_len);
-        if (line == NULL)
-            break;
-        printf("Reading at %x: %s", line, line);
+        read_line_val *line_struct = read_line(max_line_len);
+        if (line_struct->has_eof == 1) {
+            if (line_struct->read_str[0] != '\0') {
+                line = line_struct->read_str;
+            }
+            else {
+                break;
+            }
+        }
+        else {
+            line = line_struct->read_str;
+        }
+        printf("Reading at %x: %s\n", line, line);
         EnqueueString((Queue *) out_queue, line);
     } while (line != NULL);
 
@@ -53,7 +86,7 @@ void *munch1(void *queues)
                 string[i] = '*';
         }
 
-        printf("After Munch1: %s", string);
+        printf("After Munch1: %s\n", string);
 
         EnqueueString(((pthread_param *)queues)->output, string);
     } while (string != NULL);
@@ -74,14 +107,14 @@ void *munch2(void *queues)
         if (string == NULL)
             break;
 
-        printf("Before Munch2: %s", string);
+        printf("Before Munch2: %s\n", string);
 
         for (int i=0; string[i] != '\0'; i++) {
             if (islower(string[i]))
                 string[i] = toupper(string[i]);
         }
 
-        printf("After Munch2: %s", string);
+        printf("After Munch2: %s\n", string);
 
         EnqueueString(((pthread_param *)queues)->output, string);
     } while (string != NULL);
@@ -101,7 +134,7 @@ void *writer(void *in_queue)
         if (string == NULL)
             break;
 
-        printf("Writing: %s", string);
+        printf("Writing: %s\n", string);
     } while (string != NULL);
     
     /**
