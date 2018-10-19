@@ -1,6 +1,6 @@
 CC = gcc
 WFLAGS = -Wall -Wextra
-EXE = prod_consumer
+EXE = prodcomm
 SCAN_BUILD_DIR = scan-build-out
 
 $(EXE): queue.o thread.o producer_consumer_driver.o
