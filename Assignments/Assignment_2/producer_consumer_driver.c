@@ -48,8 +48,12 @@ int main()
     pthread_join(munch2_t, NULL);
     pthread_join(writer_t, NULL);
 
+    fprintf(stdout, "\n\nQueue Statistics:\n");
+    fprintf(stdout, "\nQueue 1 (Reader to Munch1):\n");
     PrintQueueStats(Q1);
+    fprintf(stdout, "\nQueue 2 (Munch1 to Munch2):\n");
     PrintQueueStats(Q2);
+    fprintf(stdout, "\nQueue 3 (Munch2 to Writer):\n");
     PrintQueueStats(Q3);
 
     return 0;
