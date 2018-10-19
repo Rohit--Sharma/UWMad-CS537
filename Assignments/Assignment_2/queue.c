@@ -15,7 +15,7 @@ Queue* createQueue(int capacity)
 { 
     struct Queue* queue = (struct Queue*) malloc(sizeof(struct Queue));
     if (errno == ENOMEM) {
-        fprintf(stderr, "No enough memory for malloc\n");
+        fprintf(stderr, "Not enough memory for malloc\n");
         return NULL;
     }
 
@@ -29,13 +29,14 @@ Queue* createQueue(int capacity)
     queue->dequeueBlockCount = 0;
     queue->string = (char **) malloc(sizeof(char *) * capacity);
     if (errno == ENOMEM) {
-        fprintf(stderr, "No enough memory for malloc\n");
+        fprintf(stderr, "Not enough memory for malloc\n");
         return NULL;
     }
 
     for (int i = 0; i < capacity; i++)    
 	    queue->string[i] = NULL;
     
+    // if sem_init() returns -1, then there was an error in initializing sem
     if (sem_init(&(queue->stat_block_mutex), 0, 1) == -1 || sem_init(&(queue->mutex), 0, 1) == -1 || 
         sem_init(&(queue->full), 0, 0) == -1 || sem_init(&(queue->empty), 0, capacity) == -1) {
         fprintf(stderr, "Error in initializing the semaphore\n");
@@ -94,5 +95,5 @@ char* DequeueString(Queue* queue)
 
 void PrintQueueStats(Queue *q)
 {
-	printf("1. Enqueue Count: %d\n2. Dequeue Count: %d\n3. Enqueue Block Count: %d\n4. Dequeue Block Count: %d\n", q->enqueueCount - 1, q->dequeueCount - 1, q->enqueueBlockCount, q->dequeueBlockCount);
+	fprintf(stderr, "1. Enqueue Count: %d\n2. Dequeue Count: %d\n3. Enqueue Block Count: %d\n4. Dequeue Block Count: %d\n", q->enqueueCount - 1, q->dequeueCount - 1, q->enqueueBlockCount, q->dequeueBlockCount);
 }

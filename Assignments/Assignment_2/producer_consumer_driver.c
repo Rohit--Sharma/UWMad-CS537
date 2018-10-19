@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include "producer_consumer_header.h"
@@ -30,30 +31,37 @@ int main()
     Q2 = createQueue(QUEUE_SIZE);
     Q3 = createQueue(QUEUE_SIZE);
 
-    pthread_create(&reader_t, NULL, reader, (void *) Q1);
-
     pthread_param *munch1_param = (pthread_param *) malloc(sizeof(pthread_param)), 
         *munch2_param = (pthread_param *) malloc(sizeof(pthread_param));
+    if (errno == ENOMEM) {
+        fprintf(stderr, "Not enough memory for malloc\nExiting...\n");
+        return -1;
+    }
+
     munch1_param->input = Q1;
     munch1_param->output = Q2;
     munch2_param->input = Q2;
     munch2_param->output = Q3;
 
-    pthread_create(&munch1_t, NULL, munch1, (void *) munch1_param);
-    pthread_create(&munch2_t, NULL, munch2, (void *) munch2_param);
-    pthread_create(&writer_t, NULL, writer, (void *) Q3);
+    if (pthread_create(&reader_t, NULL, reader, (void *) Q1) != 0 || 
+        pthread_create(&munch1_t, NULL, munch1, (void *) munch1_param) != 0 ||
+        pthread_create(&munch2_t, NULL, munch2, (void *) munch2_param) != 0 ||
+        pthread_create(&writer_t, NULL, writer, (void *) Q3) != 0) {
+        fprintf(stderr, "One or more thread(s) couldn't be created successfully.\nExiting...\n");
+        return -1;
+    }
 
     pthread_join(reader_t, NULL);
     pthread_join(munch1_t, NULL);
     pthread_join(munch2_t, NULL);
     pthread_join(writer_t, NULL);
 
-    fprintf(stdout, "\n\nQueue Statistics:\n");
-    fprintf(stdout, "\nQueue 1 (Reader to Munch1):\n");
+    fprintf(stderr, "\n\nQueue Statistics:\n");
+    fprintf(stderr, "\nQueue 1 (Reader to Munch1):\n");
     PrintQueueStats(Q1);
-    fprintf(stdout, "\nQueue 2 (Munch1 to Munch2):\n");
+    fprintf(stderr, "\nQueue 2 (Munch1 to Munch2):\n");
     PrintQueueStats(Q2);
-    fprintf(stdout, "\nQueue 3 (Munch2 to Writer):\n");
+    fprintf(stderr, "\nQueue 3 (Munch2 to Writer):\n");
     PrintQueueStats(Q3);
 
     return 0;
