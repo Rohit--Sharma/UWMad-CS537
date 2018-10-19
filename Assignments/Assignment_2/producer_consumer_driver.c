@@ -20,7 +20,7 @@
 #include <semaphore.h>
 #include "producer_consumer_header.h"
 
-const int MAX_LINE_LEN = 7;
+const int MAX_LINE_LEN = 1024;
 const int QUEUE_SIZE = 10;
 
 int main()
