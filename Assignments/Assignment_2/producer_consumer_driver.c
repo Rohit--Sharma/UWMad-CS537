@@ -5,8 +5,10 @@
 // Organization:    University of Wisconsin-Madison
 //
 // Authors:         Rohit Kumar Sharma, M. Giri Prasanna
+// NetID:           rsharma54, mugundakrish
+// CSLogin:         rsharma, mgiriprasanna
 // Email:           rsharma@cs.wisc.edu, mugundakrish@wisc.edu
-// Created on:      September 26, 2018
+// Created on:      October 14, 2018
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -20,6 +22,8 @@
 #include <semaphore.h>
 #include "producer_consumer_header.h"
 
+//The MAX_LINE_LEN stores the buffer size (string length is buffer size - 1)
+//QUEUE_SIZE specifies the size of the queue to be created
 const int MAX_LINE_LEN = 1024;
 const int QUEUE_SIZE = 10;
 
@@ -27,9 +31,13 @@ int main()
 {
     pthread_t reader_t, munch1_t, munch2_t, writer_t;
     Queue *Q1, *Q2, *Q3;
-    Q1 = createQueue(QUEUE_SIZE);
-    Q2 = createQueue(QUEUE_SIZE);
-    Q3 = createQueue(QUEUE_SIZE);
+    //Q1 is the queue between reader and munch1
+    Q1 = CreateStringQueue(QUEUE_SIZE);
+    //Q2 is the queue between munch1 and munch2
+    Q2 = CreateStringQueue(QUEUE_SIZE);
+    //Q3 is the queue between munch2 and writer
+    Q3 = CreateStringQueue(QUEUE_SIZE);
+
     int error_num = 0;
 
     pthread_param *munch1_param = (pthread_param *) malloc(sizeof(pthread_param)), 
@@ -43,7 +51,8 @@ int main()
     munch1_param->output = Q2;
     munch2_param->input = Q2;
     munch2_param->output = Q3;
-
+	
+    //Creating the 4 threads here and taking care of any system call errors
     if ((error_num = pthread_create(&reader_t, NULL, reader, (void *) Q1)) != 0 || 
       (error_num = pthread_create(&munch1_t, NULL, munch1, (void *) munch1_param)) != 0 ||
       (error_num = pthread_create(&munch2_t, NULL, munch2, (void *) munch2_param)) != 0 ||
@@ -72,6 +81,7 @@ int main()
         return -1;
     }
 
+    //Printing the queue statistics to stderr
     fprintf(stderr, "\n\nQueue Statistics:\n");
     fprintf(stderr, "\nQueue 1 (Reader to Munch1):\n");
     PrintQueueStats(Q1);
