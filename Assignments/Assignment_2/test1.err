@@ -1,0 +1,27 @@
+[31mLine size exceeds the buffer size 7[m
+[31mLine size exceeds the buffer size 7[m
+[31mLine size exceeds the buffer size 7[m
+[31mLine size exceeds the buffer size 7[m
+[31mLine size exceeds the buffer size 7[m
+[31mLine size exceeds the buffer size 7[m
+[31m[m
+[31m[m
+[31mQueue Statistics:[m
+[31m[m
+[31mQueue 1 (Reader to Munch1):[m
+[31m1. Enqueue Count: 9[m
+[31m2. Dequeue Count: 9[m
+[31m3. Enqueue Block Count: 0[m
+[31m4. Dequeue Block Count: 2[m
+[31m[m
+[31mQueue 2 (Munch1 to Munch2):[m
+[31m1. Enqueue Count: 9[m
+[31m2. Dequeue Count: 9[m
+[31m3. Enqueue Block Count: 0[m
+[31m4. Dequeue Block Count: 1[m
+[31m[m
+[31mQueue 3 (Munch2 to Writer):[m
+[31m1. Enqueue Count: 9[m
+[31m2. Dequeue Count: 9[m
+[31m3. Enqueue Block Count: 0[m
+[31m4. Dequeue Block Count: 0[m
