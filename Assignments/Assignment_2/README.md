@@ -70,7 +70,7 @@ The *Makefile* contains the rules to compile and link all the source code files 
 
 
 ### Description
-    The Reader thread reads from standard input, one line at a time. Reader takes each line of the input and passes it to thread Munch1 through a queue of character strings.
-    Munch1 scans the line and replaces each space character (not tabs or newlines) with an asterisk ("*") character. It then passes the line to thread Munch2 through another queue of character strings.
-    Munch2 scans the line and converts all lower case letters to upper case (e.g., convert "a" to "A"). It then passes the line to thread Writer though yet another queue of character strings.
-    Writer writes the line to standard output.
+The Reader thread reads from standard input, one line at a time. Reader takes each line of the input and passes it to thread Munch1 through a queue of character strings.
+Munch1 scans the line and replaces each space character (not tabs or newlines) with an asterisk ("\*") character. It then passes the line to thread Munch2 through another queue of character strings.
+Munch2 scans the line and converts all lower case letters to upper case (e.g., convert "a" to "A"). It then passes the line to thread Writer though yet another queue of character strings.
+Writer writes the line to standard output.

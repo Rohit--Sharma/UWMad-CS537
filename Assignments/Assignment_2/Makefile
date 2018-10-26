@@ -1,3 +1,12 @@
+#///////////////////////////////////////////////////////////////////////////////
+#// Authors:         Rohit Kumar Sharma, M. Giri Prasanna
+#// NetID:           rsharma54, mugundakrish
+#// CSLogin:         rsharma, mgiriprasanna
+#// Email:           rsharma@cs.wisc.edu, mugundakrish@wisc.edu
+#// Created on:      October 14, 2018
+#//
+#///////////////////////////////////////////////////////////////////////////////
+
 CC = gcc
 WFLAGS = -Wall -Wextra
 EXE = prodcomm

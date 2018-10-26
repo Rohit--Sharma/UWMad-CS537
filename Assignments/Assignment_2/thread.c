@@ -1,3 +1,11 @@
+///////////////////////////////////////////////////////////////////////////////
+// Authors:         Rohit Kumar Sharma, M. Giri Prasanna
+// NetID:           rsharma54, mugundakrish
+// CSLogin:         rsharma, mgiriprasanna
+// Email:           rsharma@cs.wisc.edu, mugundakrish@wisc.edu
+// Created on:      October 14, 2018
+//
+///////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -11,12 +19,17 @@
 extern const int MAX_LINE_LEN;
 extern const int QUEUE_SIZE;
 
+//This structure is used for returning a line from stdio
+//It also checks whether eof has been encountered or
+//if the line has exceeded the buffer size.
 typedef struct {
     char *read_str;
     int has_eof;
     int buff_size_exceeding;
 } read_line_val;
 
+//This function returns a line if it is lesser than buffer size
+//It takes care of what is returned when the EOF is encountered
 read_line_val *read_line(int buff_size)
 {
     read_line_val *new_line_val = (read_line_val *) malloc(sizeof(read_line_val));
@@ -61,6 +74,7 @@ read_line_val *read_line(int buff_size)
     return new_line_val;
 }
 
+//Reader thread reads a line from stdio and enqueues it into Q1 for Munch1 to access
 void *reader(void *out_queue)
 {
     size_t max_line_len = MAX_LINE_LEN;
@@ -69,6 +83,7 @@ void *reader(void *out_queue)
     do {
         read_line_val *line_struct = read_line(max_line_len);
         if (line_struct->buff_size_exceeding == 1) {
+	    //If line size exceeds buffer size, then line is discarded and message is printed to stderr
             fprintf(stderr, "Line size exceeds the buffer size %zu\n", max_line_len);
             continue;
         }
@@ -93,6 +108,7 @@ void *reader(void *out_queue)
     return NULL;
 }
 
+//Munch1 dequeues string from Q1, processes it and enqueues the string to Q2
 void *munch1(void *queues)
 {
     char *string;
@@ -102,14 +118,11 @@ void *munch1(void *queues)
         if (string == NULL)
             break;
 
-        // printf("Before Munch1: %s.\n", string);  
-
+	//Replace every space with a *
         for (int i=0; string[i] != '\0'; i++) {
             if (string[i] == ' ')
                 string[i] = '*';
         }
-
-        // printf("After Munch1: %s.\n", string);
 
         EnqueueString(((pthread_param *)queues)->output, string);
     } while (string != NULL);
@@ -121,6 +134,7 @@ void *munch1(void *queues)
     return NULL;
 }
 
+//Munch2 dequeues string from Q2, processes it and enqueues the string to Q3
 void *munch2(void *queues)
 {
     char *string;
@@ -157,6 +171,7 @@ void *writer(void *in_queue)
         free(string);
         string = DequeueString((Queue *)in_queue);
     }
+    fprintf(stdout, "\nTotal number of processed strings: %d\n", ((Queue *)in_queue)->enqueueCount - 1);
     pthread_exit(NULL);
     return NULL;
 }

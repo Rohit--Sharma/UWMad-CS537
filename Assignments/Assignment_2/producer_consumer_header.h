@@ -1,7 +1,14 @@
+///////////////////////////////////////////////////////////////////////////////
+// Authors:         Rohit Kumar Sharma, M. Giri Prasanna
+// NetID:           rsharma54, mugundakrish
+// CSLogin:         rsharma, mgiriprasanna
+// Email:           rsharma@cs.wisc.edu, mugundakrish@wisc.edu
+// Created on:      October 14, 2018
+//
+///////////////////////////////////////////////////////////////////////////////
 #include <semaphore.h>
 
-extern const int QUEUE_SIZE;
-
+//Queue definition
 #ifndef STRUCT_STAT_STATM_CMDLINE
 #define STRUCT_STAT_STATM_CMDLINE
 typedef struct Queue
@@ -13,6 +20,7 @@ typedef struct Queue
 } Queue;
 #endif
 
+//This structure is used to pass the Queues as arguments to the threads
 #ifndef STRUCT_PTHREAD_PARAM
 #define STRUCT_PTHREAD_PARAM 
 typedef struct pthred_param
@@ -22,11 +30,13 @@ typedef struct pthred_param
 } pthread_param;
 #endif
 
-Queue* createQueue(int capacity);
-void EnqueueString(Queue* queue, char *string);
-char* DequeueString(Queue* queue);
-void PrintQueueStats(Queue *queue);
+//Function definitions for the Queue methods
+Queue *CreateStringQueue(int size);
+void EnqueueString(Queue *q, char *string);
+char * DequeueString(Queue *q);
+void PrintQueueStats(Queue *q);
 
+//Function definitions for the Threads
 void *reader(void *out_queue);
 void *munch1(void *queues);
 void *munch2(void *queues);
