@@ -9,9 +9,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "build_spec_graph.h"
 
-MakeNode * create_node (char * target, char * command) {
+MakeNode * create_node (char * target, char ** command) {
     MakeNode * makenode = (MakeNode *) malloc (sizeof(MakeNode));
 
     makenode->name = target;
@@ -23,8 +24,14 @@ MakeNode * create_node (char * target, char * command) {
 }
 
 void display_node (MakeNode * makenode) {
-    if (makenode != NULL)
-        fprintf(stdout, "MTarget: %s\nMCommand: %s\n", makenode->name, makenode->rule);
+    if (makenode != NULL) {
+        fprintf(stdout, "Target: %s\n", makenode->name);
+        char ** commands = makenode->rule;
+        while (*commands != NULL) {
+            fprintf(stdout, "  Command: %s\n", *commands);
+            commands++;
+        }
+    }
     else
         fprintf(stderr, "Error: Cannot display makenode. makenode is NULL\n");
 }

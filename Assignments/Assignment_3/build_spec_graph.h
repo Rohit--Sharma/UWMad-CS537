@@ -7,6 +7,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef STRUCT_LIST_COMMANDS
+#define STRUCT_LIST_COMMANDS
+typedef struct command {
+    char *rule;
+    struct command *next;
+} command;
+#endif
+
+
 /**
  * Definition of the Node structure
  */
@@ -14,9 +23,9 @@
 #define STRUCT_MAKE_NODE
 typedef struct MakeNode
 {
-    char *name;                     // Tha name of the target
-    char *rule;                     // The command for creation of the target
+    char * name;                     // Tha name of the target
+    char ** rule;                     // The array of commands to be executed for the target
     int isLeafNode;                 // A flag which is 1 for a leaf node, else 0
-    struct MakeNode **children;     // An array of pointers to child nodes
+    struct MakeNode ** children;     // An array of pointers to child nodes
 } MakeNode;
 #endif

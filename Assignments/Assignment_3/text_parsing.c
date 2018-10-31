@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "build_spec_graph.h"
+#include "build_spec_repr.h"
+#include "text_parsing.h"
 
 extern const int MAX_LINE_LEN;
 
@@ -74,14 +76,20 @@ char ** read_input_makefile (char *file_name) {
     FILE * makefile_ptr = fopen(file_name, "r");
 
     char ch = fgetc(makefile_ptr);
+    char * target_line = NULL;
     while (ch != EOF) {     // ((ch = fgetc(makefile_ptr)) != EOF) {
         MakeNode * curr_node = NULL;
-        char * target_line = NULL;
         // read a line: 
         //   4 possibilities: target line, command (begins with \t), empty line, comment (TODO: bonus)
         switch (ch) {
             case '\t': {
                 // command
+
+                if (target_line == NULL) {
+                    fprintf(stderr, "Error: No target for the command found.\n");
+                }
+
+                char ** commands = NULL;
 
                 // read the whole line into a buffer
                 char * command_line = (char *) malloc(sizeof(char) * 256);   // TODO: Change it to MAX_LINE_LEN
@@ -95,7 +103,19 @@ char ** read_input_makefile (char *file_name) {
                 }
                 *(command_line + i) = '\0';
 
-                fprintf(stdout, "Command: %s\n", command_line);
+                commands = (char **) malloc(sizeof(char *) * 2);
+                int j = 0;
+                *(commands + j) = command_line;
+                j++;
+                *(commands + j) = NULL;
+                j++;
+
+                // fprintf(stdout, "Command: %s\n", command_line);
+
+                curr_node = create_node(target_line, commands);
+                display_node(curr_node);
+
+                target_line = NULL;
 
                 break;
             }
@@ -129,7 +149,7 @@ char ** read_input_makefile (char *file_name) {
                 }
                 *(target_line + i) = '\0';
 
-                fprintf(stdout, "Target: %s\n", target_line);
+                // fprintf(stdout, "Target: %s\n", target_line);
                 // return tokenize_string(target_line);
 
                 break;

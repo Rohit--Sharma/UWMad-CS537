@@ -6,3 +6,7 @@
 // Created on:      October 25, 2018
 //
 ///////////////////////////////////////////////////////////////////////////////
+#include "build_spec_graph.h"
+
+MakeNode * create_node (char * target, char ** command);
+void display_node (MakeNode * makenode);
