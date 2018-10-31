@@ -131,8 +131,19 @@ char ** read_input_makefile (char *file_name) {
                 }
                 // fprintf(stdout, "Command: %s\n", command_line);
 
-                curr_node = create_node(target_line, cmds_head);
+                char ** tokens = tokenize_string(target_line);
+                char * target = tokens[0];
+                char ** dependencies = tokens + 1;
+                target[strlen(target) - 1] = '\0';    // remove the : char
+                curr_node = create_node(target, cmds_head);
                 display_node(curr_node);
+                printf("   Dependencies: ");
+                i = 0;
+                while (*(dependencies + i) != NULL) {
+                    printf("%s | ", *(dependencies + i));
+                    i++;
+                }
+                printf("\n");
 
                 target_line = NULL;
 

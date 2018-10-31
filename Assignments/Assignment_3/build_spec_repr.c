@@ -38,6 +38,7 @@ void display_node (MakeNode * makenode) {
             fprintf(stdout, "  Command: %s\n", cmds_head->rule);
             cmds_head = cmds_head->next;
         }
+        fprintf(stdout, "\n");
     }
     else
         fprintf(stderr, "Error: Cannot display makenode. makenode is NULL\n");

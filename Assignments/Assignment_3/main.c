@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 
+const int MAX_LINE_LEN = 1024;
+
 int main() {
 	return 0;
 }
