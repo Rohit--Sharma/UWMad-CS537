@@ -10,7 +10,7 @@
 #ifndef STRUCT_LIST_COMMANDS
 #define STRUCT_LIST_COMMANDS
 typedef struct command {
-    char *rule;
+    char * rule;
     struct command *next;
 } command;
 #endif

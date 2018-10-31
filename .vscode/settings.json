@@ -3,6 +3,7 @@
 		"ctype.h": "c",
 		"dirent.h": "c",
 		"string.h": "c",
-		"537ps_header.h": "c"
+		"537ps_header.h": "c",
+		"typeinfo": "c"
 	}
 }
