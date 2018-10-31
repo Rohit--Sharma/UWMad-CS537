@@ -12,6 +12,13 @@
 #include <stdlib.h>
 #include "build_spec_graph.h"
 
+command * create_command (char * rule) {
+    command * cmd = (command *) malloc(sizeof(command));
+    cmd->rule = rule;
+    cmd->next = NULL;
+    return cmd;
+}
+
 MakeNode * create_node (char * target, command * cmds_head) {
     MakeNode * makenode = (MakeNode *) malloc (sizeof(MakeNode));
 

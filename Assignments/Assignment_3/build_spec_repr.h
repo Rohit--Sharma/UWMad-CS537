@@ -8,5 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "build_spec_graph.h"
 
+command * create_command (char * rule);
 MakeNode * create_node (char * target, command * cmds_header);
 void display_node (MakeNode * makenode);

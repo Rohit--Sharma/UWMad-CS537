@@ -103,14 +103,10 @@ char ** read_input_makefile (char *file_name) {
                 }
                 *(command_line + i) = '\0';
 
-                cmds_head = (command *) malloc(sizeof(command));
-                // int j = 0;
-                cmds_head->rule = command_line;
-                cmds_head->next = NULL;
-
-                command * curr_cmd = cmds_head;
+                cmds_head = create_command(command_line);
 
                 // read the rest of the commands in the linked list
+                command * curr_cmd = cmds_head;
                 if (ch == '\n') {
                     ch = fgetc(makefile_ptr);
                     while (ch == '\t') {
@@ -125,10 +121,8 @@ char ** read_input_makefile (char *file_name) {
                         }
                         *(command_line + i) = '\0';
 
-                        curr_cmd->next = (command *) malloc(sizeof(command));
+                        curr_cmd->next = create_command(command_line);
                         curr_cmd = curr_cmd->next;
-                        curr_cmd->rule = command_line;
-                        curr_cmd->next = NULL;
 
                         if (ch == '\n')
                             ch = fgetc(makefile_ptr);
