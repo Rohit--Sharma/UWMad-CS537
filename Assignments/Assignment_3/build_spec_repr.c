@@ -12,11 +12,11 @@
 #include <stdlib.h>
 #include "build_spec_graph.h"
 
-MakeNode * create_node (char * target, char ** command) {
+MakeNode * create_node (char * target, command * cmds_head) {
     MakeNode * makenode = (MakeNode *) malloc (sizeof(MakeNode));
 
     makenode->name = target;
-    makenode->rule = command;
+    makenode->rules = cmds_head;
     makenode->isLeafNode = 0;
     makenode->children = NULL;
 
@@ -26,10 +26,10 @@ MakeNode * create_node (char * target, char ** command) {
 void display_node (MakeNode * makenode) {
     if (makenode != NULL) {
         fprintf(stdout, "Target: %s\n", makenode->name);
-        char ** commands = makenode->rule;
-        while (*commands != NULL) {
-            fprintf(stdout, "  Command: %s\n", *commands);
-            commands++;
+        command * cmds_head = makenode->rules;
+        while (cmds_head != NULL) {
+            fprintf(stdout, "  Command: %s\n", cmds_head->rule);
+            cmds_head = cmds_head->next;
         }
     }
     else

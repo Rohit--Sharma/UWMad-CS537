@@ -89,7 +89,7 @@ char ** read_input_makefile (char *file_name) {
                     fprintf(stderr, "Error: No target for the command found.\n");
                 }
 
-                char ** commands = NULL;
+                command * cmds_head = NULL;
 
                 // read the whole line into a buffer
                 char * command_line = (char *) malloc(sizeof(char) * 256);   // TODO: Change it to MAX_LINE_LEN
@@ -103,16 +103,41 @@ char ** read_input_makefile (char *file_name) {
                 }
                 *(command_line + i) = '\0';
 
-                commands = (char **) malloc(sizeof(char *) * 2);
-                int j = 0;
-                *(commands + j) = command_line;
-                j++;
-                *(commands + j) = NULL;
-                j++;
+                cmds_head = (command *) malloc(sizeof(command));
+                // int j = 0;
+                cmds_head->rule = command_line;
+                cmds_head->next = NULL;
 
+                command * curr_cmd = cmds_head;
+
+                // read the rest of the commands in the linked list
+                if (ch == '\n') {
+                    ch = fgetc(makefile_ptr);
+                    while (ch == '\t') {
+                        command_line = (char *) malloc(sizeof(char) * 256);   // TODO: Change it to MAX_LINE_LEN
+
+                        int i = 0;
+                        ch = fgetc(makefile_ptr);   // ignore the \t char
+                        while (ch != EOF && ch != '\n' && ch != '\0') {
+                            *(command_line + i) = ch;
+                            i++;
+                            ch = fgetc(makefile_ptr);
+                        }
+                        *(command_line + i) = '\0';
+
+                        curr_cmd->next = (command *) malloc(sizeof(command));
+                        curr_cmd = curr_cmd->next;
+                        curr_cmd->rule = command_line;
+                        curr_cmd->next = NULL;
+
+                        if (ch == '\n')
+                            ch = fgetc(makefile_ptr);
+                    }
+                    fseek(makefile_ptr, -1, SEEK_CUR);
+                }
                 // fprintf(stdout, "Command: %s\n", command_line);
 
-                curr_node = create_node(target_line, commands);
+                curr_node = create_node(target_line, cmds_head);
                 display_node(curr_node);
 
                 target_line = NULL;

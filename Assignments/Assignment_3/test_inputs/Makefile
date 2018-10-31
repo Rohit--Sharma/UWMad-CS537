@@ -7,6 +7,10 @@
 
 readproc.o: readproc.c readproc.h
 	gcc -c -Wall -Wextra readproc.c
+	cmdt1
+	cmdt2
+	cmdt4
+	cmd55
 
 parseopts.o: parseopts.c parseopts.h
 	gcc -c -Wall -Wextra parseopts.c
