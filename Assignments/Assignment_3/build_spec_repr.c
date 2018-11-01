@@ -15,28 +15,28 @@
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
 
-command * create_command (char * rule) {
-    command * cmd = (command *) malloc(sizeof(command));
+command *create_command (char *rule) {
+    command *cmd = (command *) malloc(sizeof(command));
     cmd->rule = rule;
     cmd->next = NULL;
     return cmd;
 }
 
-MakeNode * create_node (char * target, command * cmds_head) {
-    MakeNode * makenode = (MakeNode *) malloc (sizeof(MakeNode));
+MakeNode *create_node (char *target, command *cmds_head, char **dependencies) {
+    MakeNode *makenode = (MakeNode *) malloc (sizeof(MakeNode));
 
     makenode->name = target;
     makenode->rules = cmds_head;
     makenode->isLeafNode = 0;
-    makenode->children = NULL;
+    makenode->children = dependencies;
 
     return makenode;
 }
 
-void display_node (MakeNode * makenode) {
+void display_node (MakeNode *makenode) {
     if (makenode != NULL) {
         fprintf(stdout, "Target: %s\n", makenode->name);
-        command * cmds_head = makenode->rules;
+        command *cmds_head = makenode->rules;
         while (cmds_head != NULL) {
             fprintf(stdout, "  Command: %s\n", cmds_head->rule);
             cmds_head = cmds_head->next;
@@ -50,7 +50,7 @@ void display_node (MakeNode * makenode) {
 /**
  * Jenkins One At A Time Hash
  */
-uint32_t hash_code (hash_table * map, char * key, size_t len)
+uint32_t hash_code (hash_table *map, char *key, size_t len)
 {
     uint32_t hash, i;
     for(hash = i = 0; i < len; ++i)
@@ -65,8 +65,8 @@ uint32_t hash_code (hash_table * map, char * key, size_t len)
     return hash % map->size;
 }
 
-hash_table * create_hash_table (int size) {
-    hash_table * map = (hash_table *) malloc (sizeof(hash_table));
+hash_table *create_hash_table (int size) {
+    hash_table *map = (hash_table *) malloc (sizeof(hash_table));
     map->size = size;
     map->list = (hash_node **) malloc (sizeof(hash_node *) * size);
     int i;
@@ -75,11 +75,11 @@ hash_table * create_hash_table (int size) {
     return map;
 }
 
-void hash_insert (hash_table * t, char * key, int val) {
+void hash_insert (hash_table *t, char *key, MakeNode *val) {
     int pos = hash_code(t, key, strlen(key));
-    hash_node * list = t->list[pos];
-    hash_node * newNode = (hash_node *) malloc (sizeof(hash_node));
-    hash_node * temp = list;
+    hash_node *list = t->list[pos];
+    hash_node *newNode = (hash_node *) malloc (sizeof(hash_node));
+    hash_node *temp = list;
     while (temp) {
         if (strcmp(temp->key, key) == 0) {
             temp->val = val;
@@ -93,25 +93,25 @@ void hash_insert (hash_table * t, char * key, int val) {
     t->list[pos] = newNode;
 }
 
-int hash_lookup (hash_table *t, char * key) {
+MakeNode *hash_lookup (hash_table *t, char *key) {
     int pos = hash_code(t, key, strlen(key));
-    hash_node * list = t->list[pos];
-    hash_node * temp = list;
+    hash_node *list = t->list[pos];
+    hash_node *temp = list;
     while (temp) {
         if (strcmp(temp->key, key) == 0) {
             return temp->val;
         }
         temp = temp->next;
     }
-    return -1;
+    return NULL;
 }
 
-int main() {
-    hash_table *my_map = create_hash_table(100);
-    hash_insert(my_map, "hello", 3);
-    hash_insert(my_map, "rohit", 71);
+// int main() {
+//     hash_table *my_map = create_hash_table(100);
+//     hash_insert(my_map, "hello", 3);
+//     hash_insert(my_map, "rohit", 71);
 
-    printf("%d %d %d\n", hash_lookup(my_map, "rohit"), hash_lookup(my_map, "sharma"), hash_lookup(my_map, "hello"));
+//     printf("%d %d %d\n", hash_lookup(my_map, "rohit"), hash_lookup(my_map, "sharma"), hash_lookup(my_map, "hello"));
 
-    return 0;
-}
+//     return 0;
+// }

@@ -10,7 +10,7 @@
 #ifndef STRUCT_LIST_COMMANDS
 #define STRUCT_LIST_COMMANDS
 typedef struct command {
-    char * rule;
+    char *rule;
     struct command *next;
 } command;
 #endif
@@ -22,9 +22,11 @@ typedef struct command {
 #define STRUCT_MAKE_NODE
 typedef struct MakeNode
 {
-    char * name;                     // Tha name of the target
-    command * rules;                     // The list of commands to be executed for the target
+    char *name;                     // Tha name of the target
+    command *rules;                     // The list of commands to be executed for the target
     int isLeafNode;                 // A flag which is 1 for a leaf node, else 0
-    struct MakeNode ** children;     // An array of pointers to child nodes
+    char **children;     // An array of pointers to dependency names
 } MakeNode;
 #endif
+
+void add_dependency(struct directed_acyclic_graph* dag, MakeNode* target, MakeNode* dependency);

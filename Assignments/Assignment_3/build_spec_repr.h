@@ -11,8 +11,8 @@
 #ifndef STRUCT_HASH_NODE
 #define STRUCT_HASH_NODE
 typedef struct hash_node {
-    char * key;
-    int val;
+    char *key;
+    MakeNode *val;
     struct hash_node *next;
 } hash_node;
 #endif
@@ -25,6 +25,10 @@ typedef struct hash_table {
 } hash_table;
 #endif
 
-command * create_command (char * rule);
-MakeNode * create_node (char * target, command * cmds_header);
-void display_node (MakeNode * makenode);
+command *create_command (char *rule);
+MakeNode *create_node (char *target, command *cmds_header, char **dependencies);
+void display_node (MakeNode *makenode);
+
+hash_table *create_hash_table (int size);
+void hash_insert (hash_table *t, char *key, MakeNode *val);
+MakeNode *hash_lookup (hash_table *t, char *key);
