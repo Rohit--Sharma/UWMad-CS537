@@ -29,4 +29,4 @@ typedef struct MakeNode
 } MakeNode;
 #endif
 
-void add_dependency(struct directed_acyclic_graph* dag, MakeNode* target, MakeNode* dependency);
+//void add_dependency(struct directed_acyclic_graph* dag, MakeNode* target, MakeNode* dependency);
