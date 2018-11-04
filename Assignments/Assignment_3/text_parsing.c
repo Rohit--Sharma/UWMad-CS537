@@ -225,22 +225,22 @@ void construct_graph_edges (hash_table *hash_map) {
     }
 }
 
-int main() {
-    // char ** tokens = tokenize_string("main.o: main.c main.h dep1.c");
-    // char ** tokens = read_input_makefile("test_inputs/Makefile");
-    // int i = 0;
-    // while (*(tokens + i) != NULL) {
-    //     printf("%s\n", *(tokens + i));
-    //     free (*(tokens + i));
-    //     i++;
-    // }
-    // free (tokens);
+// int main() {
+//     // char ** tokens = tokenize_string("main.o: main.c main.h dep1.c");
+//     // char ** tokens = read_input_makefile("test_inputs/Makefile");
+//     // int i = 0;
+//     // while (*(tokens + i) != NULL) {
+//     //     printf("%s\n", *(tokens + i));
+//     //     free (*(tokens + i));
+//     //     i++;
+//     // }
+//     // free (tokens);
 
-    hash_table *my_map = create_hash_table(10000);  // TODO: Make a const for the size of hash table
+//     hash_table *my_map = create_hash_table(10000);  // TODO: Make a const for the size of hash table
 
-    read_input_makefile(my_map, "test_inputs/Makefile");
+//     read_input_makefile(my_map, "test_inputs/Makefile");
 
-    construct_graph_edges(my_map);
+//     construct_graph_edges(my_map);
 
-    return 0;
-}
+//     return 0;
+// }
