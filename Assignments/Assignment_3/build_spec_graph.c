@@ -22,6 +22,7 @@ struct directed_acyclic_graph
 { 
     int targets_and_dependencies;
     int *visited_node;
+    int *topological_num;
     struct graph_adj_list_node **dependencies;
 };
 
@@ -41,12 +42,13 @@ struct directed_acyclic_graph* create_graph(int no_of_target_dependencies)
     // Create an array of adjacency lists 
     dag->dependencies = (struct graph_adj_list_node **) malloc(no_of_target_dependencies * sizeof(struct graph_adj_list_node *));
     dag->visited_node = (int *) malloc(no_of_target_dependencies * sizeof(int));
-
+    dag->topological_num = (int *) malloc(no_of_target_dependencies * sizeof(int));
     // Initialize each adjacency list as empty
     int i; 
     for (i = 0; i < no_of_target_dependencies; ++i) {
     	dag->dependencies[i] = NULL; 
   	dag->visited_node[i] = 0;
+	dag->topological_num[i] = 0;
     }
     return dag;
 } 
@@ -130,28 +132,43 @@ void print_graph(struct directed_acyclic_graph* dag)
     }
 }
 
-void depth_first_traversal(struct directed_acyclic_graph* dag, int node_num)
+int depth_first_topological_traversal(struct directed_acyclic_graph* dag, int node_num, int n)
 {
     struct graph_adj_list_node* adj_list = dag->dependencies[node_num];
     struct graph_adj_list_node* temp = adj_list;
     int next_node_num;
     dag->visited_node[node_num] = 1;
-    printf("Visited %s \n", dag->dependencies[node_num]->target->name);
-    printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
-    while(temp != NULL) {
+    //printf("Visited %s \n", dag->dependencies[node_num]->target->name);
+    //printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
+    while (temp != NULL) {
         struct graph_adj_list_node* next_node = temp;
         for (int i = 0; i < dag->targets_and_dependencies; i++) {
             if (dag->dependencies[i]->target == next_node->target) {
                 next_node_num = i;
             }
         }
-        if(dag->visited_node[next_node_num] == 0) {
-            depth_first_traversal(dag, next_node_num);
+
+        if (dag->visited_node[next_node_num] == 0) {
+            n = depth_first_topological_traversal(dag, next_node_num, n);
+            printf("\nnode num is %d, topological num is %d and target is %s",next_node_num, dag->topological_num[next_node_num], dag->dependencies[next_node_num]->target->name); 
         }
         temp = temp->next;
     }
+    
+ 	dag->topological_num[node_num] = n;
+	printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
+	return n-1;	
 }
 
+struct graph_adj_list_node** topo_list(struct directed_acyclic_graph* dag) {
+	int i = 0;
+	struct graph_adj_list_node **topologically_sorted_nodes;
+	topologically_sorted_nodes = (struct graph_adj_list_node **) malloc((dag->targets_and_dependencies) * sizeof(struct graph_adj_list_node *));
+	for (int i=0; i<dag->targets_and_dependencies; i++) {
+		topologically_sorted_nodes[(dag->targets_and_dependencies)-(dag->topological_num[i])] = dag->dependencies[i];
+	}
+	return topologically_sorted_nodes;
+}
 int main() {
 	//printf("\nEnter here");
 	MakeNode* n1 = (MakeNode *) malloc(sizeof(MakeNode));
@@ -202,6 +219,10 @@ int main() {
 	// 	printf("\n\ni is %i and list is %d, %d", i, dag->dependencies[i], dag->dependencies[i]->target);
 	// }
 	print_graph(dag);
-	depth_first_traversal(dag, 0);
+	depth_first_topological_traversal(dag, 0, dag->targets_and_dependencies);
+	struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
+	printf("\n");
+	for (int i =0; i<5;i++)
+		printf("->%s", topologically_sorted_nodes[i]->target->name);
 	return 0;
 }
