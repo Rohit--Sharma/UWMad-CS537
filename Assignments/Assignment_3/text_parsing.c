@@ -192,6 +192,7 @@ void read_input_makefile (hash_table *map, char *file_name) {
                 // Execute previous commands if any exist
                 if (cmds_head != NULL) {
                     curr_node = create_node(target_line, cmds_head);
+		    printf("\n****current node name is %s****\n", curr_node->name);
                     // insert node into the hashmap
                     hash_insert(map, curr_node->name, curr_node);
 
@@ -212,6 +213,7 @@ void read_input_makefile (hash_table *map, char *file_name) {
     // If cmds_head is not null, create the last makenode
     if (cmds_head != NULL) {
         curr_node = create_node(target_line, cmds_head);
+	printf("\n****current node name is %s****\n", curr_node->name);
         // insert node into the hashmap
         hash_insert(map, curr_node->name, curr_node);
 
@@ -237,10 +239,13 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
                         // create leaf node
                         fprintf(stdout, "Creating new node for %s | ", *(children + j));
                         dependency_node = create_node(*(children + j), NULL);
+			printf("\n***children %d, name is %s", j, children[j]);
+		    	printf("\n****current dependency name is %s****\n", dependency_node->name);
 
                         // insert the created node into the hash_map
                         hash_insert(hash_map, *(children + j), dependency_node);
                     }
+		    printf("\n****current dependency name is %s****\n", dependency_node->name);
                     fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
                     add_dependency(dag, temp->val, dependency_node);
 

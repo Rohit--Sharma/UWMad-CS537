@@ -28,12 +28,12 @@ int main() {
     
     construct_graph_edges(dag, my_map);
 
-    // depth_first_topological_traversal(dag, 0, dag->targets_and_dependencies);
     print_graph(dag);
+    depth_first_topological_traversal(dag, 11, dag->targets_and_dependencies);
     // struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
 	// for each node in order, call execute_program(node)
 
-    // int i = 0;
+    int i = 0;
     // while (topologically_sorted_nodes[i] != NULL){
     //     execute_program(topologically_sorted_nodes[i]->target);
     //     i++;
