@@ -12,7 +12,7 @@
 #include "build_spec_repr.h"
 #include "text_parsing.h"
 
-const int MAX_LINE_LEN = 1024;
+const size_t MAX_LINE_LEN = 1024;
 
 int main() {
 	

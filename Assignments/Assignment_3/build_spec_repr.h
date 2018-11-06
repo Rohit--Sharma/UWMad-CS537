@@ -26,7 +26,7 @@ typedef struct hash_table {
 #endif
 
 command *create_command (char *rule);
-MakeNode *create_node (char *target, command *cmds_header, char **dependencies);
+MakeNode *create_node (char *target_line, command *cmds_head);
 void display_node (MakeNode *makenode);
 
 hash_table *create_hash_table (int size);

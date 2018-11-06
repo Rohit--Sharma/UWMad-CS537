@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include "text_parsing.h"
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
 
@@ -22,7 +23,11 @@ command *create_command (char *rule) {
     return cmd;
 }
 
-MakeNode *create_node (char *target, command *cmds_head, char **dependencies) {
+MakeNode *create_node (char *target_line, command *cmds_head) {
+    char **tokens = tokenize_string(target_line);
+    char *target = tokens[0];
+    char **dependencies = tokens + 1;
+    target[strlen(target) - 1] = '\0';    // remove the : char
     MakeNode *makenode = (MakeNode *) malloc (sizeof(MakeNode));
 
     makenode->name = target;
@@ -42,6 +47,14 @@ void display_node (MakeNode *makenode) {
             cmds_head = cmds_head->next;
         }
         fprintf(stdout, "\n");
+        int i = 0;
+        printf("   Dependencies: ");
+        char **dependencies = makenode->children;
+        while (*(dependencies + i) != NULL) {
+            printf("%s | ", *(dependencies + i));
+            i++;
+        }
+        printf("\n");
     }
     else
         fprintf(stderr, "Error: Cannot display makenode. makenode is NULL\n");

@@ -6,7 +6,7 @@
 	gcc -c -Wall -Wextra 537ps.c
 
 readproc.o: readproc.c readproc.h
-	gcc -c -Wall -Wextra readproc.c
+	gcc -c -Wall -Wextra readproc.c dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
 	cmdt1
 	cmdt2
 	cmdt4

@@ -15,7 +15,7 @@
 #include "build_spec_repr.h"
 #include "text_parsing.h"
 
-extern const int MAX_LINE_LEN;
+extern const size_t MAX_LINE_LEN;
 
 char **tokenize_string (char *input) {
     char **result = NULL;
@@ -83,8 +83,7 @@ typedef struct {
 
 //This function returns a line if it is lesser than buffer size
 //It takes care of what is returned when the EOF is encountered
-read_line_val *read_line(int buff_size, FILE *fileptr)
-{
+read_line_val *read_line(int buff_size, FILE *fileptr) {
     read_line_val *new_line_val = (read_line_val *) malloc(sizeof(read_line_val));
     char *new_line = (char *) malloc(sizeof(char) * buff_size);
     if (errno == ENOMEM) {
@@ -130,13 +129,34 @@ read_line_val *read_line(int buff_size, FILE *fileptr)
 char **read_input_makefile (hash_table *map, char *file_name) {
     FILE *makefile_ptr = fopen(file_name, "r");
 
-    char ch = fgetc(makefile_ptr);
+    char *line = NULL;
     char *target_line = NULL;
-    while (ch != EOF) {     // ((ch = fgetc(makefile_ptr)) != EOF) {
-        MakeNode *curr_node = NULL;
-        // read a line: 
-        //   4 possibilities: target line, command (begins with \t), empty line, comment (TODO: bonus)
-        switch (ch) {
+
+    command *cmds_head = NULL, *curr_cmd = NULL;
+    MakeNode *curr_node = NULL;
+    int first_cmd = 1;
+
+    do {
+        read_line_val *line_struct = read_line(MAX_LINE_LEN, makefile_ptr);
+        if (line_struct->buff_size_exceeding == 1) {
+	        //If line size exceeds buffer size, then line is discarded and message is printed to stderr
+            fprintf(stderr, "Error in parsing the Makefile. Line size exceeds the buffer size %zu\n", MAX_LINE_LEN);
+            break;  // exit(1) ??
+        }
+        if (line_struct->has_eof == 1) {
+            if (line_struct->read_str[0] != '\0') {
+                line = line_struct->read_str;
+            }
+            else {
+                break;
+            }
+        }
+        else {
+            line = line_struct->read_str;
+        }
+
+        // Process the line
+        switch (*line) {
             case '\t': {
                 // command
 
@@ -144,78 +164,20 @@ char **read_input_makefile (hash_table *map, char *file_name) {
                     fprintf(stderr, "Error: No target for the command found.\n");
                 }
 
-                command *cmds_head = NULL;
-
-                // read the whole line into a buffer
-                char *command_line = (char *) malloc(sizeof(char) * 256);   // TODO: Change it to MAX_LINE_LEN
-
-                int i = 0;
-                ch = fgetc(makefile_ptr);   // ignore the \t char
-                while (ch != EOF && ch != '\n' && ch != '\0') {
-                    *(command_line + i) = ch;
-                    i++;
-                    ch = fgetc(makefile_ptr);
+                if (first_cmd && cmds_head == NULL) {
+                    cmds_head = create_command(line + 1);
+                    curr_cmd = cmds_head;
+                    first_cmd = 0;
                 }
-                *(command_line + i) = '\0';
-
-                cmds_head = create_command(command_line);
-
-                // read the rest of the commands in the linked list
-                command * curr_cmd = cmds_head;
-                if (ch == '\n') {
-                    ch = fgetc(makefile_ptr);
-                    while (ch == '\t') {
-                        command_line = (char *) malloc(sizeof(char) * 256);   // TODO: Change it to MAX_LINE_LEN
-
-                        int i = 0;
-                        ch = fgetc(makefile_ptr);   // ignore the \t char
-                        while (ch != EOF && ch != '\n' && ch != '\0') {
-                            *(command_line + i) = ch;
-                            i++;
-                            ch = fgetc(makefile_ptr);
-                        }
-                        *(command_line + i) = '\0';
-
-                        curr_cmd->next = create_command(command_line);
-                        curr_cmd = curr_cmd->next;
-
-                        if (ch == '\n')
-                            ch = fgetc(makefile_ptr);
-                    }
-                    fseek(makefile_ptr, -1, SEEK_CUR);
+                else {
+                    curr_cmd->next = create_command(line + 1);
+                    curr_cmd = curr_cmd->next;
                 }
-                // fprintf(stdout, "Command: %s\n", command_line);
-
-                char **tokens = tokenize_string(target_line);
-                char *target = tokens[0];
-                char **dependencies = tokens + 1;
-                target[strlen(target) - 1] = '\0';    // remove the : char
-                curr_node = create_node(target, cmds_head, dependencies);
-
-                // insert node into the hashmap
-                hash_insert(map, target, curr_node);
-
-                display_node(curr_node);
-                printf("   Dependencies: ");
-                i = 0;
-                while (*(dependencies + i) != NULL) {
-                    printf("%s | ", *(dependencies + i));
-                    i++;
-                }
-                printf("\n");
-
-                target_line = NULL;
 
                 break;
             }
-            case '\n': {
+            case '\0': {
                 // empty line
-
-                // igmore all the consecutive empty lines
-                while (ch == '\n') {
-                    // fprintf(stdout, "Ignoring new line\n");
-                    ch = fgetc(makefile_ptr);
-                }
 
                 break;
             }
@@ -227,24 +189,36 @@ char **read_input_makefile (hash_table *map, char *file_name) {
             default: {
                 // target line
 
-                // read the whole line into a buffer
-                target_line = (char *) malloc(sizeof(char) * 256);   // TODO: Change it to MAX_LINE_LEN
+                // Execute previous commands if any exist
+                if (cmds_head != NULL) {
+                    
+                    curr_node = create_node(target_line, cmds_head);
 
-                int i = 0;
-                while (ch != EOF && ch != '\n' && ch != '\0') {
-                    *(target_line + i) = ch;
-                    i++;
-                    ch = fgetc(makefile_ptr);
+                    // insert node into the hashmap
+                    hash_insert(map, curr_node->name, curr_node);
+
+                    display_node(curr_node);
+
+                    cmds_head = NULL;
+                    first_cmd = 1;
                 }
-                *(target_line + i) = '\0';
 
-                // fprintf(stdout, "Target: %s\n", target_line);
-                // return tokenize_string(target_line);
-
+                // store the current line
+                target_line = line;
                 break;
             }
         }
-        // break;
+
+    } while (line != NULL);
+
+    // If cmds_head is not null, create the last makenode
+    if (cmds_head != NULL) {
+        curr_node = create_node(target_line, cmds_head);
+
+        // insert node into the hashmap
+        hash_insert(map, curr_node->name, curr_node);
+
+        display_node(curr_node);
     }
 
     fclose(makefile_ptr);
@@ -265,7 +239,7 @@ void construct_graph_edges (hash_table *hash_map) {
                     MakeNode *dependency_node = hash_lookup(hash_map, *(children + j));
                     if (dependency_node == NULL) {
                         // create leaf node
-                        dependency_node = create_node(*(children + j), NULL, NULL);
+                        dependency_node = create_node(*(children + j), NULL);
 
                         // insert the created node into the hash_map
                         hash_insert(hash_map, *(children + j), dependency_node);
