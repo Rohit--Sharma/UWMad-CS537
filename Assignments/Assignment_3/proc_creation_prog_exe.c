@@ -68,5 +68,7 @@ int main_2() {
     temp->rules = commands;
     execute_program(temp);
 
+    free(temp);
+
     return 0;
 }

@@ -78,7 +78,6 @@ hash_table *create_hash_table (int size) {
 void hash_insert (hash_table *t, char *key, MakeNode *val) {
     int pos = hash_code(t, key, strlen(key));
     hash_node *list = t->list[pos];
-    hash_node *newNode = (hash_node *) malloc (sizeof(hash_node));
     hash_node *temp = list;
     while (temp) {
         if (strcmp(temp->key, key) == 0) {
@@ -87,6 +86,7 @@ void hash_insert (hash_table *t, char *key, MakeNode *val) {
         }
         temp = temp->next;
     }
+    hash_node *newNode = (hash_node *) malloc (sizeof(hash_node));
     newNode->key = key;
     newNode->val = val;
     newNode->next = list;
