@@ -11,4 +11,4 @@
 
 char **tokenize_string (char *input);
 void construct_graph_edges (hash_table *hash_map);
-char **read_input_makefile (hash_table *map, char *file_name);
+void read_input_makefile (hash_table *map, char *file_name);

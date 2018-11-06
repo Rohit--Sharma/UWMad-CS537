@@ -126,7 +126,7 @@ read_line_val *read_line(int buff_size, FILE *fileptr) {
     return new_line_val;
 }
 
-char **read_input_makefile (hash_table *map, char *file_name) {
+void read_input_makefile (hash_table *map, char *file_name) {
     FILE *makefile_ptr = fopen(file_name, "r");
 
     char *line = NULL;
@@ -208,7 +208,7 @@ char **read_input_makefile (hash_table *map, char *file_name) {
                 break;
             }
         }
-
+        free(line_struct);
     } while (line != NULL);
 
     // If cmds_head is not null, create the last makenode
@@ -222,7 +222,6 @@ char **read_input_makefile (hash_table *map, char *file_name) {
     }
 
     fclose(makefile_ptr);
-    return NULL;
 }
 
 void construct_graph_edges (hash_table *hash_map) {

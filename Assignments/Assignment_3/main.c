@@ -22,5 +22,9 @@ int main() {
 
     // construct_graph_edges(my_map);
 
+	// order = traversal
+
+	// for each node in order, call execute_program(node)
+
     return 0;
 }
