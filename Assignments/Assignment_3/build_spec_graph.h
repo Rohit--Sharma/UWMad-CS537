@@ -6,6 +6,7 @@
 // Created on:      October 25, 2018
 //
 ///////////////////////////////////////////////////////////////////////////////
+#include <time.h>
 
 #ifndef STRUCT_LIST_COMMANDS
 #define STRUCT_LIST_COMMANDS
@@ -23,6 +24,7 @@ typedef struct command {
 typedef struct MakeNode
 {
     char *name;                     // Tha name of the target
+    time_t timestamp;
     command *rules;                     // The list of commands to be executed for the target
     int isLeafNode;                 // A flag which is 1 for a leaf node, else 0
     char **children;     // An array of pointers to dependency names

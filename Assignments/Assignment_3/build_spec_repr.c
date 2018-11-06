@@ -8,10 +8,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "text_parsing.h"
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
@@ -28,9 +30,19 @@ MakeNode *create_node (char *target_line, command *cmds_head) {
     char *target = tokens[0];
     char **dependencies = tokens + 1;
     target[strlen(target) - 1] = '\0';    // remove the : char
+
+    struct stat file_stat;
+    if(stat(target, &file_stat) < 0) {
+        // TODO: Display error info according to errno
+        fprintf(stderr, "Error in getting file statistics for %s\n", target);
+    }
+    // fprintf(stdout, "Last modified time for %s: %s\n", target, ctime(&file_stat.st_mtime));
+    // to compare timestamps, use difftime(time_t t1, time_t t2) 
+
     MakeNode *makenode = (MakeNode *) malloc (sizeof(MakeNode));
 
     makenode->name = target;
+    makenode->timestamp = file_stat.st_mtime;
     makenode->rules = cmds_head;
     makenode->isLeafNode = 0;
     makenode->children = dependencies;
