@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
 #include "text_parsing.h"
@@ -71,13 +72,68 @@ char **tokenize_string (char *input) {
     return result;
 }
 
+//This structure is used for returning a line from stdio
+//It also checks whether eof has been encountered or
+//if the line has exceeded the buffer size.
+typedef struct {
+    char *read_str;
+    int has_eof;
+    int buff_size_exceeding;
+} read_line_val;
+
+//This function returns a line if it is lesser than buffer size
+//It takes care of what is returned when the EOF is encountered
+read_line_val *read_line(int buff_size, FILE *fileptr)
+{
+    read_line_val *new_line_val = (read_line_val *) malloc(sizeof(read_line_val));
+    char *new_line = (char *) malloc(sizeof(char) * buff_size);
+    if (errno == ENOMEM) {
+        fprintf(stderr, "No enough memory for malloc\n");
+        new_line[0] = '\0';
+        new_line_val->read_str = new_line;
+        new_line_val->has_eof = 1;
+        new_line_val->buff_size_exceeding = 0;
+        return new_line_val;
+    }
+    char c = '\0';
+    for (int i = 0; i < buff_size; i++) {
+        c = fgetc(fileptr);
+        if (c != EOF && c != '\n') {
+            new_line[i] = c;
+        } else if (c == '\n') {
+            new_line[i] = '\0';
+            new_line_val->read_str = new_line;
+            new_line_val->has_eof = 0;
+            new_line_val->buff_size_exceeding = 0;
+            return new_line_val;
+        } else {
+            new_line[i] = '\0';
+            new_line_val->read_str = new_line;
+            new_line_val->has_eof = 1;
+            new_line_val->buff_size_exceeding = 0;
+            return new_line_val;
+        }
+    }
+    new_line_val->buff_size_exceeding = 1;
+    new_line[buff_size - 1] = '\0';
+    new_line_val->read_str = new_line;
+    new_line_val->has_eof = 0;
+
+    // Flush the rest of the line
+    while ((c = fgetc(fileptr)) != '\n' && c != EOF);
+    if (c == EOF)
+        new_line_val->has_eof = 1;
+
+    return new_line_val;
+}
+
 char **read_input_makefile (hash_table *map, char *file_name) {
-    FILE * makefile_ptr = fopen(file_name, "r");
+    FILE *makefile_ptr = fopen(file_name, "r");
 
     char ch = fgetc(makefile_ptr);
-    char * target_line = NULL;
+    char *target_line = NULL;
     while (ch != EOF) {     // ((ch = fgetc(makefile_ptr)) != EOF) {
-        MakeNode * curr_node = NULL;
+        MakeNode *curr_node = NULL;
         // read a line: 
         //   4 possibilities: target line, command (begins with \t), empty line, comment (TODO: bonus)
         switch (ch) {
