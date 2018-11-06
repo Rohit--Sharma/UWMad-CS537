@@ -10,5 +10,5 @@
 #include "build_spec_repr.h"
 
 char **tokenize_string (char *input);
-void construct_graph_edges (hash_table *hash_map);
+void construct_graph_edges (directed_graph *dag, hash_table *hash_map);
 void read_input_makefile (hash_table *map, char *file_name);

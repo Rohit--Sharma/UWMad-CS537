@@ -31,4 +31,31 @@ typedef struct MakeNode
 } MakeNode;
 #endif
 
-//void add_dependency(struct directed_acyclic_graph* dag, MakeNode* target, MakeNode* dependency);
+#ifndef STRUCT_GRAPH_ADJ_LIST_NODE
+#define STRUCT_GRAPH_ADJ_LIST_NODE
+typedef struct graph_adj_list_node
+{
+    MakeNode *target;
+    struct graph_adj_list_node* next;
+} graph_adj_list_node;
+#endif
+
+
+#ifndef STRUCT_DIRECTED_GRAPH
+#define STRUCT_DIRECTED_GRAPH
+typedef struct directed_graph 
+{ 
+    int targets_and_dependencies;
+    int *visited_node;
+    int *topological_num;
+    struct graph_adj_list_node **dependencies;
+} directed_graph;
+#endif
+
+
+void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency);
+graph_adj_list_node* new_adj_list_node(MakeNode* target_node); 
+directed_graph* create_graph(int no_of_target_dependencies); 
+void print_graph(directed_graph* dag);
+int depth_first_topological_traversal(directed_graph* dag, int node_num, int n);
+graph_adj_list_node** topo_list(directed_graph* dag);

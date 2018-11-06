@@ -221,7 +221,7 @@ void read_input_makefile (hash_table *map, char *file_name) {
     fclose(makefile_ptr);
 }
 
-void construct_graph_edges (hash_table *hash_map) {
+void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
     for (int i = 0; i < 10000; i++) {  // TODO: Make a const for the size of hash table
         if (hash_map->list[i] != NULL) {
             hash_node *temp = hash_map->list[i];
@@ -240,7 +240,7 @@ void construct_graph_edges (hash_table *hash_map) {
                         // insert the created node into the hash_map
                         hash_insert(hash_map, *(children + j), dependency_node);
                     }
-                    // add_dependency(dag, temp->val, dependency_node);
+                    add_dependency(dag, temp->val, dependency_node);
 
                     j++;
                 }

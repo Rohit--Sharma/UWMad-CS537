@@ -8,8 +8,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
+#include "proc_creation_prog_exe.h"
 #include "text_parsing.h"
 
 const size_t MAX_LINE_LEN = 1024;
@@ -20,11 +22,22 @@ int main() {
 
     read_input_makefile(my_map, "test_inputs/Makefile");
 
-    // construct_graph_edges(my_map);
+    directed_graph *dag = (directed_graph *) malloc(sizeof(directed_graph));
+	
+    dag = create_graph(50);
+    
+    construct_graph_edges(dag, my_map);
 
-	// order = traversal
-
+    depth_first_topological_traversal(dag, 0, dag->targets_and_dependencies);
+    print_graph(dag);
+    struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
 	// for each node in order, call execute_program(node)
+
+    int i = 0;
+    while (topologically_sorted_nodes[i] != NULL){
+	execute_program(topologically_sorted_nodes[i]->target);
+	i++;
+    }
 
     return 0;
 }
