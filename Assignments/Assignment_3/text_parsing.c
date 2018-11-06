@@ -11,7 +11,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <sys/stat.h>
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
 #include "text_parsing.h"
@@ -193,11 +192,6 @@ void read_input_makefile (hash_table *map, char *file_name) {
                 // Execute previous commands if any exist
                 if (cmds_head != NULL) {
                     curr_node = create_node(target_line, cmds_head);
-                    struct stat fileStat;
-                    if(stat(curr_node->name, &fileStat) < 0) {
-                        // TODO: Display error info according to errno
-                        fprintf(stderr, "Error in getting file statistics\n");
-                    }
                     // insert node into the hashmap
                     hash_insert(map, curr_node->name, curr_node);
 
