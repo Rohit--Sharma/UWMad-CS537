@@ -17,11 +17,10 @@
 extern const int MAX_LINE_LEN;
 
 char **tokenize_string (char *input) {
-
     char **result = NULL;
     char *temp = input;
     char *last_space = NULL;
-    int i = 0;
+    unsigned int i = 0;
     int count_tokens = 0;   // count_tokens will have the number of tokens in the input string + 1 for indicating the end
     while (*(temp + i) != '\0') {
         if (*(temp + i) == ' ') {

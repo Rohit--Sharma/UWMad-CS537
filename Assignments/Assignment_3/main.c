@@ -20,7 +20,7 @@ int main() {
 
     read_input_makefile(my_map, "test_inputs/Makefile");
 
-    construct_graph_edges(my_map);
+    // construct_graph_edges(my_map);
 
     return 0;
 }
