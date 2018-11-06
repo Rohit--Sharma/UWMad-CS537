@@ -18,16 +18,10 @@ struct graph_adj_list_node
     struct graph_adj_list_node* next;
 };
   
-// A structure to represent an adjacency list 
-// struct graph_adj_list
-// { 
-//     struct graph_adj_list_node *head;
-// };
-
 struct directed_acyclic_graph 
 { 
     int targets_and_dependencies;
-    //MakeNode *graph_head; 
+    int *visited_node;
     struct graph_adj_list_node **dependencies;
 };
 
@@ -46,12 +40,14 @@ struct directed_acyclic_graph* create_graph(int no_of_target_dependencies)
   
     // Create an array of adjacency lists 
     dag->dependencies = (struct graph_adj_list_node **) malloc(no_of_target_dependencies * sizeof(struct graph_adj_list_node *));
-  
+    dag->visited_node = (int *) malloc(no_of_target_dependencies * sizeof(int));
+
     // Initialize each adjacency list as empty
     int i; 
-    for (i = 0; i < no_of_target_dependencies; ++i) 
+    for (i = 0; i < no_of_target_dependencies; ++i) {
     	dag->dependencies[i] = NULL; 
-  
+  	dag->visited_node[i] = 0;
+    }
     return dag;
 } 
 
@@ -136,6 +132,28 @@ void print_graph(struct directed_acyclic_graph* dag)
     }
 }
 
+void depth_first_traversal(struct directed_acyclic_graph* dag, int node_num)
+{
+        struct graph_adj_list_node* adj_list = dag->dependencies[node_num];
+        struct graph_adj_list_node* temp = adj_list;
+        int next_node_num;
+        dag->visited_node[node_num] = 1;
+        printf("Visited %s \n", dag->dependencies[node_num]->target->name);
+   	printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
+        while(temp!=NULL) {
+            struct graph_adj_list_node* next_node = temp;
+       	    for (int i=0; i < dag->targets_and_dependencies; i++) {
+		    if (dag->dependencies[i]->target == next_node->target) {
+			    next_node_num = i;
+		    }
+	    }
+            if(dag->visited_node[next_node_num] == 0) {
+                depth_first_traversal(dag, next_node_num);
+            }
+            temp = temp->next;
+        }       
+}
+
 int main() {
 	//printf("\nEnter here");
 	MakeNode* n1 = (MakeNode *) malloc(sizeof(MakeNode));
@@ -186,6 +204,7 @@ int main() {
 	// 	printf("\n\ni is %i and list is %d, %d", i, dag->dependencies[i], dag->dependencies[i]->target);
 	// }
 	print_graph(dag);
+	depth_first_traversal(dag, 0);
 	return 0;
 }
 
