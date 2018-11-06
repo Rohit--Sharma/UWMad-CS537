@@ -70,7 +70,7 @@ void add_dependency(struct directed_acyclic_graph* dag, MakeNode* target, MakeNo
         i++;
     }
     i = 0;
-    while (dag->dependencies[i] != NULL){
+    while (dag->dependencies[i] != NULL) {
         if (dag->dependencies[i]->target == dependency) {
             dest_node = i;
             // dependency_node = dag->dependencies[i];
@@ -81,7 +81,7 @@ void add_dependency(struct directed_acyclic_graph* dag, MakeNode* target, MakeNo
     
     if (src_node == -1) {
     	target_node = new_adj_list_node(target);
-        for (i=0; i < dag->targets_and_dependencies; i++) {
+        for (i = 0; i < dag->targets_and_dependencies; i++) {
             if (dag->dependencies[i] == NULL) {
         	    dag->dependencies[i] = target_node;
 		        //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, target_node->target);
@@ -93,7 +93,7 @@ void add_dependency(struct directed_acyclic_graph* dag, MakeNode* target, MakeNo
 
     if (dest_node == -1) {
     	dependency_node = new_adj_list_node(dependency);
-        for (i=0; i<(dag->targets_and_dependencies); i++) {
+        for (i = 0; i < dag->targets_and_dependencies; i++) {
             if (dag->dependencies[i] == NULL) {
         	    dag->dependencies[i] = dependency_node;
 		        //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, dependency_node->target);
@@ -118,13 +118,11 @@ void print_graph(struct directed_acyclic_graph* dag)
 {
     int i;
     struct graph_adj_list_node* ptr = NULL; //(struct graph_adj_list_node*) malloc(sizeof(struct graph_adj_list_node));
-    for (i = 0; i < dag->targets_and_dependencies; i++)
-    {	
+    for (i = 0; i < dag->targets_and_dependencies; i++) {	
         printf("\nInside for loop for printing interation %d of %d", i, dag->targets_and_dependencies);
 	    ptr = dag->dependencies[i];
         printf("\n%d: ", i);
-        while (ptr)
-        {
+        while (ptr) {
             printf("-> %s", ptr->target->name);
             ptr = ptr->next;
         }
@@ -134,24 +132,24 @@ void print_graph(struct directed_acyclic_graph* dag)
 
 void depth_first_traversal(struct directed_acyclic_graph* dag, int node_num)
 {
-        struct graph_adj_list_node* adj_list = dag->dependencies[node_num];
-        struct graph_adj_list_node* temp = adj_list;
-        int next_node_num;
-        dag->visited_node[node_num] = 1;
-        printf("Visited %s \n", dag->dependencies[node_num]->target->name);
-   	printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
-        while(temp!=NULL) {
-            struct graph_adj_list_node* next_node = temp;
-       	    for (int i=0; i < dag->targets_and_dependencies; i++) {
-		    if (dag->dependencies[i]->target == next_node->target) {
-			    next_node_num = i;
-		    }
-	    }
-            if(dag->visited_node[next_node_num] == 0) {
-                depth_first_traversal(dag, next_node_num);
+    struct graph_adj_list_node* adj_list = dag->dependencies[node_num];
+    struct graph_adj_list_node* temp = adj_list;
+    int next_node_num;
+    dag->visited_node[node_num] = 1;
+    printf("Visited %s \n", dag->dependencies[node_num]->target->name);
+    printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
+    while(temp != NULL) {
+        struct graph_adj_list_node* next_node = temp;
+        for (int i = 0; i < dag->targets_and_dependencies; i++) {
+            if (dag->dependencies[i]->target == next_node->target) {
+                next_node_num = i;
             }
-            temp = temp->next;
-        }       
+        }
+        if(dag->visited_node[next_node_num] == 0) {
+            depth_first_traversal(dag, next_node_num);
+        }
+        temp = temp->next;
+    }
 }
 
 int main() {
@@ -207,4 +205,3 @@ int main() {
 	depth_first_traversal(dag, 0);
 	return 0;
 }
-
