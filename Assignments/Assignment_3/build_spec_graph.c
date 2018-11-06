@@ -154,22 +154,22 @@ int depth_first_topological_traversal(struct directed_acyclic_graph* dag, int no
         }
         temp = temp->next;
     }
-    
+
  	dag->topological_num[node_num] = n;
 	printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
 	return n-1;	
 }
 
 struct graph_adj_list_node** topo_list(struct directed_acyclic_graph* dag) {
-	int i = 0;
 	struct graph_adj_list_node **topologically_sorted_nodes;
 	topologically_sorted_nodes = (struct graph_adj_list_node **) malloc((dag->targets_and_dependencies) * sizeof(struct graph_adj_list_node *));
-	for (int i=0; i<dag->targets_and_dependencies; i++) {
+	for (int i = 0; i < dag->targets_and_dependencies; i++) {
 		topologically_sorted_nodes[(dag->targets_and_dependencies)-(dag->topological_num[i])] = dag->dependencies[i];
 	}
 	return topologically_sorted_nodes;
 }
-int main() {
+
+int main_1() {
 	//printf("\nEnter here");
 	MakeNode* n1 = (MakeNode *) malloc(sizeof(MakeNode));
 	MakeNode* n2 = (MakeNode *) malloc(sizeof(MakeNode));

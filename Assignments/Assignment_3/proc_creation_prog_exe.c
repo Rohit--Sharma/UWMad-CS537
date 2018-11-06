@@ -19,7 +19,7 @@
 void execute_program(MakeNode *node) {
     command *commands = node->rules;
     while (commands != NULL) {
-        pid_t parent = getpid();
+        // pid_t parent = getpid();
         pid_t pid = fork();
 
         if (pid == -1) {
@@ -32,8 +32,7 @@ void execute_program(MakeNode *node) {
                 if (WIFEXITED(status) && !WEXITSTATUS(status))  
                 fprintf(stderr, "program execution successfull\n"); 
                 else if (WIFEXITED(status) && WEXITSTATUS(status)) { 
-                    if (WEXITSTATUS(status) == 127) { 
-    
+                    if (WEXITSTATUS(status) == 127) {
                         // execv failed 
                         fprintf(stderr, "execv failed\n"); 
                     } 
@@ -61,7 +60,7 @@ void execute_program(MakeNode *node) {
     }
 }
 
-int main() {
+int main_2() {
     MakeNode *temp = (MakeNode *) malloc(sizeof(MakeNode));
     temp->name = "target";
     command *commands = create_command("echo Hello, World");

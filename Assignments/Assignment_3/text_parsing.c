@@ -59,7 +59,7 @@ char **tokenize_string (char *input) {
             i++;
         }
 
-        *(token + j) == '\0';
+        *(token + j) = '\0';
         *(result + idx++) = token;  // strdup(token);
 
         if (*(temp + i) == '\0')
