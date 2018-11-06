@@ -1,0 +1,178 @@
+Target: 537ps
+  Command: gcc -o 537ps 537ps.o readproc.o parseopts.o output.o
+  Command: echo built successfully....
+
+   Dependencies: 537ps.o | readproc.o | parseopts.o | output.o | 
+Target: 537ps.o
+  Command: gcc -c -Wall -Wextra 537ps.c
+
+   Dependencies: 537ps.c | 537ps.h | readproc.h | parseopts.h | 
+Target: readproc.o
+  Command: gcc -c -Wall -Wextra readproc.c dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+  Command: cmdt1
+  Command: cmdt2
+  Command: cmdt4
+  Command: cmd55
+
+   Dependencies: readproc.c | readproc.h | 
+Target: parseopts.o
+  Command: gcc -c -Wall -Wextra parseopts.c
+
+   Dependencies: parseopts.c | parseopts.h | 
+Target: output.o
+  Command: gcc -c -Wall -Wextra output.c
+
+   Dependencies: output.c | 
+
+node num is 1, topological num is 50 and target is output.
+node num is 1, topological num is 50 and target is output.
+node num is 0, topological num is 49 and target is output.o
+Inside for loop for printing interation 0 of 50
+0: -> output.o-> output.->NULL
+
+Inside for loop for printing interation 1 of 50
+1: -> output.->NULL
+
+Inside for loop for printing interation 2 of 50
+2: -> parseopts.o-> parseopts.-> parseopts.->NULL
+
+Inside for loop for printing interation 3 of 50
+3: -> parseopts.->NULL
+
+Inside for loop for printing interation 4 of 50
+4: -> parseopts.->NULL
+
+Inside for loop for printing interation 5 of 50
+5: -> readproc.o-> readproc.-> readproc.->NULL
+
+Inside for loop for printing interation 6 of 50
+6: -> readproc.->NULL
+
+Inside for loop for printing interation 7 of 50
+7: -> readproc.->NULL
+
+Inside for loop for printing interation 8 of 50
+8: -> 537ps.o-> 537ps.-> 537ps.-> readproc.-> parseopts.->NULL
+
+Inside for loop for printing interation 9 of 50
+9: -> 537ps.->NULL
+
+Inside for loop for printing interation 10 of 50
+10: -> 537ps.->NULL
+
+Inside for loop for printing interation 11 of 50
+11: -> 537ps-> 537ps.o-> readproc.o-> parseopts.o-> output.o->NULL
+
+Inside for loop for printing interation 12 of 50
+12: ->NULL
+
+Inside for loop for printing interation 13 of 50
+13: ->NULL
+
+Inside for loop for printing interation 14 of 50
+14: ->NULL
+
+Inside for loop for printing interation 15 of 50
+15: ->NULL
+
+Inside for loop for printing interation 16 of 50
+16: ->NULL
+
+Inside for loop for printing interation 17 of 50
+17: ->NULL
+
+Inside for loop for printing interation 18 of 50
+18: ->NULL
+
+Inside for loop for printing interation 19 of 50
+19: ->NULL
+
+Inside for loop for printing interation 20 of 50
+20: ->NULL
+
+Inside for loop for printing interation 21 of 50
+21: ->NULL
+
+Inside for loop for printing interation 22 of 50
+22: ->NULL
+
+Inside for loop for printing interation 23 of 50
+23: ->NULL
+
+Inside for loop for printing interation 24 of 50
+24: ->NULL
+
+Inside for loop for printing interation 25 of 50
+25: ->NULL
+
+Inside for loop for printing interation 26 of 50
+26: ->NULL
+
+Inside for loop for printing interation 27 of 50
+27: ->NULL
+
+Inside for loop for printing interation 28 of 50
+28: ->NULL
+
+Inside for loop for printing interation 29 of 50
+29: ->NULL
+
+Inside for loop for printing interation 30 of 50
+30: ->NULL
+
+Inside for loop for printing interation 31 of 50
+31: ->NULL
+
+Inside for loop for printing interation 32 of 50
+32: ->NULL
+
+Inside for loop for printing interation 33 of 50
+33: ->NULL
+
+Inside for loop for printing interation 34 of 50
+34: ->NULL
+
+Inside for loop for printing interation 35 of 50
+35: ->NULL
+
+Inside for loop for printing interation 36 of 50
+36: ->NULL
+
+Inside for loop for printing interation 37 of 50
+37: ->NULL
+
+Inside for loop for printing interation 38 of 50
+38: ->NULL
+
+Inside for loop for printing interation 39 of 50
+39: ->NULL
+
+Inside for loop for printing interation 40 of 50
+40: ->NULL
+
+Inside for loop for printing interation 41 of 50
+41: ->NULL
+
+Inside for loop for printing interation 42 of 50
+42: ->NULL
+
+Inside for loop for printing interation 43 of 50
+43: ->NULL
+
+Inside for loop for printing interation 44 of 50
+44: ->NULL
+
+Inside for loop for printing interation 45 of 50
+45: ->NULL
+
+Inside for loop for printing interation 46 of 50
+46: ->NULL
+
+Inside for loop for printing interation 47 of 50
+47: ->NULL
+
+Inside for loop for printing interation 48 of 50
+48: ->NULL
+
+Inside for loop for printing interation 49 of 50
+49: ->NULL

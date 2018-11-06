@@ -33,8 +33,8 @@ directed_graph* create_graph(int no_of_target_dependencies)
     int i; 
     for (i = 0; i < no_of_target_dependencies; ++i) {
     	dag->dependencies[i] = NULL; 
-  	dag->visited_node[i] = 0;
-	dag->topological_num[i] = 0;
+        dag->visited_node[i] = 0;
+        dag->topological_num[i] = 0;
     }
     return dag;
 } 
@@ -106,15 +106,17 @@ void print_graph(directed_graph* dag)
 {
     int i;
     graph_adj_list_node* ptr = NULL; //(struct graph_adj_list_node*) malloc(sizeof(struct graph_adj_list_node));
-    for (i = 0; i < dag->targets_and_dependencies; i++) {	
-        printf("\nInside for loop for printing interation %d of %d", i, dag->targets_and_dependencies);
-	    ptr = dag->dependencies[i];
-        printf("\n%d: ", i);
-        while (ptr) {
-            printf("-> %s", ptr->target->name);
-            ptr = ptr->next;
+    for (i = 0; i < dag->targets_and_dependencies; i++) {
+        if (dag->dependencies[i] != NULL) {	
+            printf("\nInside for loop for printing interation %d of %d", i, dag->targets_and_dependencies);
+            ptr = dag->dependencies[i];
+            printf("\n%d: ", i);
+            while (ptr) {
+                printf("-> %s", ptr->target->name);
+                ptr = ptr->next;
+            }
+            printf("->NULL\n");
         }
-        printf("->NULL\n");
     }
 }
 

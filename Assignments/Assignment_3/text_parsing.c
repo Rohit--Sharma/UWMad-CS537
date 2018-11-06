@@ -226,20 +226,22 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
         if (hash_map->list[i] != NULL) {
             hash_node *temp = hash_map->list[i];
             while (temp != NULL) {
-                // fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
+                fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
                 char **children = temp->val->children;
                 int j = 0;
                 while (*(children + j) != NULL) {
-                    // fprintf(stdout, "%s | ", *(children + j));
+                    fprintf(stdout, "%s | ", *(children + j));
                     // If the node for child exists, create an edge in the graph. Else, create the leaf node and edge for it in the graph
                     MakeNode *dependency_node = hash_lookup(hash_map, *(children + j));
                     if (dependency_node == NULL) {
                         // create leaf node
+                        fprintf(stdout, "Creating new node for %s | ", *(children + j));
                         dependency_node = create_node(*(children + j), NULL);
 
                         // insert the created node into the hash_map
                         hash_insert(hash_map, *(children + j), dependency_node);
                     }
+                    fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
                     add_dependency(dag, temp->val, dependency_node);
 
                     j++;
