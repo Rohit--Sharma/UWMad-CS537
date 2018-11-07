@@ -197,7 +197,9 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
                 // Execute previous commands if any exist
                 if (cmds_head != NULL) {
                     curr_node = create_node(target_line, cmds_head);
+                    int num_children = num_dependencies(curr_node);
                     num_nodes++;
+                    num_nodes += num_children;
 		            // printf("\n****current node name is %s****\n", curr_node->name);
                     // insert node into the hashmap
                     hash_insert(map, curr_node->name, curr_node);
@@ -224,7 +226,9 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
     // If cmds_head is not null, create the last makenode
     if (cmds_head != NULL) {
         curr_node = create_node(target_line, cmds_head);
+        int num_children = num_dependencies(curr_node);
         num_nodes++;
+        num_nodes += num_children;
 	    // printf("\n****current node name is %s****\n", curr_node->name);
         // insert node into the hashmap
         hash_insert(map, curr_node->name, curr_node);
@@ -300,6 +304,19 @@ graph_stats *construct_graph_edges (directed_graph* dag, hash_table *hash_map, c
 
     result->nodes_count = num_nodes;
     return result;
+}
+
+/**
+ * Returns the number of dependencies for a node
+ * Used for computing the number of nodes to be created
+ */
+int num_dependencies (MakeNode *node) {
+    char **dependencies = node->children;
+    int i = 0;
+    while (*(dependencies + i) != NULL) {
+        i++;
+    }
+    return i;
 }
 
 // int main() {
