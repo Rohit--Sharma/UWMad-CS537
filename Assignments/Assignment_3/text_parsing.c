@@ -202,15 +202,15 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
                     // insert node into the hashmap
                     hash_insert(map, curr_node->name, curr_node);
 
+                    if (root == NULL) {
+                        root = curr_node->name;
+                        make_file_stats->root = root;
+                    }
+
                     display_node(curr_node);
 
                     cmds_head = NULL;
                     first_cmd = 1;
-                }
-
-                if (root == NULL) {
-                    root = curr_node->name;
-                    make_file_stats->root = root;
                 }
 
                 // store the current line
@@ -228,6 +228,11 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
 	    // printf("\n****current node name is %s****\n", curr_node->name);
         // insert node into the hashmap
         hash_insert(map, curr_node->name, curr_node);
+
+        if (root == NULL) {
+            root = curr_node->name;
+            make_file_stats->root = root;
+        }
 
         display_node(curr_node);
     }
