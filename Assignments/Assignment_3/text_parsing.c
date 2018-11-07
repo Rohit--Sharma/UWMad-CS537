@@ -126,12 +126,16 @@ read_line_val *read_line(int buff_size, FILE *fileptr) {
     return new_line_val;
 }
 
-void read_input_makefile (hash_table *map, char *file_name) {
+make_stats *read_input_makefile (hash_table *map, char *file_name) {
+    make_stats *make_file_stats = (make_stats *) malloc(sizeof(make_stats));
     // fprintf(stdout, "Inside read_input_makefile()\n");
     FILE *makefile_ptr = fopen(file_name, "r");
 
     char *line = NULL;
     char *target_line = NULL;
+    char *root = NULL;
+
+    int num_nodes = 0;
 
     command *cmds_head = NULL, *curr_cmd = NULL;
     MakeNode *curr_node = NULL;
@@ -193,6 +197,7 @@ void read_input_makefile (hash_table *map, char *file_name) {
                 // Execute previous commands if any exist
                 if (cmds_head != NULL) {
                     curr_node = create_node(target_line, cmds_head);
+                    num_nodes++;
 		            // printf("\n****current node name is %s****\n", curr_node->name);
                     // insert node into the hashmap
                     hash_insert(map, curr_node->name, curr_node);
@@ -201,6 +206,11 @@ void read_input_makefile (hash_table *map, char *file_name) {
 
                     cmds_head = NULL;
                     first_cmd = 1;
+                }
+
+                if (root == NULL) {
+                    root = curr_node->name;
+                    make_file_stats->root = root;
                 }
 
                 // store the current line
@@ -214,6 +224,7 @@ void read_input_makefile (hash_table *map, char *file_name) {
     // If cmds_head is not null, create the last makenode
     if (cmds_head != NULL) {
         curr_node = create_node(target_line, cmds_head);
+        num_nodes++;
 	    // printf("\n****current node name is %s****\n", curr_node->name);
         // insert node into the hashmap
         hash_insert(map, curr_node->name, curr_node);
@@ -222,20 +233,34 @@ void read_input_makefile (hash_table *map, char *file_name) {
     }
 
     fclose(makefile_ptr);
+
+    make_file_stats->nodes_count = num_nodes;
+    return make_file_stats;
 }
 
-void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
+/**
+ * Creates edges for all the dependencies of the makefile
+ * returns the index of location where target node is stored
+ */
+graph_stats *construct_graph_edges (directed_graph* dag, hash_table *hash_map, char *root) {
+    graph_stats *result = (graph_stats *) malloc(sizeof(graph_stats));
+    int num_nodes = 0;
+    int counter = 0;
     // fprintf(stdout, "Inside construct_graph_edges()\n");
     for (int i = 0; i < 10000; i++) {  // TODO: Make a const for the size of hash table
         if (hash_map->list[i] != NULL) {
             hash_node *temp = hash_map->list[i];
             while (temp != NULL) {
+                if (strcmp(temp->key, root) == 0) {
+                    result->index_head = counter;
+                }
                 // fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
                 char **children = temp->val->children;
                 
 				// if no dependencies
 				if (children == NULL) {
 					add_dependency(dag, temp->val, NULL);
+                    num_nodes++;
 				}
 				else {
                     int j = 0;
@@ -257,14 +282,19 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
                         // printf("\n****current dependency name is %s****\n", dependency_node->name);
                         // fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
                         add_dependency(dag, temp->val, dependency_node);
+                        num_nodes++;
 
                         j++;
                     }
                 }
                 temp = temp->next;
+                counter++;
             }
         }
     }
+
+    result->nodes_count = num_nodes;
+    return result;
 }
 
 // int main() {
