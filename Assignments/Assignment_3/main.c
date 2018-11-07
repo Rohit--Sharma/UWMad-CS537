@@ -20,7 +20,7 @@ int main() {
 	
     hash_table *my_map = create_hash_table(10000);  // TODO: Make a const for the size of hash table
 
-    read_input_makefile(my_map, "test_inputs/Simple_makefile");
+    read_input_makefile(my_map, "test_inputs/Makefile2");
     // fprintf(stdout, "Exiting read_input_makefile()\n");
 
     directed_graph *dag = create_graph(50);
@@ -28,21 +28,36 @@ int main() {
 
     construct_graph_edges(dag, my_map);
     // fprintf(stdout, "Exiting construct_graph_edges()\n");
-
+    printf("Program reaches here\n");
     print_graph(dag);
-    depth_first_topological_traversal(dag, 5, dag->targets_and_dependencies);
+    printf("Program reaches here 2\n");
+    depth_first_topological_traversal(dag, 7, dag->targets_and_dependencies);
+    printf("Program reaches here 3\n");
     struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
     printf("\n");
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 50; i++) {
+		if (topologically_sorted_nodes[i]==NULL)
+			break;
 	 	printf("->%s", topologically_sorted_nodes[i]->target->name);
+	}
 //	 for each node in order, call execute_program(node)
 
-    // int i = 0;
-    // while (topologically_sorted_nodes[i] != NULL){
-    //     execute_program(topologically_sorted_nodes[i]->target);
-    //     // fprintf(stdout, "\nSorted node %d is %s\n", topologically_sorted_nodes[i]->target->name);
-    //     i++;
-    // }
+    printf("Program reaches here 4\n");
+    int i = 0;
+    while (topologically_sorted_nodes[i] != NULL){
+          printf("Inside execute loop %d\n", i);
+          FILE * fp;
+          fp = fopen (topologically_sorted_nodes[i]->target->name, "r");
+          printf("topologically_sorted_node->target and name are %d and %s and fp is %d\n", topologically_sorted_nodes[i]->target, topologically_sorted_nodes[i]->target->name, fp);
+          if (fp == NULL) {
+        	if (topologically_sorted_nodes[i]->target->rules != NULL)
+         		execute_program(topologically_sorted_nodes[i]->target);
+    		printf("Exiting Execute_program for node at %d\n", topologically_sorted_nodes[i]->target);
+          }else {
+          	fclose(fp);
+	  }
+          i++;
+    }
 
     return 0;
 }

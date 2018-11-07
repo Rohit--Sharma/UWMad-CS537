@@ -18,6 +18,7 @@
 
 void execute_program(MakeNode *node) {
     command *commands = node->rules;
+    printf("Inside Execute_program for node at %d\n", node);
     while (commands != NULL) {
         // pid_t parent = getpid();
         pid_t pid = fork();
