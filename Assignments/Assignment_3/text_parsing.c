@@ -242,7 +242,7 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
                         fprintf(stdout, "Creating new node for %s | \n", *(children + j));
                         dependency_node = create_node(*(children + j), NULL);
                         display_node(dependency_node);
-                        printf("***children %d, name is %s***\n", j, children[j]);
+                        printf("***children %d, name is %s***\n", j, *(children + j));
                         // printf("\n****current dependency name is %s****\n", dependency_node->name);
 
                         // insert the created node into the hash_map
