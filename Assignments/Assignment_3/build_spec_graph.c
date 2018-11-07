@@ -105,6 +105,14 @@ void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency)
     }
 }
 
+int index_head_node (directed_graph *dag, char *root) {
+    for (int i = 0; i < dag->targets_and_dependencies; i++) {
+        if (dag->dependencies[i] != NULL && strcmp(dag->dependencies[i]->target->name, root) == 0) {
+            return i;
+        }
+    }
+}
+
 void print_graph(directed_graph* dag)
 {
     int i;

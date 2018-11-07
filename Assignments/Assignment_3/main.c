@@ -30,7 +30,11 @@ int main() {
 	printf("Program reaches here\n");
 	print_graph(dag);
 	printf("Program reaches here 2\n");
-	depth_first_topological_traversal(dag, graph_statistics->index_head, dag->targets_and_dependencies);
+
+	int index_head = index_head_node(dag, make_file_stats->root);
+	printf("Index of root: %d\n", index_head);
+
+	depth_first_topological_traversal(dag, index_head, dag->targets_and_dependencies);
 	printf("Program reaches here 3\n");
 	struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
 	printf("\n");
