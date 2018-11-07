@@ -80,7 +80,7 @@ void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency)
         }
     }
 
-    if (dest_node == -1) {
+    if (dest_node == -1 && dependency != NULL) {
     	dependency_node = new_adj_list_node(dependency);
         for (i = 0; i < dag->targets_and_dependencies; i++) {
             if (dag->dependencies[i] == NULL) {
@@ -96,11 +96,13 @@ void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency)
     
     //dependency_node->next = dag->dependencies[src_node].head; 
     
-    graph_adj_list_node* temp_node = dag->dependencies[src_node];
-    while (temp_node->next != NULL) {
-        temp_node = temp_node->next;
+    if (dependency != NULL) {
+        graph_adj_list_node* temp_node = dag->dependencies[src_node];
+        while (temp_node->next != NULL) {
+            temp_node = temp_node->next;
+        }
+        temp_node->next = new_dependency_node;
     }
-    temp_node->next = new_dependency_node;
 }
 
 void print_graph(directed_graph* dag)
