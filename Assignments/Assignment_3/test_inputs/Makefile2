@@ -1,0 +1,14 @@
+537ps: options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
+	gcc -Wall -o 537ps options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
+	echo running
+options_processor.o: options_processor.c 537ps_header.h
+	gcc -Wall -c options_processor.c
+
+proc_files_parser.o: proc_files_parser.c 537ps_header.h
+	gcc -Wall -c proc_files_parser.c
+
+proc_id_processor.o: proc_id_processor.c 537ps_header.h
+	gcc -Wall -c proc_id_processor.c
+
+537ps_driver.o: 537ps_driver.c 537ps_header.h
+	gcc -Wall -c 537ps_driver.c
