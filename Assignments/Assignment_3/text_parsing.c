@@ -260,25 +260,18 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
  * Creates edges for all the dependencies of the makefile
  * returns the index of location where target node is stored
  */
-graph_stats *construct_graph_edges (directed_graph* dag, hash_table *hash_map, char *root) {
-    graph_stats *result = (graph_stats *) malloc(sizeof(graph_stats));
-    int num_nodes = 0;
-    int counter = 0;
+void construct_graph_edges (directed_graph* dag, hash_table *hash_map, char *root) {
     // fprintf(stdout, "Inside construct_graph_edges()\n");
     for (int i = 0; i < 10000; i++) {  // TODO: Make a const for the size of hash table
         if (hash_map->list[i] != NULL) {
             hash_node *temp = hash_map->list[i];
             while (temp != NULL) {
-                if (strcmp(temp->key, root) == 0) {
-                    result->index_head = counter;
-                }
                 // fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
                 char **children = temp->val->children;
                 
 				// if no dependencies
 				if (children == NULL) {
 					add_dependency(dag, temp->val, NULL);
-                    num_nodes++;
 				}
 				else {
                     int j = 0;
@@ -300,19 +293,14 @@ graph_stats *construct_graph_edges (directed_graph* dag, hash_table *hash_map, c
                         // printf("\n****current dependency name is %s****\n", dependency_node->name);
                         // fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
                         add_dependency(dag, temp->val, dependency_node);
-                        num_nodes++;
 
                         j++;
                     }
                 }
                 temp = temp->next;
-                counter++;
             }
         }
     }
-
-    result->nodes_count = num_nodes;
-    return result;
 }
 
 /**

@@ -18,15 +18,6 @@ typedef struct make_stats
 } make_stats;
 #endif
 
-#ifndef STRUCT_GRAPH_STATS
-#define STRUCT_GRAPH_STATS
-typedef struct graph_stats 
-{ 
-    int index_head;
-    int nodes_count;
-} graph_stats;
-#endif
-
 char **tokenize_string (char *input);
-graph_stats *construct_graph_edges (directed_graph *dag, hash_table *hash_map, char *root);
+void construct_graph_edges (directed_graph *dag, hash_table *hash_map, char *root);
 make_stats *read_input_makefile (hash_table *map, char *file_name);
