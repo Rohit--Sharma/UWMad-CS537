@@ -17,47 +17,47 @@
 const size_t MAX_LINE_LEN = 1024;
 
 int main() {
-	
-    hash_table *my_map = create_hash_table(10000);  // TODO: Make a const for the size of hash table
+	hash_table *my_map = create_hash_table(10000); // TODO: Make a const for the size of hash table
 
-    read_input_makefile(my_map, "test_inputs/Makefile2");
-    // fprintf(stdout, "Exiting read_input_makefile()\n");
+	read_input_makefile(my_map, "test_inputs/Makefile2");
+	// fprintf(stdout, "Exiting read_input_makefile()\n");
 
-    directed_graph *dag = create_graph(50);
-    // fprintf(stdout, "Exiting create_graph()\n");
+	directed_graph *dag = create_graph(50);
+	// fprintf(stdout, "Exiting create_graph()\n");
 
-    construct_graph_edges(dag, my_map);
-    // fprintf(stdout, "Exiting construct_graph_edges()\n");
-    printf("Program reaches here\n");
-    print_graph(dag);
-    printf("Program reaches here 2\n");
-    depth_first_topological_traversal(dag, 7, dag->targets_and_dependencies);
-    printf("Program reaches here 3\n");
-    struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
-    printf("\n");
+	construct_graph_edges(dag, my_map);
+	// fprintf(stdout, "Exiting construct_graph_edges()\n");
+	printf("Program reaches here\n");
+	print_graph(dag);
+	printf("Program reaches here 2\n");
+	depth_first_topological_traversal(dag, 7, dag->targets_and_dependencies);
+	printf("Program reaches here 3\n");
+	struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
+	printf("\n");
 	for (int i = 0; i < 50; i++) {
-		if (topologically_sorted_nodes[i]==NULL)
+		if (topologically_sorted_nodes[i] == NULL)
 			break;
-	 	printf("->%s", topologically_sorted_nodes[i]->target->name);
+		printf("->%s", topologically_sorted_nodes[i]->target->name);
 	}
-//	 for each node in order, call execute_program(node)
+	//	 for each node in order, call execute_program(node)
 
-    printf("Program reaches here 4\n");
-    int i = 0;
-    while (topologically_sorted_nodes[i] != NULL){
-          printf("Inside execute loop %d\n", i);
-          FILE * fp;
-          fp = fopen (topologically_sorted_nodes[i]->target->name, "r");
-          printf("topologically_sorted_node->target and name are %d and %s and fp is %d\n", topologically_sorted_nodes[i]->target, topologically_sorted_nodes[i]->target->name, fp);
-          if (fp == NULL) {
-        	if (topologically_sorted_nodes[i]->target->rules != NULL)
-         		execute_program(topologically_sorted_nodes[i]->target);
-    		printf("Exiting Execute_program for node at %d\n", topologically_sorted_nodes[i]->target);
-          }else {
-          	fclose(fp);
-	  }
-          i++;
-    }
+	printf("Program reaches here 4\n");
+	int i = 0;
+	while (topologically_sorted_nodes[i] != NULL) {
+		printf("Inside execute loop %d\n", i);
+		FILE *fp;
+		fp = fopen(topologically_sorted_nodes[i]->target->name, "r");
+		printf("topologically_sorted_node->target and name are %d and %s and fp is %d\n", topologically_sorted_nodes[i]->target, topologically_sorted_nodes[i]->target->name, fp);
+		if (fp == NULL) {
+			if (topologically_sorted_nodes[i]->target->rules != NULL)
+				execute_program(topologically_sorted_nodes[i]->target);
+			printf("Exiting Execute_program for node at %d\n", topologically_sorted_nodes[i]->target);
+		}
+		else {
+			fclose(fp);
+		}
+		i++;
+	}
 
-    return 0;
+	return 0;
 }
