@@ -18,6 +18,7 @@
 extern const size_t MAX_LINE_LEN;
 
 char **tokenize_string (char *input) {
+    fprintf(stdout, "Inside tokenize_string(%s)\n", input);
     char **result = NULL;
     char *temp = input;
     char *last_space = NULL;
@@ -41,7 +42,15 @@ char **tokenize_string (char *input) {
     // Increment count_tokens for indicating the end of returned strings
     count_tokens++;
 
+    fprintf(stdout, "Mallocing: %d\n", count_tokens);
     result = (char **) malloc(sizeof (char *) * count_tokens);
+    if (errno == ENOMEM) {
+        fprintf(stderr, "Not enough memory for malloc\nExiting...\n");
+        // free(munch1_param);
+        // free(munch2_param);
+        exit(1);
+    }
+    fprintf(stdout, "Malloced %d bytes in tokenize_string()\n", count_tokens);
     // TODO: Check return value of malloc
     size_t idx = 0;
     temp = input;
@@ -68,7 +77,7 @@ char **tokenize_string (char *input) {
         //i++;
     }
     *(result + idx) = 0;
-
+    fprintf(stdout, "Done tokenizing\n");
     return result;
 }
 

@@ -18,7 +18,7 @@
 
 void execute_program(MakeNode *node) {
     command *commands = node->rules;
-    printf("Inside Execute_program for node at %d\n", node);
+    printf("Inside Execute_program for node at %s\n", node->name);
     while (commands != NULL) {
         // pid_t parent = getpid();
         pid_t pid = fork();
@@ -52,7 +52,9 @@ void execute_program(MakeNode *node) {
             // Child proc
             // char *argv[4] = {"echo", "Hello,", "World!", NULL};
             // execvp("echo", argv);
+	    fprintf(stdout, "Command being executed: %s\n", commands->rule);
             char **args = tokenize_string(commands->rule);
+	    fprintf(stdout, "Execing %s %s...\n", args[0], args[1]);
             execvp(args[0], args);
             fprintf(stderr, "Exec should never return, but it returned with a failure\n");
             exit(1);    // To avoid the fork bomb
