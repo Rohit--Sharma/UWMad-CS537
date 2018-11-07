@@ -25,8 +25,8 @@ int main() {
 	directed_graph *dag = create_graph(make_file_stats->nodes_count);
 	// fprintf(stdout, "Exiting create_graph()\n");
 
-	graph_stats *graph_statistics = construct_graph_edges(dag, my_map, make_file_stats->root);
-	fprintf(stdout, "Exiting construct_graph_edges(), root index: %d, num_nodes: %d\n", graph_statistics->index_head, graph_statistics->nodes_count);
+	construct_graph_edges(dag, my_map, make_file_stats->root);
+	fprintf(stdout, "Exiting construct_graph_edges()\n");
 	printf("Program reaches here\n");
 	print_graph(dag);
 	printf("Program reaches here 2\n");
