@@ -26,15 +26,19 @@ command *create_command (char *rule) {
 }
 
 MakeNode *create_node (char *target_line, command *cmds_head) {
+    // fprintf(stdout, "Creating node\n");
     char **tokens = tokenize_string(target_line);
     char *target = tokens[0];
     char **dependencies = tokens + 1;
-    target[strlen(target) - 1] = '\0';    // remove the : char
+    if (cmds_head != NULL) {
+        // dependencies = tokens + 1;
+        target[strlen(target) - 1] = '\0';    // remove the : char
+    }
 
     struct stat file_stat;
     if(stat(target, &file_stat) < 0) {
         // TODO: Display error info according to errno
-        fprintf(stderr, "Error in getting file statistics for %s\n", target);
+        // fprintf(stderr, "Error in getting file statistics for %s\n", target);
     }
     // fprintf(stdout, "Last modified time for %s: %s\n", target, ctime(&file_stat.st_mtime));
     // to compare timestamps, use difftime(time_t t1, time_t t2) 

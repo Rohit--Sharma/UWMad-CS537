@@ -22,6 +22,7 @@ graph_adj_list_node* new_adj_list_node(MakeNode* target_node)
 
 directed_graph* create_graph(int no_of_target_dependencies) 
 { 
+    // fprintf(stdout, "Inside create_graph()\n");
     directed_graph *dag = (directed_graph *) malloc(sizeof(directed_graph));
     dag->targets_and_dependencies = no_of_target_dependencies;
   
@@ -108,7 +109,7 @@ void print_graph(directed_graph* dag)
     graph_adj_list_node* ptr = NULL; //(struct graph_adj_list_node*) malloc(sizeof(struct graph_adj_list_node));
     for (i = 0; i < dag->targets_and_dependencies; i++) {
         if (dag->dependencies[i] != NULL) {	
-            printf("\nInside for loop for printing interation %d of %d", i, dag->targets_and_dependencies);
+            printf("\nInside for loop for printing p_g interation %d of %d", i, dag->targets_and_dependencies);
             ptr = dag->dependencies[i];
             printf("\n%d: ", i);
             while (ptr) {
@@ -127,7 +128,7 @@ int depth_first_topological_traversal(directed_graph* dag, int node_num, int n)
     int next_node_num;
     dag->visited_node[node_num] = 1;
     //printf("Visited %s \n", dag->dependencies[node_num]->target->name);
-    //printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
+    // printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
     while (temp != NULL) {
         graph_adj_list_node* next_node = temp;
         for (int i = 0; i < dag->targets_and_dependencies; i++) {
@@ -140,13 +141,13 @@ int depth_first_topological_traversal(directed_graph* dag, int node_num, int n)
 
         if (dag->visited_node[next_node_num] == 0) {
             n = depth_first_topological_traversal(dag, next_node_num, n);
-            printf("\nnode num is %d, topological num is %d and target is %s",next_node_num, dag->topological_num[next_node_num], dag->dependencies[next_node_num]->target->name); 
+            // printf("\nnode num is %d, topological num is %d and target is %s",next_node_num, dag->topological_num[next_node_num], dag->dependencies[next_node_num]->target->name); 
         }
         temp = temp->next;
     }
 
  	dag->topological_num[node_num] = n;
-	printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
+	// printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
 	return n-1;	
 }
 

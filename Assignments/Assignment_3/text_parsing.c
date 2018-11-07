@@ -127,6 +127,7 @@ read_line_val *read_line(int buff_size, FILE *fileptr) {
 }
 
 void read_input_makefile (hash_table *map, char *file_name) {
+    // fprintf(stdout, "Inside read_input_makefile()\n");
     FILE *makefile_ptr = fopen(file_name, "r");
 
     char *line = NULL;
@@ -192,7 +193,7 @@ void read_input_makefile (hash_table *map, char *file_name) {
                 // Execute previous commands if any exist
                 if (cmds_head != NULL) {
                     curr_node = create_node(target_line, cmds_head);
-		    printf("\n****current node name is %s****\n", curr_node->name);
+		            // printf("\n****current node name is %s****\n", curr_node->name);
                     // insert node into the hashmap
                     hash_insert(map, curr_node->name, curr_node);
 
@@ -213,7 +214,7 @@ void read_input_makefile (hash_table *map, char *file_name) {
     // If cmds_head is not null, create the last makenode
     if (cmds_head != NULL) {
         curr_node = create_node(target_line, cmds_head);
-	printf("\n****current node name is %s****\n", curr_node->name);
+	    // printf("\n****current node name is %s****\n", curr_node->name);
         // insert node into the hashmap
         hash_insert(map, curr_node->name, curr_node);
 
@@ -224,29 +225,31 @@ void read_input_makefile (hash_table *map, char *file_name) {
 }
 
 void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
+    // fprintf(stdout, "Inside construct_graph_edges()\n");
     for (int i = 0; i < 10000; i++) {  // TODO: Make a const for the size of hash table
         if (hash_map->list[i] != NULL) {
             hash_node *temp = hash_map->list[i];
             while (temp != NULL) {
-                fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
+                // fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
                 char **children = temp->val->children;
                 int j = 0;
                 while (*(children + j) != NULL) {
-                    fprintf(stdout, "%s | ", *(children + j));
+                    // fprintf(stdout, "%s | ", *(children + j));
                     // If the node for child exists, create an edge in the graph. Else, create the leaf node and edge for it in the graph
                     MakeNode *dependency_node = hash_lookup(hash_map, *(children + j));
                     if (dependency_node == NULL) {
                         // create leaf node
-                        fprintf(stdout, "Creating new node for %s | ", *(children + j));
+                        fprintf(stdout, "Creating new node for %s | \n", *(children + j));
                         dependency_node = create_node(*(children + j), NULL);
-			printf("\n***children %d, name is %s", j, children[j]);
-		    	printf("\n****current dependency name is %s****\n", dependency_node->name);
+                        display_node(dependency_node);
+                        printf("***children %d, name is %s***\n", j, children[j]);
+                        // printf("\n****current dependency name is %s****\n", dependency_node->name);
 
                         // insert the created node into the hash_map
                         hash_insert(hash_map, *(children + j), dependency_node);
                     }
-		    printf("\n****current dependency name is %s****\n", dependency_node->name);
-                    fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
+		            // printf("\n****current dependency name is %s****\n", dependency_node->name);
+                    // fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
                     add_dependency(dag, temp->val, dependency_node);
 
                     j++;
