@@ -30,12 +30,12 @@ int main() {
     // fprintf(stdout, "Exiting construct_graph_edges()\n");
 
     print_graph(dag);
-    depth_first_topological_traversal(dag, 1, dag->targets_and_dependencies);
+    depth_first_topological_traversal(dag, 5, dag->targets_and_dependencies);
     struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
-    // printf("\n");
-	// for (int i = 0; i < 11; i++)
-	// 	printf("->%s", topologically_sorted_nodes[i]->target->name);
-	// for each node in order, call execute_program(node)
+    printf("\n");
+	for (int i = 0; i < 6; i++)
+	 	printf("->%s", topologically_sorted_nodes[i]->target->name);
+//	 for each node in order, call execute_program(node)
 
     // int i = 0;
     // while (topologically_sorted_nodes[i] != NULL){

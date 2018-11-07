@@ -30,10 +30,8 @@ MakeNode *create_node (char *target_line, command *cmds_head) {
     char **tokens = tokenize_string(target_line);
     char *target = tokens[0];
     char **dependencies = tokens + 1;
-    if (cmds_head != NULL) {
-        // dependencies = tokens + 1;
-        target[strlen(target) - 1] = '\0';    // remove the : char
-    }
+    if (target[strlen(target)-1] == ':')
+    	target[strlen(target) - 1] = '\0';    // remove the : char
 
     struct stat file_stat;
     if(stat(target, &file_stat) < 0) {
