@@ -41,7 +41,22 @@ directed_graph* create_graph(int no_of_target_dependencies)
         dag->topological_num[i] = 0;
     }
     return dag;
-} 
+}
+
+void delete_graph (directed_graph *graph, int num_nodes) {
+    free(graph->visited_node);
+    free(graph->topological_num);
+    for (int i = 0; i < num_nodes; i++) {
+        graph_adj_list_node *list = graph->dependencies[i];
+        graph_adj_list_node *temp = NULL;
+        while (list) {
+            temp = list->next;
+            delete_makenode (list->target);
+            free(list);
+            list = temp;
+        }
+    }
+}
 
 void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency)
 {

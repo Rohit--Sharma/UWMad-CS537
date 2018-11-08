@@ -32,3 +32,5 @@ void display_node (MakeNode *makenode);
 hash_table *create_hash_table (int size);
 void hash_insert (hash_table *t, char *key, MakeNode *val);
 MakeNode *hash_lookup (hash_table *t, char *key);
+void delete_hash_table (hash_table *map, int size);
+void delete_makenode (MakeNode *node);

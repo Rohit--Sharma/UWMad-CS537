@@ -15,10 +15,11 @@
 #include "text_parsing.h"
 
 const size_t MAX_LINE_LEN = 1024;
+const size_t HASH_TABLE_SIZE = 10000;
 const int debug = 0;
 
 int main() {
-	hash_table *my_map = create_hash_table(10000); // TODO: Make a const for the size of hash table
+	hash_table *my_map = create_hash_table(HASH_TABLE_SIZE); // TODO: Make a const for the size of hash table
 
 	make_stats *make_file_stats = read_input_makefile(my_map, "test_inputs/Makefile2");
 	if (debug) 
@@ -69,6 +70,10 @@ int main() {
 		}
 		i++;
 	}
+
+	// Cleanup of memory
+	delete_hash_table (my_map, HASH_TABLE_SIZE);
+	delete_graph (dag, make_file_stats->nodes_count);
 
 	return 0;
 }
