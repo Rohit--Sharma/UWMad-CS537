@@ -34,14 +34,16 @@ int main() {
 		fprintf(stdout, "Exiting construct_graph_edges()\n");
 		print_graph(dag);
 	}
-	
+
 	int cycle;
 	cycle = is_dag_cyclic(dag);
 	if (cycle) {
 		fprintf(stderr, "Makefile has a cyclic dependency. Aborting!\n");
 		exit(1);
-	} else
-		printf("\nGraph is %d and graph is alright", cycle);
+	} else {
+		if (debug)
+			printf("\nGraph is %d and graph is alright", cycle);
+	}
 	int index_head = index_head_node(dag, make_file_stats->root);
 	if (debug) 
 		printf("Index of root: %d\n", index_head);
