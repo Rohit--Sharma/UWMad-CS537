@@ -61,6 +61,11 @@ char *options_processor (int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	char *makefile_name = options_processor(argc, argv);
+	if (makefile_name == NULL) {
+		fprintf(stderr, "Error: Specified Makefile not found.\n Usage: ./537make (or) ./537make -f <Makefile name>\nExiting...\n");
+		exit(1);
+	}
+
 	if (debug)
 		fprintf (stderr, "Makefile from cmdline: %s\n", makefile_name);
 

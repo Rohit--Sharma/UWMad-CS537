@@ -19,6 +19,9 @@ extern const size_t MAX_LINE_LEN;
 extern const size_t HASH_TABLE_SIZE;
 extern const int debug;
 
+/**
+ * Creates a linked list node for a token
+ */
 make_tokens *create_token(char *token)
 {
 	make_tokens *new_token = (make_tokens *)malloc(sizeof(make_tokens));
@@ -27,6 +30,9 @@ make_tokens *create_token(char *token)
 	return new_token;
 }
 
+/**
+ * Creates a linked list after tokenizing the input based on ':' and ' '
+ */
 make_tokens *tokenize_makestring(char *input)
 {
 	if (debug)
@@ -90,6 +96,9 @@ make_tokens *tokenize_makestring(char *input)
 	return result;
 }
 
+/**
+ * Creates an array of char * which are tokens of input based on ' '
+ */
 char **tokenize_string(char *input)
 {
 	if (debug)
@@ -231,6 +240,9 @@ read_line_val *read_line(int buff_size, FILE *fileptr)
 	return new_line_val;
 }
 
+/**
+ * Parses the input file line by line and creates makenodes for each Makefile target
+ */
 make_stats *read_input_makefile(hash_table *map, char *file_name)
 {
 	make_stats *make_file_stats = (make_stats *)malloc(sizeof(make_stats));
