@@ -39,7 +39,8 @@ char **tokenize_string (char *input) {
     }
 
     // Increment count_tokens for the last token
-    count_tokens += last_space < (input + strlen(input) - 1);
+    if (input != NULL)
+        count_tokens += last_space < (input + strlen(input) - 1);
 
     // Increment count_tokens for indicating the end of returned strings
     count_tokens++;

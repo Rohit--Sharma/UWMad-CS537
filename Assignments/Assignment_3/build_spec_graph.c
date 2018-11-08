@@ -56,7 +56,6 @@ void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency)
     while (dag->dependencies[i] != NULL) {
         if (dag->dependencies[i]->target == target) {
             src_node = i;
-            target_node = dag->dependencies[i];
             break;
         }
         i++;
@@ -89,7 +88,6 @@ void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency)
             if (dag->dependencies[i] == NULL) {
         	    dag->dependencies[i] = dependency_node;
 		        //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, dependency_node->target);
-        	    dest_node = i;
         	    break;
             }
         }
