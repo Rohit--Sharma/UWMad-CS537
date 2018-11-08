@@ -157,7 +157,7 @@ int depth_first_topological_traversal(directed_graph* dag, int node_num, int n)
     }
 
  	dag->topological_num[node_num] = n;
-	// printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
+	printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
 	return n-1;	
 }
 
@@ -166,7 +166,10 @@ graph_adj_list_node** topo_list(directed_graph* dag)
 	graph_adj_list_node **topologically_sorted_nodes;
 	topologically_sorted_nodes = (graph_adj_list_node **) malloc((dag->targets_and_dependencies) * sizeof(graph_adj_list_node *));
 	for (int i = 0; i < dag->targets_and_dependencies; i++) {
-		topologically_sorted_nodes[(dag->targets_and_dependencies)-(dag->topological_num[i])] = dag->dependencies[i];
+		if (dag->dependencies[i] != NULL) {
+			printf("\nnode num is %d %d\n", dag->targets_and_dependencies, dag->topological_num[i]); 
+			topologically_sorted_nodes[(dag->targets_and_dependencies)-(dag->topological_num[i])] = dag->dependencies[i];
+		}
 	}
 	return topologically_sorted_nodes;
 }

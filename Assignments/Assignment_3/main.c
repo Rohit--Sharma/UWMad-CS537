@@ -36,16 +36,21 @@ int main() {
 
 	depth_first_topological_traversal(dag, index_head, dag->targets_and_dependencies);
 	printf("Program reaches here 3\n");
+	printf("Testing malloc\n");
+	int *mall_test = (int *) malloc (sizeof(int) * 3);
+	printf("Malloc tested\n");
 	struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
-	printf("\n");
-	for (int i = 0; i < 50; i++) {
-		if (topologically_sorted_nodes[i] == NULL)
-			break;
-		printf("->%s", topologically_sorted_nodes[i]->target->name);
-	}
+	//printf("\n");
+	//for (int i = 0; i < 50; i++) {
+	//	if (topologically_sorted_nodes[i] == NULL)
+	//		break;
+	//	printf("->%s", topologically_sorted_nodes[i]->target->name);
+	//}
 	//	 for each node in order, call execute_program(node)
 
-	printf("Program reaches here 4\n");
+	printf("\nProgram reaches here 4\nTesting malloc\n");
+	int *malloc_test = (int *) malloc (sizeof(int) * 5);
+	printf("Malloc tested successfully\n");
 	int i = 0;
 	while (topologically_sorted_nodes[i] != NULL) {
 		printf("Inside execute loop %d\n", i);
