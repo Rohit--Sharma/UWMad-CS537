@@ -69,7 +69,12 @@ make_tokens *tokenize_makestring (char *input) {
         }
 
         *(token + j) = '\0';
-        curr->next = create_token (token); 
+        if (j > 0) {
+            curr->next = create_token (token); 
+        }
+        else {
+            free (token);
+        }
         curr = curr->next;
     }
     return result;

@@ -42,7 +42,7 @@ MakeNode *create_node (char *target_line, command *cmds_head) {
     if (mk_tokens == NULL)
         return NULL;
     
-    char **tokens = tokenize_string(target_line);
+    // char **tokens = tokenize_string(target_line);
     char *target = mk_tokens->token;
     mk_tokens = mk_tokens->next;
 
