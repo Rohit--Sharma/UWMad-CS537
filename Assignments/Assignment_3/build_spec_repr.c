@@ -29,9 +29,15 @@ MakeNode *create_node (char *target_line, command *cmds_head) {
     // fprintf(stdout, "Creating node\n");
     char **tokens = tokenize_string(target_line);
     char *target = tokens[0];
-    char **dependencies = tokens + 1;
-    if (target[strlen(target)-1] == ':')
+    char **dependencies = NULL;
+    if (target[strlen(target)-1] == ':') {
     	target[strlen(target) - 1] = '\0';    // remove the : char
+        dependencies = tokens + 1;
+    }
+    else {
+        // ':' is a separate token. The dependencies start from index 2 in the tokenized strings
+        dependencies = tokens + 2;
+    }
 
     struct stat file_stat;
     if(stat(target, &file_stat) < 0) {
