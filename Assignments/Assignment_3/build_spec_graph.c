@@ -171,7 +171,7 @@ void print_graph(directed_graph *dag)
     }
 }
 
-int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, MakeNode *parent)
+int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, MakeNode *parent, int head_node_num)
 {
     node_visit_status[node_num] = 1;
 
@@ -200,11 +200,12 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
         }
         else
         {
-            time_diff = difftime(next_node->target->timestamp, parent->timestamp);
+            time_diff = difftime(next_node->target->timestamp, dag->dependencies[head_node_num]->target->timestamp);
             if (time_diff > 0)
             {
                 next_node->target->modify_build = 1;
-                parent->modify_build = 1;
+                dag->dependencies[head_node_num]->target->modify_build = 1;
+		parent->modify_build = 1;
             }
         }
         if (debug)
@@ -214,7 +215,7 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
             printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
         if (node_visit_status[next_node_num] == 1)
             return 1;
-        if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent))
+        if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent, head_node_num))
             return 1;
         temp = temp->next;
     }
@@ -235,7 +236,7 @@ void print_modify_builds(directed_graph *dag)
     }
 }
 // Returns true if there is a cycle in graph
-int is_dag_cyclic(directed_graph *dag)
+int is_dag_cyclic(directed_graph *dag, int head_node_num)
 {
     // Initialize node_visit_status of all vertices as 0 (not visited)
     // 1 is visiting and 2 is visited
@@ -260,7 +261,7 @@ int is_dag_cyclic(directed_graph *dag)
             temp = temp->next;
         }
         if (node_visit_status[i] == 0)
-            if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target) == 1)
+            if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target, head_node_num) == 1)
                 return 1;
     }
     return 0;
