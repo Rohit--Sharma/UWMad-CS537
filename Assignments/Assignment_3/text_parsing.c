@@ -16,6 +16,7 @@
 #include "text_parsing.h"
 
 extern const size_t MAX_LINE_LEN;
+extern const int debug;
 
 char **tokenize_string (char *input) {
     fprintf(stdout, "Inside tokenize_string(%s)\n", input);

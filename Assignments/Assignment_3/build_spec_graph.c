@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include "build_spec_graph.h"
 
+extern const int debug;
+
 // A structure to represent an adjacency list node 
 graph_adj_list_node* new_adj_list_node(MakeNode* target_node) 
 { 
@@ -157,7 +159,8 @@ int depth_first_topological_traversal(directed_graph* dag, int node_num, int n)
     }
 
  	dag->topological_num[node_num] = n;
-	printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
+	if (debug) 
+		printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
 	return n-1;	
 }
 
@@ -167,73 +170,74 @@ graph_adj_list_node** topo_list(directed_graph* dag)
 	topologically_sorted_nodes = (graph_adj_list_node **) malloc((dag->targets_and_dependencies) * sizeof(graph_adj_list_node *));
 	for (int i = 0; i < dag->targets_and_dependencies; i++) {
 		if (dag->dependencies[i] != NULL) {
-			printf("\nnode num is %d %d\n", dag->targets_and_dependencies, dag->topological_num[i]); 
+			if (debug) 
+		        printf("\nnode num is %d %d\n", dag->targets_and_dependencies, dag->topological_num[i]); 
 			topologically_sorted_nodes[(dag->targets_and_dependencies)-(dag->topological_num[i])] = dag->dependencies[i];
 		}
 	}
 	return topologically_sorted_nodes;
 }
 
-int main_1() {
-	//printf("\nEnter here");
-	MakeNode* n1 = (MakeNode *) malloc(sizeof(MakeNode));
-	MakeNode* n2 = (MakeNode *) malloc(sizeof(MakeNode));
-	MakeNode* n3 = (MakeNode *) malloc(sizeof(MakeNode));
-	MakeNode* n4 = (MakeNode *) malloc(sizeof(MakeNode));
-	MakeNode* n5 = (MakeNode *) malloc(sizeof(MakeNode));
-	MakeNode* n6 = (MakeNode *) malloc(sizeof(MakeNode));
-	//printf("\nNode 1 is %d\nNode2 is %d\nNode3 is %d\nNode4 is %d\n", n1, n2, n3, n4);
-	char * str1 = (char *) malloc(sizeof(char)*50);
-	char * str2 = (char *) malloc(sizeof(char)*50);
-	char * str3 = (char *) malloc(sizeof(char)*50);
-	char * str4 = (char *) malloc(sizeof(char)*50);
-	char * str5 = (char *) malloc(sizeof(char)*50);
-	char * str6 = (char *) malloc(sizeof(char)*50);
-	str1 = "Red";
-	str2 = "Green";
-	str3 = "Blue";
-	str4 = "Yellow";
-	str5 = "White";
-	str6 = "Black";
-	n1->name = str1;
-	n2->name = str2;
-	n3->name = str3;
-	n4->name = str4;
-	n5->name = str5;
-	n6->name = str6;
+// int main_1() {
+// 	//printf("\nEnter here");
+// 	MakeNode* n1 = (MakeNode *) malloc(sizeof(MakeNode));
+// 	MakeNode* n2 = (MakeNode *) malloc(sizeof(MakeNode));
+// 	MakeNode* n3 = (MakeNode *) malloc(sizeof(MakeNode));
+// 	MakeNode* n4 = (MakeNode *) malloc(sizeof(MakeNode));
+// 	MakeNode* n5 = (MakeNode *) malloc(sizeof(MakeNode));
+// 	MakeNode* n6 = (MakeNode *) malloc(sizeof(MakeNode));
+// 	//printf("\nNode 1 is %d\nNode2 is %d\nNode3 is %d\nNode4 is %d\n", n1, n2, n3, n4);
+// 	char * str1 = (char *) malloc(sizeof(char)*50);
+// 	char * str2 = (char *) malloc(sizeof(char)*50);
+// 	char * str3 = (char *) malloc(sizeof(char)*50);
+// 	char * str4 = (char *) malloc(sizeof(char)*50);
+// 	char * str5 = (char *) malloc(sizeof(char)*50);
+// 	char * str6 = (char *) malloc(sizeof(char)*50);
+// 	str1 = "Red";
+// 	str2 = "Green";
+// 	str3 = "Blue";
+// 	str4 = "Yellow";
+// 	str5 = "White";
+// 	str6 = "Black";
+// 	n1->name = str1;
+// 	n2->name = str2;
+// 	n3->name = str3;
+// 	n4->name = str4;
+// 	n5->name = str5;
+// 	n6->name = str6;
 	
-	//printf("\nAssigned Names here: Printing below:");
-	//printf("\nn1 name is //%s//", n1->name);
-	//printf("\nn2 name is //%s//", n2->name);
-	//printf("\nn3 name is //%s//", n3->name);
-	//printf("\nn4 name is //%s//", n4->name);
+// 	//printf("\nAssigned Names here: Printing below:");
+// 	//printf("\nn1 name is //%s//", n1->name);
+// 	//printf("\nn2 name is //%s//", n2->name);
+// 	//printf("\nn3 name is //%s//", n3->name);
+// 	//printf("\nn4 name is //%s//", n4->name);
 	
-	directed_graph *dag = (directed_graph *) malloc(sizeof(struct directed_graph));
-	// printf("\nAllocated space for DAG:");
+// 	directed_graph *dag = (directed_graph *) malloc(sizeof(struct directed_graph));
+// 	// printf("\nAllocated space for DAG:");
 	
-	dag = create_graph(50);
-	// printf("\nCreatedDAG:");
-	// printf("\n\nDAG is located at : %d", dag);
-	add_dependency(dag, n1, n2);
+// 	dag = create_graph(50);
+// 	// printf("\nCreatedDAG:");
+// 	// printf("\n\nDAG is located at : %d", dag);
+// 	add_dependency(dag, n1, n2);
 	
-	// printf("\n\nDAG is located at : %d", dag);
-	add_dependency(dag, n1, n3);
-	add_dependency(dag, n2, n1);
-	// printf("\n\nDAG is located at : %d", dag);
-	add_dependency(dag, n2, n4);
-	add_dependency(dag, n2, n5);
-	add_dependency(dag, n3, n4);
-	add_dependency(dag, n4, n5);
-	add_dependency(dag, n5, n6);
+// 	// printf("\n\nDAG is located at : %d", dag);
+// 	add_dependency(dag, n1, n3);
+// 	add_dependency(dag, n2, n1);
+// 	// printf("\n\nDAG is located at : %d", dag);
+// 	add_dependency(dag, n2, n4);
+// 	add_dependency(dag, n2, n5);
+// 	add_dependency(dag, n3, n4);
+// 	add_dependency(dag, n4, n5);
+// 	add_dependency(dag, n5, n6);
 
-	// for (int i=0; i<3; i++){
-	// 	printf("\n\ni is %i and list is %d, %d", i, dag->dependencies[i], dag->dependencies[i]->target);
-	// }
-	print_graph(dag);
-	depth_first_topological_traversal(dag, 0, 50);
-	graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
-	printf("\n");
-	for (int i =0; i<6;i++)
-		printf("->%s", topologically_sorted_nodes[i]->target->name);
-	return 0;
-}
+// 	// for (int i=0; i<3; i++){
+// 	// 	printf("\n\ni is %i and list is %d, %d", i, dag->dependencies[i], dag->dependencies[i]->target);
+// 	// }
+// 	print_graph(dag);
+// 	depth_first_topological_traversal(dag, 0, 50);
+// 	graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
+// 	printf("\n");
+// 	for (int i =0; i<6;i++)
+// 		printf("->%s", topologically_sorted_nodes[i]->target->name);
+// 	return 0;
+// }

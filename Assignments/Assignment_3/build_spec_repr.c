@@ -18,6 +18,8 @@
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
 
+extern const int debug;
+
 command *create_command (char *rule) {
     command *cmd = (command *) malloc(sizeof(command));
     cmd->rule = rule;
