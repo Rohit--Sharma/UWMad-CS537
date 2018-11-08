@@ -72,16 +72,18 @@ MakeNode *create_node(char *target_line, command *cmds_head)
 
 void delete_makenode(MakeNode *node)
 {
-	// free(node->name);
-	// delete_command(node->rules);
+	if (debug)
+		printf("Node %s is being deleted\n", node->name);
+	//free(node->name);
+	//delete_command(node->rules);
 
-	// char **dependencies = node->children;
-	// char *temp = NULL;
-	// int i = 0;
-	// while ((temp = *(dependencies + i)) != NULL) {
-	//     free(temp);
-	//     i++;
-	// }
+	//char **dependencies = node->children;
+	//char *temp = NULL;
+	//int i = 0;
+	//while ((temp = *(dependencies + i)) != NULL) {
+	//    free(temp);
+	//    i++;
+	//}
 }
 
 void display_node(MakeNode *makenode)
