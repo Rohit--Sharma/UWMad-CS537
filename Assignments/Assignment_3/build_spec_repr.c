@@ -38,17 +38,13 @@ void delete_command (command *cmd) {
 
 MakeNode *create_node (char *target_line, command *cmds_head) {
     // fprintf(stdout, "Creating node\n");
+    make_tokens *mk_tokens = tokenize_makestring (target_line);
+    if (mk_tokens == NULL)
+        return NULL;
+    
     char **tokens = tokenize_string(target_line);
-    char *target = tokens[0];
-    char **dependencies = NULL;
-    if (target[strlen(target)-1] == ':') {
-    	target[strlen(target) - 1] = '\0';    // remove the : char
-        dependencies = tokens + 1;
-    }
-    else {
-        // ':' is a separate token. The dependencies start from index 2 in the tokenized strings
-        dependencies = tokens + 2;
-    }
+    char *target = mk_tokens->token;
+    mk_tokens = mk_tokens->next;
 
     struct stat file_stat;
     if (stat(target, &file_stat) < 0) {
@@ -64,22 +60,22 @@ MakeNode *create_node (char *target_line, command *cmds_head) {
     makenode->timestamp = file_stat.st_mtime;
     makenode->rules = cmds_head;
     makenode->isLeafNode = 0;
-    makenode->children = dependencies;
+    makenode->children = mk_tokens;
 
     return makenode;
 }
 
 void delete_makenode (MakeNode *node) {
-    free(node->name);
-    delete_command(node->rules);
+    // free(node->name);
+    // delete_command(node->rules);
 
-    char **dependencies = node->children;
-    char *temp = NULL;
-    int i = 0;
-    while ((temp = *(dependencies + i)) != NULL) {
-        free(temp);
-        i++;
-    }
+    // char **dependencies = node->children;
+    // char *temp = NULL;
+    // int i = 0;
+    // while ((temp = *(dependencies + i)) != NULL) {
+    //     free(temp);
+    //     i++;
+    // }
 }
 
 void display_node (MakeNode *makenode) {
@@ -91,12 +87,11 @@ void display_node (MakeNode *makenode) {
             cmds_head = cmds_head->next;
         }
         fprintf(stdout, "\n");
-        int i = 0;
         printf("   Dependencies: ");
-        char **dependencies = makenode->children;
-        while (*(dependencies + i) != NULL) {
-            printf("%s | ", *(dependencies + i));
-            i++;
+        make_tokens *dependencies = makenode->children;
+        while (dependencies != NULL) {
+            printf("%s | ", dependencies->token);
+            dependencies = dependencies->next;
         }
         printf("\n");
     }

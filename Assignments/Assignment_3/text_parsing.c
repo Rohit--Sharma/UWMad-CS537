@@ -19,6 +19,62 @@ extern const size_t MAX_LINE_LEN;
 extern const size_t HASH_TABLE_SIZE;
 extern const int debug;
 
+make_tokens *create_token (char *token) {
+    make_tokens *new_token = (make_tokens *) malloc(sizeof(make_tokens));
+    new_token->token = token;
+    new_token->next = NULL;
+    return new_token;
+}
+
+make_tokens *tokenize_makestring (char *input) {
+    if (debug) 
+		fprintf(stdout, "Inside tokenize_makestring(%s)\n", input);
+    
+    int first_token = 1;
+
+    char *temp = input;
+    int i = 0;
+    make_tokens *result = NULL, *curr = NULL;
+    while (*(temp + i) != '\0') {
+        
+        if (first_token) {
+            char *token = malloc(sizeof (char) * MAX_LINE_LEN);
+            int j = 0;
+            while (*(temp + i) != ' ' && *(temp + i) != ':' && *(temp + i) != '\0') {
+                *(token + j) = *(temp + i);
+                i++;
+                j++;
+            }
+            // discard continuous spaces
+            while (*(temp + i) == ' ' || *(temp + i) == ':') {
+                i++;
+            }
+
+            *(token + j) = '\0';
+            result = create_token (token); 
+            curr = result;
+            first_token = 0;
+        }
+
+        char *token = malloc(sizeof (char) * MAX_LINE_LEN);
+        int j = 0;
+        while (*(temp + i) != ' ' && *(temp + i) != ':' && *(temp + i) != '\0') {
+            *(token + j) = *(temp + i);
+            i++;
+            j++;
+        }
+        // discard continuous spaces
+        while (*(temp + i) == ' ') {
+            i++;
+        }
+
+        *(token + j) = '\0';
+        curr->next = create_token (token); 
+        curr = curr->next;
+    }
+    return result;
+}
+
 char **tokenize_string (char *input) {
     if (debug) 
 		fprintf(stdout, "Inside tokenize_string(%s)\n", input);
@@ -62,7 +118,7 @@ char **tokenize_string (char *input) {
     temp = input;
     i = 0;
     while (*(temp + i) != '\0') {
-        char *token = malloc(sizeof (char) * 64);
+        char *token = malloc(sizeof (char) * MAX_LINE_LEN);
         int j = 0;
         while (*(temp + i) != ' ' && *(temp + i) != '\0') {
             *(token + j) = *(temp + i);
@@ -144,7 +200,8 @@ read_line_val *read_line(int buff_size, FILE *fileptr) {
 
 make_stats *read_input_makefile (hash_table *map, char *file_name) {
     make_stats *make_file_stats = (make_stats *) malloc(sizeof(make_stats));
-    // fprintf(stdout, "Inside read_input_makefile()\n");
+    if (debug)
+        fprintf(stdout, "Inside read_input_makefile()\n");
     FILE *makefile_ptr = fopen(file_name, "r");
 
     char *line = NULL;
@@ -271,39 +328,39 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
 void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
     if (debug)
         fprintf(stdout, "Inside construct_graph_edges()\n");
-    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+    for (size_t i = 0; i < HASH_TABLE_SIZE; i++) {
         if (hash_map->list[i] != NULL) {
             hash_node *temp = hash_map->list[i];
             while (temp != NULL) {
                 if (debug)
                     fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
-                char **children = temp->val->children;
+                make_tokens *children = temp->val->children;
                 
 				// if no dependencies
-				if (children == NULL || *children == NULL) {
+				if (children == NULL) {
                     if (debug)
                         fprintf(stdout, "Adding edge from %s to NULL\n", temp->val->name);
 					add_dependency(dag, temp->val, NULL);
 				}
 				else {
                     int j = 0;
-                    while (*(children + j) != NULL) {
+                    while (children != NULL) {
                         // fprintf(stdout, "%s | ", *(children + j));
                         // If the node for child exists, create an edge in the graph. Else, create the leaf node and edge for it in the graph
-                        MakeNode *dependency_node = hash_lookup(hash_map, *(children + j));
+                        MakeNode *dependency_node = hash_lookup(hash_map, children->token);
                         if (dependency_node == NULL) {
                             // create leaf node
                             if (debug) 
-		                        fprintf(stdout, "Creating new node for %s | \n", *(children + j));
-                            dependency_node = create_node(*(children + j), NULL);
+		                        fprintf(stdout, "Creating new node for %s | \n", children->token);
+                            dependency_node = create_node(children->token, NULL);
                             if (debug) 
 		                        display_node(dependency_node);
                             if (debug) 
-		                        printf("***children %d, name is %s***\n", j, *(children + j));
+		                        printf("***children %d, name is %s***\n", j, children->token);
                             // printf("\n****current dependency name is %s****\n", dependency_node->name);
 
                             // insert the created node into the hash_map
-                            hash_insert(hash_map, *(children + j), dependency_node);
+                            hash_insert(hash_map, children->token, dependency_node);
                         }
                         // printf("\n****current dependency name is %s****\n", dependency_node->name);
                         if (debug)
@@ -311,6 +368,7 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
                         add_dependency(dag, temp->val, dependency_node);
 
                         j++;
+                        children = children->next;
                     }
                 }
                 temp = temp->next;
@@ -324,10 +382,11 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
  * Used for computing the number of nodes to be created
  */
 int num_dependencies (MakeNode *node) {
-    char **dependencies = node->children;
+    make_tokens *dependencies = node->children;
     int i = 0;
-    while (*(dependencies + i) != NULL) {
+    while (make_tokens != NULL) {
         i++;
+        make_tokens = make_tokens->next;
     }
     return i;
 }
