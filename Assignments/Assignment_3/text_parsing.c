@@ -16,6 +16,7 @@
 #include "text_parsing.h"
 
 extern const size_t MAX_LINE_LEN;
+extern const size_t HASH_TABLE_SIZE;
 extern const int debug;
 
 char **tokenize_string (char *input) {
@@ -268,16 +269,20 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
  * Creates edges for all the dependencies of the makefile
  */
 void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
-    // fprintf(stdout, "Inside construct_graph_edges()\n");
-    for (int i = 0; i < 10000; i++) {  // TODO: Make a const for the size of hash table
+    if (debug)
+        fprintf(stdout, "Inside construct_graph_edges()\n");
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
         if (hash_map->list[i] != NULL) {
             hash_node *temp = hash_map->list[i];
             while (temp != NULL) {
-                // fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
+                if (debug)
+                    fprintf(stdout, "%s: %p\n", temp->key, (void *) temp->val);
                 char **children = temp->val->children;
                 
 				// if no dependencies
-				if (children == NULL) {
+				if (children == NULL || *children == NULL) {
+                    if (debug)
+                        fprintf(stdout, "Adding edge from %s to NULL\n", temp->val->name);
 					add_dependency(dag, temp->val, NULL);
 				}
 				else {
@@ -301,7 +306,8 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
                             hash_insert(hash_map, *(children + j), dependency_node);
                         }
                         // printf("\n****current dependency name is %s****\n", dependency_node->name);
-                        // fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
+                        if (debug)
+                            fprintf(stdout, "Adding edge from %s to %s\n", temp->val->name, dependency_node->name);
                         add_dependency(dag, temp->val, dependency_node);
 
                         j++;
