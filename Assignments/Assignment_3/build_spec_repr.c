@@ -27,6 +27,15 @@ command *create_command (char *rule) {
     return cmd;
 }
 
+void delete_command (command *cmd) {
+    command *temp = NULL;
+    while (cmd) {
+        temp = cmd->next;
+        free(cmd->rule);
+        cmd = temp;
+    }
+}
+
 MakeNode *create_node (char *target_line, command *cmds_head) {
     // fprintf(stdout, "Creating node\n");
     char **tokens = tokenize_string(target_line);
@@ -42,7 +51,7 @@ MakeNode *create_node (char *target_line, command *cmds_head) {
     }
 
     struct stat file_stat;
-    if(stat(target, &file_stat) < 0) {
+    if (stat(target, &file_stat) < 0) {
         // TODO: Display error info according to errno
         // fprintf(stderr, "Error in getting file statistics for %s\n", target);
     }
@@ -58,6 +67,19 @@ MakeNode *create_node (char *target_line, command *cmds_head) {
     makenode->children = dependencies;
 
     return makenode;
+}
+
+void delete_makenode (MakeNode *node) {
+    free(node->name);
+    delete_command(node->rules);
+
+    char **dependencies = node->children;
+    char *temp = NULL;
+    int i = 0;
+    while ((temp = *(dependencies + i)) != NULL) {
+        free(temp);
+        i++;
+    }
 }
 
 void display_node (MakeNode *makenode) {
@@ -108,6 +130,18 @@ hash_table *create_hash_table (int size) {
     for(i = 0; i < size; i++)
         map->list[i] = NULL;
     return map;
+}
+
+void delete_hash_table (hash_table *map, int size) {
+    for (int i = 0; i < size; i++) {
+        hash_node *list = map->list[i];
+        hash_node *temp = NULL;
+        while (list) {
+            temp = list->next;
+            free(list);
+            list = temp;
+        }
+    }
 }
 
 void hash_insert (hash_table *t, char *key, MakeNode *val) {
