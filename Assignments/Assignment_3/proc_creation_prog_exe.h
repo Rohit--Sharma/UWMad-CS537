@@ -6,6 +6,9 @@
 // Created on:      October 25, 2018
 //
 ///////////////////////////////////////////////////////////////////////////////
-
+#ifndef PROC_CREATION_PROG_EXE
+#define PROC_CREATION_PROG_EXE
 
 void execute_program(MakeNode *node);
+
+#endif

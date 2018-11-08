@@ -6,6 +6,9 @@
 // Created on:      October 25, 2018
 //
 ///////////////////////////////////////////////////////////////////////////////
+#ifndef BUILD_SPEC_REPR
+#define BUILD_SPEC_REPR
+
 #include "build_spec_graph.h"
 
 #ifndef STRUCT_HASH_NODE
@@ -34,3 +37,5 @@ void hash_insert (hash_table *t, char *key, MakeNode *val);
 MakeNode *hash_lookup (hash_table *t, char *key);
 void delete_hash_table (hash_table *map, int size);
 void delete_makenode (MakeNode *node);
+
+#endif
