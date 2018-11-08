@@ -19,7 +19,8 @@ extern const size_t MAX_LINE_LEN;
 extern const int debug;
 
 char **tokenize_string (char *input) {
-    fprintf(stdout, "Inside tokenize_string(%s)\n", input);
+    if (debug) 
+		fprintf(stdout, "Inside tokenize_string(%s)\n", input);
     char **result = NULL;
     char *temp = input;
     char *last_space = NULL;

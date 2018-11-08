@@ -34,7 +34,8 @@ void execute_program(MakeNode *node) {
             int status;
             if (waitpid(pid, &status, 0) > 0) {
                 if (WIFEXITED(status) && !WEXITSTATUS(status))  
-                fprintf(stderr, "program execution successfull\n"); 
+                    if (debug) 
+		                fprintf(stdout, "program execution successfull\n"); 
                 else if (WIFEXITED(status) && WEXITSTATUS(status)) { 
                     if (WEXITSTATUS(status) == 127) {
                         // execv failed 
@@ -54,8 +55,7 @@ void execute_program(MakeNode *node) {
             // Child proc
             // char *argv[4] = {"echo", "Hello,", "World!", NULL};
             // execvp("echo", argv);
-	        if (debug) 
-		        fprintf(stdout, "Command being executed: %s\n", commands->rule);
+	        fprintf(stdout, "%s\n", commands->rule);
             char **args = tokenize_string(commands->rule);
 	        if (debug) 
 		        fprintf(stdout, "Execing %s %s...\n", args[0], args[1]);
