@@ -1,76 +1,82 @@
-# Programming Assignment - 2
-## *Shared Memory Producer/Consumer Program*
+# Programming Assignment - 3
+## *The MAKEFILE*
 
-The features of the *prodcomm* program:
-- Reads lines from stdin, processes and outputs the result to stdout.
-- The different threads are synchronized using semaphores.
-- Buffer Size and Queue Size can be changed from the producer_consumer_driver.c
-- Queue structures have fields for statistics to track enqueue, dequeue, and respective blocking counts. 
-- Makefile to compile and link all the source code files and create the executable was implemented.
+The features of the *537make* program:
+- can provide filename for makefile through commandline, or it checks for makefile and Makefile
+- parses through the provided makefile and identifies targets, dependencies and build rules
+- It builds a directed graph between the various targets and dependencies
+- It detects any cycle in the graph and exits if that's the case
+- It executes these dependencies and targets in order to make the final target
+- takes care of blank spaces, blank lines, comments in the makefiles and ignores them 
+- if any dependency files are changed, during the next make, only the dependent/relevant targets are rebuilt 
+- Makefile to compile and link all the source code files and create the executable was implemented
 - Graceful handling of termination and errors was implemented.
 
 ### Usage
-The following indicates how to use the *prodcomm* utility. To run the command, compile the program by utilizing the make utility as follows:
+The following indicates how to use the *537make* utility. To run the command, compile the program by utilizing the make utility as follows:
 ```
 $ make
 ```
-It executes all the source codes and creates the object files and the final executable called *537ps*.
+It executes all the source codes and creates the object files and the final executable called *537make*.
 
 To compile the program with CSA, run the following command:
 ```
 $ scan-build make
 ```
-Now, the command *prodcomm* will produce the following output for certain simple testcases mentioned below:
+Now, the command *537make* will produce the following output for certain simple testcases mentioned below:
 ```
-$ cat test_input1
-hey this is a test
-end of test file
-
-$ ./prodcomm < test_input1
-HEY*THIS*IS*A*TEST
-END*OF*TEST*FILE
+$ cat file/makefile
+#nnnnn
+537ps: options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
+	gcc -Wall -o 537ps options_processor.o proc_files_parser.o proc_id_processor.o 537ps_driver.o
+#alsjd
 
 
-Queue Statistics:
+options_processor.o          : options_processor.c 537ps_header.h
+	gcc -Wall -c options_processor.c
 
-Queue 1 (Reader to Munch1):
-1. Enqueue Count: 2
-2. Dequeue Count: 2
-3. Enqueue Block Count: 0
-4. Dequeue Block Count: 1
+proc_files_parser.o:proc_files_parser.c 537ps_header.h
+	gcc -Wall -c proc_files_parser.c
 
-Queue 2 (Munch1 to Munch2):
-1. Enqueue Count: 2
-2. Dequeue Count: 2
-3. Enqueue Block Count: 0
-4. Dequeue Block Count: 1
+proc_id_processor.o: proc_id_processor.c   537ps_header.h
+	gcc -Wall -c proc_id_processor.c
 
-Queue 3 (Munch2 to Writer):
-1. Enqueue Count: 2
-2. Dequeue Count: 2
-3. Enqueue Block Count: 0
-4. Dequeue Block Count: 1
-```
+537ps_driver.o: 537ps_driver.c 537ps_header.h
+	gcc -Wall -c 537ps_driver.c
+
+
+$ ./537make -f file/makefile
+gcc -g -Wall -Wextra -c main.c
+gcc -g -Wall -Wextra -c build_spec_graph.c
+gcc -g -Wall -Wextra -c text_parsing.c
+gcc -g -Wall -Wextra -c build_spec_repr.c
+gcc -g -Wall -Wextra -c proc_creation_prog_exe.c
+gcc -g -o 537make main.o build_spec_graph.o text_parsing.o build_spec_repr.o proc_creation_prog_exe.o -lpthread 
+
 
 ### Program Organization
 The program files are organized in the following manner:
-- proj2/
+- proj3/
 	- README.md
 	- partner.txt
-	- code/
-		- producer_consumer_header.h
-		- producer_consumer_driver.c
-		- thread.c
-		- queue.c
-		- Makefile
+	- build_spec_graph.c
+	- build_spec_graph.h
+	- build_spec_repr.c
+	- build_spec_repr.h
+	- main.c
+	- Makefile
+	- proc_creation_prog_exe.h
+	- proc_creation_prog_exe.c
+	- text_parsing.c
+	- text_parsing.h
 
-The *producer_consumer_driver.c* creates the three queues and the multiple threads. File *queue.c* contains the queue function definitions for creating a queue, enqueueing a string, dequeueing a string, and printing queue statistics. *thread.c* contains the definitions for the Reader, Munch1, Munch2, and Writer processes. The *producer_consumer_header.h* file contains the method definitions and data structures of the various methods and structures used throughtout the program.
+The *build_spec_graph.c* contains the different functions that are used for constructing and using the graph. File *build_spec_repr.c* contains the functions that actually build the graph based on various dependencies between files and targets. The *text_parsing.c* file contains the method definitions and data structures used to parse the given makefile and identify targets and dependencies. The *proc_creation_prog_exe.c* file takes care of forking the jobs (executing each of the targets). *main.c* calls each of the relevant functions from the other files to make the final target. 
 
-The *Makefile* contains the rules to compile and link all the source code files and create the executable *prodcomm*.
+The *Makefile* contains the rules to compile and link all the source code files and create the executable *537make*.
 
 
 ### Description
-The Reader thread reads from standard input, one line at a time. Reader takes each line of the input and passes it to thread Munch1 through a queue of character strings.
-Munch1 scans the line and replaces each space character (not tabs or newlines) with an asterisk ("\*") character. It then passes the line to thread Munch2 through another queue of character strings.
-Munch2 scans the line and converts all lower case letters to upper case (e.g., convert "a" to "A"). It then passes the line to thread Writer though yet another queue of character strings.
-Writer writes the line to standard output.
+A makefile is provided through the command line or by default, the program takes the file name makefile/Makefile.
+It parses through the makefile and identifies the different targets, dependencies, and rules for building the same.
+A graph is creating using these targets and dependencies which is checked for cycles and then topologically sorted.
+The targets are build in order from bottom-up.
