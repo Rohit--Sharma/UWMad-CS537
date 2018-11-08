@@ -24,9 +24,11 @@ graph_adj_list_node *new_adj_list_node(MakeNode *target_node)
     return new_node;
 }
 
+//This function creates the graph
 directed_graph *create_graph(int no_of_target_dependencies)
 {
-    // fprintf(stdout, "Inside create_graph()\n");
+    if (debug)
+    	fprintf(stdout, "Inside create_graph()\n");
     directed_graph *dag = (directed_graph *)malloc(sizeof(directed_graph));
     dag->targets_and_dependencies = no_of_target_dependencies;
 
@@ -45,6 +47,7 @@ directed_graph *create_graph(int no_of_target_dependencies)
     return dag;
 }
 
+//This function deletes the graph
 void delete_graph(directed_graph *graph, int num_nodes)
 {
     free(graph->visited_node);
@@ -63,6 +66,7 @@ void delete_graph(directed_graph *graph, int num_nodes)
     }
 }
 
+//This function updates the graph with an edge between target and dependency that are specified
 void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
 {
     // Add an edge from target to dependency
@@ -102,7 +106,6 @@ void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
             if (dag->dependencies[i] == NULL)
             {
                 dag->dependencies[i] = target_node;
-                //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, target_node->target);
                 src_node = i;
                 break;
             }
@@ -123,10 +126,6 @@ void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
         }
     }
 
-    // printf ("\ntarget is : //%s// and destination is //%s// and src_node and dest_node are %d and %d", target->name, dependency->name, src_node, dest_node);
-
-    //dependency_node->next = dag->dependencies[src_node].head;
-
     if (dependency != NULL)
     {
         graph_adj_list_node *temp_node = dag->dependencies[src_node];
@@ -138,6 +137,7 @@ void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
     }
 }
 
+//This function returns the head node number of the graph
 int index_head_node(directed_graph *dag, char *root)
 {
     for (int i = 0; i < dag->targets_and_dependencies; i++)
@@ -150,6 +150,7 @@ int index_head_node(directed_graph *dag, char *root)
     return -1;
 }
 
+//This function prints the graph in adjacency list form
 void print_graph(directed_graph *dag)
 {
     printf("Printing the graph:\n");
@@ -171,6 +172,12 @@ void print_graph(directed_graph *dag)
     }
 }
 
+//This function detects any cycles in the graph (form of graph coloring where 
+//visited[] = 0 means not visited
+//visited[] = 1 means being visited
+//visited[] = 2 means completed visiting
+//It also takes care of any timestamp checks to specify whether a dependency and its subsequent targets
+//should be built
 int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, MakeNode *parent, int head_node_num)
 {
     node_visit_status[node_num] = 1;
@@ -205,8 +212,17 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
             {
                 next_node->target->modify_build = 1;
                 dag->dependencies[head_node_num]->target->modify_build = 1;
+                dag->dependencies[node_num]->target->modify_build = 1;
 		parent->modify_build = 1;
             }
+            time_diff = difftime(next_node->target->timestamp, parent->timestamp);
+	    if (time_diff > 0)
+	    {
+                next_node->target->modify_build = 1;
+                dag->dependencies[head_node_num]->target->modify_build = 1;
+                dag->dependencies[node_num]->target->modify_build = 1;
+		parent->modify_build = 1;
+	    }
         }
         if (debug)
             printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %d \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
@@ -225,6 +241,7 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
     return 0;
 }
 
+//This just prints the modify build bits for each of the target nodes for debugging purposes
 void print_modify_builds(directed_graph *dag)
 {
     int i;
@@ -235,7 +252,8 @@ void print_modify_builds(directed_graph *dag)
         printf("%s is target and modify build is %d\n", dag->dependencies[i]->target->name, dag->dependencies[i]->target->modify_build);
     }
 }
-// Returns true if there is a cycle in graph
+
+// Returns 1 if there is a cycle in graph
 int is_dag_cyclic(directed_graph *dag, int head_node_num)
 {
     // Initialize node_visit_status of all vertices as 0 (not visited)
@@ -267,6 +285,7 @@ int is_dag_cyclic(directed_graph *dag, int head_node_num)
     return 0;
 }
 
+//This performs topological sort on the graph
 int depth_first_topological_traversal(directed_graph *dag, int node_num, int n)
 {
     graph_adj_list_node *adj_list = dag->dependencies[node_num];
@@ -306,6 +325,7 @@ int depth_first_topological_traversal(directed_graph *dag, int node_num, int n)
     return n - 1;
 }
 
+//Returns a list in order of which the targets should be built
 graph_adj_list_node **topo_list(directed_graph *dag)
 {
     graph_adj_list_node **topologically_sorted_nodes;

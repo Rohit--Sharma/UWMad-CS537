@@ -18,6 +18,8 @@
 
 extern const int debug;
 
+//This executes the rules for a given target
+//Executes each of the commands in order
 void execute_program(MakeNode *node)
 {
 	command *commands = node->rules;
@@ -63,9 +65,6 @@ void execute_program(MakeNode *node)
 		}
 		else
 		{
-			// Child proc
-			// char *argv[4] = {"echo", "Hello,", "World!", NULL};
-			// execvp("echo", argv);
 			fprintf(stdout, "%s\n", commands->rule);
 			char **args = tokenize_string(commands->rule);
 			if (debug)
@@ -78,16 +77,16 @@ void execute_program(MakeNode *node)
 	}
 }
 
-int main_2()
-{
-	MakeNode *temp = (MakeNode *)malloc(sizeof(MakeNode));
-	temp->name = "target";
-	command *commands = create_command("echo Hello, World");
-	commands->next = create_command("echo Done");
-	temp->rules = commands;
-	execute_program(temp);
-
-	free(temp);
-
-	return 0;
-}
+//int main_2()
+//{
+//	MakeNode *temp = (MakeNode *)malloc(sizeof(MakeNode));
+//	temp->name = "target";
+//	command *commands = create_command("echo Hello, World");
+//	commands->next = create_command("echo Done");
+//	temp->rules = commands;
+//	execute_program(temp);
+//
+//	free(temp);
+//
+//	return 0;
+//}

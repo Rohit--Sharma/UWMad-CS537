@@ -20,6 +20,7 @@
 
 extern const int debug;
 
+//This creates the command from rule supplied by text parser to add to the node
 command *create_command(char *rule)
 {
 	command *cmd = (command *)malloc(sizeof(command));
@@ -39,6 +40,7 @@ void delete_command(command *cmd)
 	}
 }
 
+//This creates the node from target line and updates name, rules, children information and timestamp
 MakeNode *create_node(char *target_line, command *cmds_head)
 {
 	// fprintf(stdout, "Creating node\n");
@@ -70,6 +72,7 @@ MakeNode *create_node(char *target_line, command *cmds_head)
 	return makenode;
 }
 
+
 void delete_makenode(MakeNode *node)
 {
 	if (debug)
@@ -86,6 +89,7 @@ void delete_makenode(MakeNode *node)
 	//}
 }
 
+//Displays node information - for debugging purposes
 void display_node(MakeNode *makenode)
 {
 	if (makenode != NULL)

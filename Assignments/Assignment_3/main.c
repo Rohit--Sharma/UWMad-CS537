@@ -21,6 +21,7 @@ const size_t MAX_LINE_LEN = 1024;
 const size_t HASH_TABLE_SIZE = 10000;
 const int debug = 0;
 
+//This takes care of the bonus part - to pass any name for makefile through input
 char *options_processor (int argc, char *argv[]) 
 {
 	if (argc <= 1) {
@@ -63,16 +64,20 @@ int main(int argc, char *argv[])
 	if (debug)
 		fprintf (stderr, "Makefile from cmdline: %s\n", makefile_name);
 
-	hash_table *my_map = create_hash_table(HASH_TABLE_SIZE); // TODO: Make a const for the size of hash table
+	//Creating a hash table
+	hash_table *my_map = create_hash_table(HASH_TABLE_SIZE);
 
+	//Reads input make file and makes sense of the targets and dependencies
 	make_stats *make_file_stats = read_input_makefile(my_map, makefile_name);
 	if (debug)
 		fprintf(stdout, "Exiting read_input_makefile()\n");
 
+	//Creates a directed graph with targets and dependencies
 	directed_graph *dag = create_graph(make_file_stats->nodes_count);
 	if (debug)
 		fprintf(stdout, "Exiting create_graph(%d)\n", make_file_stats->nodes_count);
 
+	//Construct the graph with all the edges taken care of
 	construct_graph_edges(dag, my_map);
 	if (debug)
 	{
@@ -86,6 +91,8 @@ int main(int argc, char *argv[])
 		print_modify_builds(dag);
 		printf("Index of root: %d\n", index_head);
 	}	
+	
+	//Detects any cycles in the graph and exits if one exists
 	int cycle;
 	cycle = is_dag_cyclic(dag, index_head);
 	if (cycle)
@@ -99,6 +106,8 @@ int main(int argc, char *argv[])
 			printf("\nGraph is %d and graph is alright", cycle);
 	}
 
+	//Since there are no cycles in the directed graph, do a topological sort to 
+	//determine order of executing the dependencies
 	depth_first_topological_traversal(dag, index_head, dag->targets_and_dependencies);
 	struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);
 	if (debug)
@@ -113,6 +122,8 @@ int main(int argc, char *argv[])
 		printf("\n");
 	}
 
+	//If the file does not exist, build it.
+	//If the file exists, but needs to be rebuilt due to some dependency file being change, build it.
 	int i = 0;
 	while (topologically_sorted_nodes[i] != NULL)
 	{
