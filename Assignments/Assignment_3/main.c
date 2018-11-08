@@ -21,7 +21,7 @@ const int debug = 0;
 int main() {
 	hash_table *my_map = create_hash_table(HASH_TABLE_SIZE); // TODO: Make a const for the size of hash table
 
-	make_stats *make_file_stats = read_input_makefile(my_map, "file/makefile");
+	make_stats *make_file_stats = read_input_makefile(my_map, "test_inputs/Makefile2");
 	if (debug) 
 		fprintf(stdout, "Exiting read_input_makefile()\n");
 
