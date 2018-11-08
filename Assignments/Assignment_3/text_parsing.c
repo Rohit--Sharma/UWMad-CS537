@@ -43,7 +43,8 @@ char **tokenize_string (char *input) {
     // Increment count_tokens for indicating the end of returned strings
     count_tokens++;
 
-    fprintf(stdout, "Mallocing: %d\n", count_tokens);
+    if (debug) 
+		fprintf(stdout, "Mallocing: %d\n", count_tokens);
     result = (char **) malloc(sizeof (char *) * count_tokens);
     if (errno == ENOMEM) {
         fprintf(stderr, "Not enough memory for malloc\nExiting...\n");
@@ -51,7 +52,8 @@ char **tokenize_string (char *input) {
         // free(munch2_param);
         exit(1);
     }
-    fprintf(stdout, "Malloced %d bytes in tokenize_string()\n", count_tokens);
+    if (debug) 
+		fprintf(stdout, "Malloced %d bytes in tokenize_string()\n", count_tokens);
     // TODO: Check return value of malloc
     size_t idx = 0;
     temp = input;
@@ -78,7 +80,8 @@ char **tokenize_string (char *input) {
         //i++;
     }
     *(result + idx) = 0;
-    fprintf(stdout, "Done tokenizing\n");
+    if (debug) 
+		fprintf(stdout, "Done tokenizing\n");
     return result;
 }
 
@@ -219,7 +222,8 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
                         make_file_stats->root = root;
                     }
 
-                    display_node(curr_node);
+                    if (debug) 
+		                display_node(curr_node);
 
                     cmds_head = NULL;
                     first_cmd = 1;
@@ -248,7 +252,8 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
             make_file_stats->root = root;
         }
 
-        display_node(curr_node);
+        if (debug) 
+		    display_node(curr_node);
     }
 
     fclose(makefile_ptr);
@@ -282,10 +287,13 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map, char *roo
                         MakeNode *dependency_node = hash_lookup(hash_map, *(children + j));
                         if (dependency_node == NULL) {
                             // create leaf node
-                            fprintf(stdout, "Creating new node for %s | \n", *(children + j));
+                            if (debug) 
+		                        fprintf(stdout, "Creating new node for %s | \n", *(children + j));
                             dependency_node = create_node(*(children + j), NULL);
-                            display_node(dependency_node);
-                            printf("***children %d, name is %s***\n", j, *(children + j));
+                            if (debug) 
+		                        display_node(dependency_node);
+                            if (debug) 
+		                        printf("***children %d, name is %s***\n", j, *(children + j));
                             // printf("\n****current dependency name is %s****\n", dependency_node->name);
 
                             // insert the created node into the hash_map
