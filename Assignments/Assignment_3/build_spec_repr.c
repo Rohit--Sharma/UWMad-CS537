@@ -74,16 +74,17 @@ void delete_makenode(MakeNode *node)
 {
 	if (debug)
 		printf("Node %s is being deleted\n", node->name);
-	//free(node->name);
-	//delete_command(node->rules);
+	free(node->name);
+	delete_command(node->rules);
 
-	//char **dependencies = node->children;
-	//char *temp = NULL;
-	//int i = 0;
-	//while ((temp = *(dependencies + i)) != NULL) {
-	//    free(temp);
-	//    i++;
-	//}
+	make_tokens *dependencies = node->children;
+	make_tokens *temp = NULL;
+	while (dependencies)
+	{
+		temp = dependencies->next;
+		free(dependencies->token);
+		dependencies = temp;
+	}
 }
 
 void display_node(MakeNode *makenode)
