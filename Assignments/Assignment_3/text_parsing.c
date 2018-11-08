@@ -265,9 +265,8 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
 
 /**
  * Creates edges for all the dependencies of the makefile
- * returns the index of location where target node is stored
  */
-void construct_graph_edges (directed_graph* dag, hash_table *hash_map, char *root) {
+void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
     // fprintf(stdout, "Inside construct_graph_edges()\n");
     for (int i = 0; i < 10000; i++) {  // TODO: Make a const for the size of hash table
         if (hash_map->list[i] != NULL) {

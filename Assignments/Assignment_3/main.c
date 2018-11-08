@@ -28,7 +28,7 @@ int main() {
 	if (debug) 
 		fprintf(stdout, "Exiting create_graph()\n");
 
-	construct_graph_edges(dag, my_map, make_file_stats->root);
+	construct_graph_edges(dag, my_map);
 	if (debug) {
 		fprintf(stdout, "Exiting construct_graph_edges()\n");
 		print_graph(dag);
@@ -57,12 +57,12 @@ int main() {
 		FILE *fp;
 		fp = fopen(topologically_sorted_nodes[i]->target->name, "r");
 		if (debug) 
-			printf("topologically_sorted_node->target and name are %d and %s and fp is %d\n", topologically_sorted_nodes[i]->target, topologically_sorted_nodes[i]->target->name, fp);
+			printf("topologically_sorted_node->target and name are %p and %s and fp is %p\n", (void *) topologically_sorted_nodes[i]->target, topologically_sorted_nodes[i]->target->name, (void *) fp);
 		if (fp == NULL) {
 			if (topologically_sorted_nodes[i]->target->rules != NULL)
 				execute_program(topologically_sorted_nodes[i]->target);
 			if (debug) 
-				printf("Exiting Execute_program for node at %d\n", topologically_sorted_nodes[i]->target);
+				printf("Exiting Execute_program for node at %p\n", (void *) topologically_sorted_nodes[i]->target);
 		}
 		else {
 			fclose(fp);

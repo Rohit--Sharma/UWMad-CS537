@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "build_spec_graph.h"
 
 extern const int debug;
@@ -113,6 +114,7 @@ int index_head_node (directed_graph *dag, char *root) {
             return i;
         }
     }
+    return -1;
 }
 
 void print_graph(directed_graph* dag)
