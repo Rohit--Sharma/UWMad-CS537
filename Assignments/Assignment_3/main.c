@@ -131,6 +131,8 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
+			if (topologically_sorted_nodes[i]->target->modify_build == 1)
+				execute_program(topologically_sorted_nodes[i]->target);
 			fclose(fp);
 		}
 		i++;
