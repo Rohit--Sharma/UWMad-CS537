@@ -33,9 +33,10 @@ void execute_program(MakeNode *node) {
             // Parent proc: wait for child
             int status;
             if (waitpid(pid, &status, 0) > 0) {
-                if (WIFEXITED(status) && !WEXITSTATUS(status))  
+                if (WIFEXITED(status) && !WEXITSTATUS(status)) { 
                     if (debug) 
 		                fprintf(stdout, "program execution successfull\n"); 
+                }
                 else if (WIFEXITED(status) && WEXITSTATUS(status)) { 
                     if (WEXITSTATUS(status) == 127) {
                         // execv failed 
