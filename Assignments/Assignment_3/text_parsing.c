@@ -384,9 +384,9 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
 int num_dependencies (MakeNode *node) {
     make_tokens *dependencies = node->children;
     int i = 0;
-    while (make_tokens != NULL) {
+    while (dependencies != NULL) {
         i++;
-        make_tokens = make_tokens->next;
+        dependencies = dependencies->next;
     }
     return i;
 }
