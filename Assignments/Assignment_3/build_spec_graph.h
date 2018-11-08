@@ -6,11 +6,9 @@
 // Created on:      October 25, 2018
 //
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef BUILD_SPEC_GRAPH
-#define BUILD_SPEC_GRAPH
 
 #include <time.h>
-#include "text_parsing.h"
+// #include "text_parsing.h"
 
 #ifndef STRUCT_LIST_COMMANDS
 #define STRUCT_LIST_COMMANDS
@@ -18,6 +16,15 @@ typedef struct command {
     char *rule;
     struct command *next;
 } command;
+#endif
+
+#ifndef STRUCT_TOKENS
+#define STRUCT_TOKENS
+typedef struct make_tokens 
+{ 
+    char *token;
+    struct make_tokens *next;
+} make_tokens;
 #endif
 
 /**
@@ -67,5 +74,3 @@ int index_head_node (directed_graph *dag, char *root);
 int is_dag_cyclic (directed_graph *dag);
 int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status);
 void delete_graph (directed_graph *graph, int num_nodes);
-
-#endif
