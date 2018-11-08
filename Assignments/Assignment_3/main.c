@@ -21,7 +21,7 @@ const int debug = 0;
 int main() {
 	hash_table *my_map = create_hash_table(HASH_TABLE_SIZE); // TODO: Make a const for the size of hash table
 
-	make_stats *make_file_stats = read_input_makefile(my_map, "test_inputs/Makefile2");
+	make_stats *make_file_stats = read_input_makefile(my_map, "file/makefile_basic_cycle");
 	if (debug) 
 		fprintf(stdout, "Exiting read_input_makefile()\n");
 
@@ -34,7 +34,14 @@ int main() {
 		fprintf(stdout, "Exiting construct_graph_edges()\n");
 		print_graph(dag);
 	}
-
+	print_graph(dag);
+	int cycle;
+	cycle = is_dag_cyclic(dag);
+	if (cycle) {
+		fprintf(stderr, "Makefile has a cyclic dependency. Aborting!\n");
+		exit(1);
+	} else
+		printf("\nGraph is %d and graph is alright", cycle);
 	int index_head = index_head_node(dag, make_file_stats->root);
 	if (debug) 
 		printf("Index of root: %d\n", index_head);
