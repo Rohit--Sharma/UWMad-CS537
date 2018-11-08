@@ -344,7 +344,7 @@ void construct_graph_edges (directed_graph* dag, hash_table *hash_map) {
 				}
 				else {
                     int j = 0;
-                    while (children != NULL) {
+                    while (children != NULL && children->token != NULL && strlen(children->token) > 0) {
                         // fprintf(stdout, "%s | ", *(children + j));
                         // If the node for child exists, create an edge in the graph. Else, create the leaf node and edge for it in the graph
                         MakeNode *dependency_node = hash_lookup(hash_map, children->token);
