@@ -9,6 +9,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <linux/limits.h>
 #include "build_spec_graph.h"
 #include "build_spec_repr.h"
 #include "proc_creation_prog_exe.h"
@@ -16,13 +19,53 @@
 
 const size_t MAX_LINE_LEN = 1024;
 const size_t HASH_TABLE_SIZE = 10000;
-const int debug = 0;
+const int debug = 1;
 
-int main()
+char *options_processor (int argc, char *argv[]) 
 {
+	if (argc <= 1) {
+		return "Makefile";
+	}
+
+	extern char *optarg;
+	extern int optopt;
+	char *makefile_path = NULL;
+
+	int c;
+	while ((c = getopt(argc, argv, "f:")) != -1) {
+		switch (c)
+		{
+			case 'f':
+				if (optarg != NULL) {
+					makefile_path = optarg;
+				}
+				break;
+			case '?':
+				if (optopt == 'f')
+					fprintf(stderr, "Option -f requires an argument.\n");
+				else if (isprint(optopt))
+					fprintf(stderr, "Unknown option '-%c'.\n", optopt);
+				else
+					fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
+				return NULL;
+			default:
+				abort();
+				return NULL;
+		}
+	}
+
+	return makefile_path;
+}
+
+int main(int argc, char *argv[])
+{
+	char *makefile_name = options_processor(argc, argv);
+	if (debug)
+		fprintf (stderr, "Makefile from cmdline: %s\n", makefile_name);
+
 	hash_table *my_map = create_hash_table(HASH_TABLE_SIZE); // TODO: Make a const for the size of hash table
 
-	make_stats *make_file_stats = read_input_makefile(my_map, "test_inputs/Makefile2");
+	make_stats *make_file_stats = read_input_makefile(my_map, makefile_name);
 	if (debug)
 		fprintf(stdout, "Exiting read_input_makefile()\n");
 
