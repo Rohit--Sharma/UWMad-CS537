@@ -34,7 +34,7 @@ int main() {
 		fprintf(stdout, "Exiting construct_graph_edges()\n");
 		print_graph(dag);
 	}
-	print_graph(dag);
+	
 	int cycle;
 	cycle = is_dag_cyclic(dag);
 	if (cycle) {

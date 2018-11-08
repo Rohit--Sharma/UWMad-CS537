@@ -287,7 +287,7 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
                         make_file_stats->root = root;
                     }
 
-                    //if (debug) 
+                    if (debug) 
 		                display_node(curr_node);
 
                     cmds_head = NULL;
@@ -317,7 +317,7 @@ make_stats *read_input_makefile (hash_table *map, char *file_name) {
             make_file_stats->root = root;
         }
 
-        //if (debug) 
+        if (debug) 
 		    display_node(curr_node);
     }
 
