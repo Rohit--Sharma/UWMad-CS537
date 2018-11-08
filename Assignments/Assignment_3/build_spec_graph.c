@@ -177,7 +177,8 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status)
         temp = temp->next;
     }
     node_visit_status[node_num] = 2;
-    printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
+    if (debug)
+        printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
     return 0; 
 }
   
