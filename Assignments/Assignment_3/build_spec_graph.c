@@ -15,132 +15,154 @@
 
 extern const int debug;
 
-// A structure to represent an adjacency list node 
-graph_adj_list_node* new_adj_list_node(MakeNode* target_node) 
-{ 
-    graph_adj_list_node *new_node = (graph_adj_list_node *)malloc(sizeof(graph_adj_list_node)); 
+// A structure to represent an adjacency list node
+graph_adj_list_node *new_adj_list_node(MakeNode *target_node)
+{
+    graph_adj_list_node *new_node = (graph_adj_list_node *)malloc(sizeof(graph_adj_list_node));
     new_node->target = target_node;
     new_node->next = NULL;
-    return new_node; 
+    return new_node;
 }
 
-directed_graph* create_graph(int no_of_target_dependencies) 
-{ 
+directed_graph *create_graph(int no_of_target_dependencies)
+{
     // fprintf(stdout, "Inside create_graph()\n");
-    directed_graph *dag = (directed_graph *) malloc(sizeof(directed_graph));
+    directed_graph *dag = (directed_graph *)malloc(sizeof(directed_graph));
     dag->targets_and_dependencies = no_of_target_dependencies;
-  
-    // Create an array of adjacency lists 
-    dag->dependencies = (graph_adj_list_node **) malloc(no_of_target_dependencies * sizeof(graph_adj_list_node *));
-    dag->visited_node = (int *) malloc(no_of_target_dependencies * sizeof(int));
-    dag->topological_num = (int *) malloc(no_of_target_dependencies * sizeof(int));
+
+    // Create an array of adjacency lists
+    dag->dependencies = (graph_adj_list_node **)malloc(no_of_target_dependencies * sizeof(graph_adj_list_node *));
+    dag->visited_node = (int *)malloc(no_of_target_dependencies * sizeof(int));
+    dag->topological_num = (int *)malloc(no_of_target_dependencies * sizeof(int));
     // Initialize each adjacency list as empty
-    int i; 
-    for (i = 0; i < no_of_target_dependencies; ++i) {
-    	dag->dependencies[i] = NULL; 
+    int i;
+    for (i = 0; i < no_of_target_dependencies; ++i)
+    {
+        dag->dependencies[i] = NULL;
         dag->visited_node[i] = 0;
         dag->topological_num[i] = 0;
     }
     return dag;
 }
 
-void delete_graph (directed_graph *graph, int num_nodes) {
+void delete_graph(directed_graph *graph, int num_nodes)
+{
     free(graph->visited_node);
     free(graph->topological_num);
-    for (int i = 0; i < num_nodes; i++) {
+    for (int i = 0; i < num_nodes; i++)
+    {
         graph_adj_list_node *list = graph->dependencies[i];
         graph_adj_list_node *temp = NULL;
-        while (list) {
+        while (list)
+        {
             temp = list->next;
-            delete_makenode (list->target);
+            delete_makenode(list->target);
             free(list);
             list = temp;
         }
     }
 }
 
-void add_dependency(directed_graph* dag, MakeNode* target, MakeNode* dependency)
+void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
 {
     // Add an edge from target to dependency
-    graph_adj_list_node* target_node = NULL;
-    graph_adj_list_node* new_dependency_node = new_adj_list_node(dependency); 
+    graph_adj_list_node *target_node = NULL;
+    graph_adj_list_node *new_dependency_node = new_adj_list_node(dependency);
     graph_adj_list_node *dependency_node = NULL;
     int i = 0;
     int src_node = -1;
     int dest_node = -1;
 
-    while (dag->dependencies[i] != NULL) {
-        if (dag->dependencies[i]->target == target) {
+    while (dag->dependencies[i] != NULL)
+    {
+        if (dag->dependencies[i]->target == target)
+        {
             src_node = i;
             break;
         }
         i++;
     }
     i = 0;
-    while (dag->dependencies[i] != NULL) {
-        if (dag->dependencies[i]->target == dependency) {
+    while (dag->dependencies[i] != NULL)
+    {
+        if (dag->dependencies[i]->target == dependency)
+        {
             dest_node = i;
             // dependency_node = dag->dependencies[i];
             break;
         }
         i++;
     }
-    
-    if (src_node == -1) {
-    	target_node = new_adj_list_node(target);
-        for (i = 0; i < dag->targets_and_dependencies; i++) {
-            if (dag->dependencies[i] == NULL) {
-        	    dag->dependencies[i] = target_node;
-		        //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, target_node->target);
-        	    src_node = i;
-        	    break;
+
+    if (src_node == -1)
+    {
+        target_node = new_adj_list_node(target);
+        for (i = 0; i < dag->targets_and_dependencies; i++)
+        {
+            if (dag->dependencies[i] == NULL)
+            {
+                dag->dependencies[i] = target_node;
+                //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, target_node->target);
+                src_node = i;
+                break;
             }
         }
     }
 
-    if (dest_node == -1 && dependency != NULL) {
-    	dependency_node = new_adj_list_node(dependency);
-        for (i = 0; i < dag->targets_and_dependencies; i++) {
-            if (dag->dependencies[i] == NULL) {
-        	    dag->dependencies[i] = dependency_node;
-		        //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, dependency_node->target);
-        	    break;
+    if (dest_node == -1 && dependency != NULL)
+    {
+        dependency_node = new_adj_list_node(dependency);
+        for (i = 0; i < dag->targets_and_dependencies; i++)
+        {
+            if (dag->dependencies[i] == NULL)
+            {
+                dag->dependencies[i] = dependency_node;
+                //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, dependency_node->target);
+                break;
             }
         }
     }
-	
+
     // printf ("\ntarget is : //%s// and destination is //%s// and src_node and dest_node are %d and %d", target->name, dependency->name, src_node, dest_node);
-    
-    //dependency_node->next = dag->dependencies[src_node].head; 
-    
-    if (dependency != NULL) {
-        graph_adj_list_node* temp_node = dag->dependencies[src_node];
-        while (temp_node->next != NULL) {
+
+    //dependency_node->next = dag->dependencies[src_node].head;
+
+    if (dependency != NULL)
+    {
+        graph_adj_list_node *temp_node = dag->dependencies[src_node];
+        while (temp_node->next != NULL)
+        {
             temp_node = temp_node->next;
         }
         temp_node->next = new_dependency_node;
     }
 }
 
-int index_head_node (directed_graph *dag, char *root) {
-    for (int i = 0; i < dag->targets_and_dependencies; i++) {
-        if (dag->dependencies[i] != NULL && strcmp(dag->dependencies[i]->target->name, root) == 0) {
+int index_head_node(directed_graph *dag, char *root)
+{
+    for (int i = 0; i < dag->targets_and_dependencies; i++)
+    {
+        if (dag->dependencies[i] != NULL && strcmp(dag->dependencies[i]->target->name, root) == 0)
+        {
             return i;
         }
     }
     return -1;
 }
 
-void print_graph(directed_graph* dag)
+void print_graph(directed_graph *dag)
 {
     printf("Printing the graph:\n");
-    graph_adj_list_node* ptr = NULL; //(struct graph_adj_list_node*) malloc(sizeof(struct graph_adj_list_node));
-    for (int i = 0; i < dag->targets_and_dependencies; i++) {
-        if (dag->dependencies[i] != NULL) {	
+    graph_adj_list_node *ptr = NULL; //(struct graph_adj_list_node*) malloc(sizeof(struct graph_adj_list_node));
+    for (int i = 0; i < dag->targets_and_dependencies; i++)
+    {
+        if (dag->dependencies[i] != NULL)
+        {
             printf("\nInside for loop for printing p_g interation %d of %d", i, dag->targets_and_dependencies);
             ptr = dag->dependencies[i];
             printf("\n%d: ", i);
-            while (ptr) {
+            while (ptr)
+            {
                 printf("-> %s", ptr->target->name);
                 ptr = ptr->next;
             }
@@ -149,128 +171,154 @@ void print_graph(directed_graph* dag)
     }
 }
 
-int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status, MakeNode *parent)
-{ 
+int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, MakeNode *parent)
+{
     node_visit_status[node_num] = 1;
-    
+
     // Iterate through all adjacent vertices
-    graph_adj_list_node* adj_list = dag->dependencies[node_num];
-    printf("Master Node target %s started and visited is %d\n", adj_list->target->name, node_visit_status[node_num]);
-    graph_adj_list_node* temp = adj_list;
+    graph_adj_list_node *adj_list = dag->dependencies[node_num];
+    if (debug)
+        printf("Master Node target %s started and visited is %d\n", adj_list->target->name, node_visit_status[node_num]);
+    graph_adj_list_node *temp = adj_list;
     int next_node_num;
-    while (temp->next != NULL) {
-        graph_adj_list_node* next_node = temp->next;
-	int time_diff;
-        for (int i = 0; i < dag->targets_and_dependencies; i++) {
-	    if (dag->dependencies[i] == NULL)
-		break;
-            if (dag->dependencies[i]->target == next_node->target) {
+    while (temp->next != NULL)
+    {
+        graph_adj_list_node *next_node = temp->next;
+        int time_diff;
+        for (int i = 0; i < dag->targets_and_dependencies; i++)
+        {
+            if (dag->dependencies[i] == NULL)
+                break;
+            if (dag->dependencies[i]->target == next_node->target)
+            {
                 next_node_num = i;
             }
         }
-	if (next_node->target->modify_build == 1) {
-		parent->modify_build = 1;
-	}
-	else {
-	time_diff = difftime(next_node->target->timestamp, parent->timestamp);
-	if (time_diff > 0) {
-		next_node->target->modify_build = 1;
-		parent->modify_build = 1;
-	}
-	}
-	printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %d \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
-	parent = dag->dependencies[node_num]->target;
-        printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
-	if (node_visit_status[next_node_num] == 1)
-		return 1;
-	if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent))
-		return 1;
+        if (next_node->target->modify_build == 1)
+        {
+            parent->modify_build = 1;
+        }
+        else
+        {
+            time_diff = difftime(next_node->target->timestamp, parent->timestamp);
+            if (time_diff > 0)
+            {
+                next_node->target->modify_build = 1;
+                parent->modify_build = 1;
+            }
+        }
+        if (debug)
+            printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %d \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
+        parent = dag->dependencies[node_num]->target;
+        if (debug)
+            printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
+        if (node_visit_status[next_node_num] == 1)
+            return 1;
+        if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent))
+            return 1;
         temp = temp->next;
     }
     node_visit_status[node_num] = 2;
-    printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
-    return 0; 
+    if (debug)
+        printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
+    return 0;
 }
 
-void print_modify_builds(directed_graph *dag){
-	int i;
-	for (i=0; i<dag->targets_and_dependencies; i++) {
-		if (dag->dependencies[i]==NULL) break;
-		printf("%s is target and modify build is %d\n", dag->dependencies[i]->target->name, dag->dependencies[i]->target->modify_build);
-	}
-}
-// Returns true if there is a cycle in graph 
-int is_dag_cyclic(directed_graph *dag) 
-{ 
-    // Initialize node_visit_status of all vertices as 0 (not visited)
-    // 1 is visiting and 2 is visited 
-    int *node_visit_status = (int*) malloc(dag->targets_and_dependencies *(sizeof(int))); 
-    for (int i = 0; i < dag->targets_and_dependencies; i++){
-        if (dag->dependencies[i] == NULL) break;
-	node_visit_status[i] = 0;
-    }
-    for (int i = 0; i < dag->targets_and_dependencies; i++){
-	if (dag->dependencies[i] == NULL) break;
-	printf("I is %d and target is %s\n", i, dag->dependencies[i]->target->name);
-	graph_adj_list_node* temp = dag->dependencies[i]->next;
-	while (temp != NULL){
-		if (temp->target->modify_build == 1)
-			dag->dependencies[i]->target->modify_build = 1;
-		temp = temp->next;
-	}
-        if (node_visit_status[i] == 0)
-           if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target) == 1) 
-              return 1; 
-    } 
-    return 0; 
-}
-
-int depth_first_topological_traversal(directed_graph* dag, int node_num, int n)
+void print_modify_builds(directed_graph *dag)
 {
-    graph_adj_list_node* adj_list = dag->dependencies[node_num];
-    graph_adj_list_node* temp = adj_list;
+    int i;
+    for (i = 0; i < dag->targets_and_dependencies; i++)
+    {
+        if (dag->dependencies[i] == NULL)
+            break;
+        printf("%s is target and modify build is %d\n", dag->dependencies[i]->target->name, dag->dependencies[i]->target->modify_build);
+    }
+}
+// Returns true if there is a cycle in graph
+int is_dag_cyclic(directed_graph *dag)
+{
+    // Initialize node_visit_status of all vertices as 0 (not visited)
+    // 1 is visiting and 2 is visited
+    int *node_visit_status = (int *)malloc(dag->targets_and_dependencies * (sizeof(int)));
+    for (int i = 0; i < dag->targets_and_dependencies; i++)
+    {
+        if (dag->dependencies[i] == NULL)
+            break;
+        node_visit_status[i] = 0;
+    }
+    for (int i = 0; i < dag->targets_and_dependencies; i++)
+    {
+        if (dag->dependencies[i] == NULL)
+            break;
+        if (debug)
+            printf("I is %d and target is %s\n", i, dag->dependencies[i]->target->name);
+        graph_adj_list_node *temp = dag->dependencies[i]->next;
+        while (temp != NULL)
+        {
+            if (temp->target->modify_build == 1)
+                dag->dependencies[i]->target->modify_build = 1;
+            temp = temp->next;
+        }
+        if (node_visit_status[i] == 0)
+            if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target) == 1)
+                return 1;
+    }
+    return 0;
+}
+
+int depth_first_topological_traversal(directed_graph *dag, int node_num, int n)
+{
+    graph_adj_list_node *adj_list = dag->dependencies[node_num];
+    graph_adj_list_node *temp = adj_list;
     int next_node_num;
     dag->visited_node[node_num] = 1;
-    if (debug) {
+    if (debug)
+    {
         printf("\nVisited %s ", dag->dependencies[node_num]->target->name);
         printf("\nnode_num is %d and dependency target is %s.\n", node_num, dag->dependencies[node_num]->target->name);
     }
-    while (temp != NULL) {
-        graph_adj_list_node* next_node = temp;
-        for (int i = 0; i < dag->targets_and_dependencies; i++) {
-	    if (dag->dependencies[i] == NULL)
-		break;
-            if (dag->dependencies[i]->target == next_node->target) {
+    while (temp != NULL)
+    {
+        graph_adj_list_node *next_node = temp;
+        for (int i = 0; i < dag->targets_and_dependencies; i++)
+        {
+            if (dag->dependencies[i] == NULL)
+                break;
+            if (dag->dependencies[i]->target == next_node->target)
+            {
                 next_node_num = i;
             }
         }
-    	//printf("\mVisited %s \n", dag->dependencies[node_num]->target->name);
+        //printf("\mVisited %s \n", dag->dependencies[node_num]->target->name);
 
-        if (dag->visited_node[next_node_num] == 0) {
+        if (dag->visited_node[next_node_num] == 0)
+        {
             n = depth_first_topological_traversal(dag, next_node_num, n);
-            // printf("\nnode num is %d, topological num is %d and target is %s",next_node_num, dag->topological_num[next_node_num], dag->dependencies[next_node_num]->target->name); 
+            // printf("\nnode num is %d, topological num is %d and target is %s",next_node_num, dag->topological_num[next_node_num], dag->dependencies[next_node_num]->target->name);
         }
         temp = temp->next;
     }
 
- 	dag->topological_num[node_num] = n;
-	if (debug) 
-		printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name); 
-	return n-1;	
+    dag->topological_num[node_num] = n;
+    if (debug)
+        printf("\nnode num is %d, topological num is %d and target is %s", node_num, dag->topological_num[node_num], dag->dependencies[node_num]->target->name);
+    return n - 1;
 }
 
-graph_adj_list_node** topo_list(directed_graph* dag)
+graph_adj_list_node **topo_list(directed_graph *dag)
 {
-	graph_adj_list_node **topologically_sorted_nodes;
-	topologically_sorted_nodes = (graph_adj_list_node **) malloc((dag->targets_and_dependencies) * sizeof(graph_adj_list_node *));
-	for (int i = 0; i < dag->targets_and_dependencies; i++) {
-		if (dag->dependencies[i] != NULL) {
-			if (debug) 
-		        printf("\nnode num is %d %d\n", dag->targets_and_dependencies, dag->topological_num[i]); 
-			topologically_sorted_nodes[(dag->targets_and_dependencies)-(dag->topological_num[i])] = dag->dependencies[i];
-		}
-	}
-	return topologically_sorted_nodes;
+    graph_adj_list_node **topologically_sorted_nodes;
+    topologically_sorted_nodes = (graph_adj_list_node **)malloc((dag->targets_and_dependencies) * sizeof(graph_adj_list_node *));
+    for (int i = 0; i < dag->targets_and_dependencies; i++)
+    {
+        if (dag->dependencies[i] != NULL)
+        {
+            if (debug)
+                printf("\nnode num is %d %d\n", dag->targets_and_dependencies, dag->topological_num[i]);
+            topologically_sorted_nodes[(dag->targets_and_dependencies) - (dag->topological_num[i])] = dag->dependencies[i];
+        }
+    }
+    return topologically_sorted_nodes;
 }
 
 // int main_1() {
@@ -300,16 +348,16 @@ graph_adj_list_node** topo_list(directed_graph* dag)
 // 	n4->name = str4;
 // 	n5->name = str5;
 // 	n6->name = str6;
-	
+
 // 	//printf("\nAssigned Names here: Printing below:");
 // 	//printf("\nn1 name is //%s//", n1->name);
 // 	//printf("\nn2 name is //%s//", n2->name);
 // 	//printf("\nn3 name is //%s//", n3->name);
 // 	//printf("\nn4 name is //%s//", n4->name);
-	
+
 // 	directed_graph *dag = (directed_graph *) malloc(sizeof(struct directed_graph));
 // 	// printf("\nAllocated space for DAG:");
-	
+
 // 	dag = create_graph(50);
 // 	// printf("\nCreatedDAG:");
 // 	// printf("\n\nDAG is located at : %d", dag);
