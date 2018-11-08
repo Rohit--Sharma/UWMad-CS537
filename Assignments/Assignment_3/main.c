@@ -47,6 +47,9 @@ int main() {
 	int index_head = index_head_node(dag, make_file_stats->root);
 	if (debug) 
 		printf("Index of root: %d\n", index_head);
+	print_modify_builds(dag);
+	if (debug) 
+		printf("Index of root: %d\n", index_head);
 
 	depth_first_topological_traversal(dag, index_head, dag->targets_and_dependencies);
 	struct graph_adj_list_node **topologically_sorted_nodes = topo_list(dag);

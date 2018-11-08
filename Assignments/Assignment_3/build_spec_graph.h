@@ -36,6 +36,7 @@ typedef struct MakeNode
 {
     char *name;                     // Tha name of the target
     time_t timestamp;
+    int modify_build;
     command *rules;                     // The list of commands to be executed for the target
     int isLeafNode;                 // A flag which is 1 for a leaf node, else 0
     make_tokens *children;     // An array of pointers to dependency names
@@ -72,5 +73,6 @@ int depth_first_topological_traversal(directed_graph* dag, int node_num, int n);
 graph_adj_list_node** topo_list(directed_graph* dag);
 int index_head_node (directed_graph *dag, char *root);
 int is_dag_cyclic (directed_graph *dag);
-int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status);
+int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status, MakeNode* parent);
 void delete_graph (directed_graph *graph, int num_nodes);
+void print_modify_builds (directed_graph *graph);

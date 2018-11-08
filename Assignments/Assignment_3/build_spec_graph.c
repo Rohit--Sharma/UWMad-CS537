@@ -149,18 +149,18 @@ void print_graph(directed_graph* dag)
     }
 }
 
-int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status)
+int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status, MakeNode *parent)
 { 
     node_visit_status[node_num] = 1;
     
     // Iterate through all adjacent vertices
     graph_adj_list_node* adj_list = dag->dependencies[node_num];
-    if (debug)
-        printf("Master Node target %s started and visited is %d\n", adj_list->target->name, node_visit_status[node_num]);
+    printf("Master Node target %s started and visited is %d\n", adj_list->target->name, node_visit_status[node_num]);
     graph_adj_list_node* temp = adj_list;
     int next_node_num;
     while (temp->next != NULL) {
         graph_adj_list_node* next_node = temp->next;
+	int time_diff;
         for (int i = 0; i < dag->targets_and_dependencies; i++) {
 	    if (dag->dependencies[i] == NULL)
 		break;
@@ -168,20 +168,37 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status)
                 next_node_num = i;
             }
         }
-        if (debug)
-            printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
+	if (next_node->target->modify_build == 1) {
+		parent->modify_build = 1;
+	}
+	else {
+	time_diff = difftime(next_node->target->timestamp, parent->timestamp);
+	if (time_diff > 0) {
+		next_node->target->modify_build = 1;
+		parent->modify_build = 1;
+	}
+	}
+	printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %d \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
+	parent = dag->dependencies[node_num]->target;
+        printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
 	if (node_visit_status[next_node_num] == 1)
 		return 1;
-	if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status))
+	if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent))
 		return 1;
         temp = temp->next;
     }
     node_visit_status[node_num] = 2;
-    if (debug)
-        printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
+    printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
     return 0; 
 }
-  
+
+void print_modify_builds(directed_graph *dag){
+	int i;
+	for (i=0; i<dag->targets_and_dependencies; i++) {
+		if (dag->dependencies[i]==NULL) break;
+		printf("%s is target and modify build is %d\n", dag->dependencies[i]->target->name, dag->dependencies[i]->target->modify_build);
+	}
+}
 // Returns true if there is a cycle in graph 
 int is_dag_cyclic(directed_graph *dag) 
 { 
@@ -194,11 +211,16 @@ int is_dag_cyclic(directed_graph *dag)
     }
     for (int i = 0; i < dag->targets_and_dependencies; i++){
 	if (dag->dependencies[i] == NULL) break;
-    if (debug)
-    	printf("I is %d and target is %s\n", i, dag->dependencies[i]->target->name);
-    if (node_visit_status[i] == 0)
-        if (dfs_for_cycle(dag, i, node_visit_status) == 1) 
-            return 1; 
+	printf("I is %d and target is %s\n", i, dag->dependencies[i]->target->name);
+	graph_adj_list_node* temp = dag->dependencies[i]->next;
+	while (temp != NULL){
+		if (temp->target->modify_build == 1)
+			dag->dependencies[i]->target->modify_build = 1;
+		temp = temp->next;
+	}
+        if (node_visit_status[i] == 0)
+           if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target) == 1) 
+              return 1; 
     } 
     return 0; 
 }
