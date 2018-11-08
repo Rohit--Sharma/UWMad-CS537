@@ -27,7 +27,7 @@ int main() {
 
 	directed_graph *dag = create_graph(make_file_stats->nodes_count);
 	if (debug) 
-		fprintf(stdout, "Exiting create_graph()\n");
+		fprintf(stdout, "Exiting create_graph(%d)\n", make_file_stats->nodes_count);
 
 	construct_graph_edges(dag, my_map);
 	if (debug) {
@@ -72,8 +72,8 @@ int main() {
 	}
 
 	// Cleanup of memory
-	delete_hash_table (my_map, HASH_TABLE_SIZE);
-	delete_graph (dag, make_file_stats->nodes_count);
+	// delete_hash_table (my_map, HASH_TABLE_SIZE);
+	// delete_graph (dag, make_file_stats->nodes_count);
 
 	return 0;
 }

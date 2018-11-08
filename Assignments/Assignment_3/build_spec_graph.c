@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "build_spec_graph.h"
+#include "build_spec_repr.h"
 
 extern const int debug;
 
@@ -132,9 +133,9 @@ int index_head_node (directed_graph *dag, char *root) {
 
 void print_graph(directed_graph* dag)
 {
-    int i;
+    printf("Printing the graph:\n");
     graph_adj_list_node* ptr = NULL; //(struct graph_adj_list_node*) malloc(sizeof(struct graph_adj_list_node));
-    for (i = 0; i < dag->targets_and_dependencies; i++) {
+    for (int i = 0; i < dag->targets_and_dependencies; i++) {
         if (dag->dependencies[i] != NULL) {	
             printf("\nInside for loop for printing p_g interation %d of %d", i, dag->targets_and_dependencies);
             ptr = dag->dependencies[i];
