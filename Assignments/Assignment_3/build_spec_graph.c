@@ -133,14 +133,64 @@ void print_graph(directed_graph* dag)
     }
 }
 
+int dfs_for_cycle(directed_graph *dag, int node_num, int* node_visit_status)
+{ 
+    node_visit_status[node_num] = 1;
+    
+    // Iterate through all adjacent vertices
+    graph_adj_list_node* adj_list = dag->dependencies[node_num];
+        printf("Master Node target %s started and visited is %d\n", adj_list->target->name, node_visit_status[node_num]);
+    graph_adj_list_node* temp = adj_list;
+    int next_node_num;
+    while (temp->next != NULL) {
+        graph_adj_list_node* next_node = temp->next;
+        for (int i = 0; i < dag->targets_and_dependencies; i++) {
+	    if (dag->dependencies[i] == NULL)
+		break;
+            if (dag->dependencies[i]->target == next_node->target) {
+                next_node_num = i;
+            }
+        }
+        printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
+	if (node_visit_status[next_node_num] == 1)
+		return 1;
+	if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status))
+		return 1;
+        temp = temp->next;
+    }
+    node_visit_status[node_num] = 2;
+    printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
+    return 0; 
+}
+  
+// Returns true if there is a cycle in graph 
+int is_dag_cyclic(directed_graph *dag) 
+{ 
+    // Initialize node_visit_status of all vertices as 0 (not visited)
+    // 1 is visiting and 2 is visited 
+    int *node_visit_status = (int*) malloc(dag->targets_and_dependencies *(sizeof(int))); 
+    for (int i = 0; i < dag->targets_and_dependencies; i++){
+        if (dag->dependencies[i] == NULL) break;
+	node_visit_status[i] = 0;
+    }
+    for (int i = 0; i < dag->targets_and_dependencies; i++){
+	if (dag->dependencies[i] == NULL) break;
+	printf("I is %d and target is %s\n", i, dag->dependencies[i]->target->name);
+        if (node_visit_status[i] == 0)
+           if (dfs_for_cycle(dag, i, node_visit_status) == 1) 
+              return 1; 
+    } 
+    return 0; 
+}
+
 int depth_first_topological_traversal(directed_graph* dag, int node_num, int n)
 {
     graph_adj_list_node* adj_list = dag->dependencies[node_num];
     graph_adj_list_node* temp = adj_list;
     int next_node_num;
     dag->visited_node[node_num] = 1;
-    //printf("Visited %s \n", dag->dependencies[node_num]->target->name);
-    // printf("\nnode_num is %d and dependency target is %s.", node_num, dag->dependencies[node_num]->target->name);
+    printf("\nVisited %s ", dag->dependencies[node_num]->target->name);
+    printf("\nnode_num is %d and dependency target is %s.\n", node_num, dag->dependencies[node_num]->target->name);
     while (temp != NULL) {
         graph_adj_list_node* next_node = temp;
         for (int i = 0; i < dag->targets_and_dependencies; i++) {
@@ -150,6 +200,7 @@ int depth_first_topological_traversal(directed_graph* dag, int node_num, int n)
                 next_node_num = i;
             }
         }
+    	//printf("\mVisited %s \n", dag->dependencies[node_num]->target->name);
 
         if (dag->visited_node[next_node_num] == 0) {
             n = depth_first_topological_traversal(dag, next_node_num, n);
@@ -219,7 +270,6 @@ graph_adj_list_node** topo_list(directed_graph* dag)
 // 	// printf("\nCreatedDAG:");
 // 	// printf("\n\nDAG is located at : %d", dag);
 // 	add_dependency(dag, n1, n2);
-	
 // 	// printf("\n\nDAG is located at : %d", dag);
 // 	add_dependency(dag, n1, n3);
 // 	add_dependency(dag, n2, n1);
