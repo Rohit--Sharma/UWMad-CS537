@@ -226,13 +226,14 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
 		if (dag->dependencies[node_num] != NULL)
 	        parent = dag->dependencies[node_num]->target;
         if (debug)
-            printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
-        if (node_visit_status[next_node_num] == 1) {
+			if (next_node_num != -1)
+	            printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
+        if (next_node_num != -1 && node_visit_status[next_node_num] == 1) {
 			if (dag->dependencies[node_num] != NULL)
 		    	fprintf(stderr, "Cycle end vertex is %s\n", dag->dependencies[node_num]->target->name);
             return 1;
 		}
-        if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent, head_node_num)) {
+        if (next_node_num != -1 && node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent, head_node_num)) {
             return 1;
 		}
         temp = temp->next;
