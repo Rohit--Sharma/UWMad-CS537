@@ -364,7 +364,7 @@ make_stats *read_input_makefile(hash_table *map, char *file_name)
 	} while (line != NULL);
 
 	// If cmds_head is not null, create the last makenode
-	if (cmds_head != NULL)
+	if (target_line != NULL)
 	{
 		curr_node = create_node(target_line, cmds_head);
 		int num_children = num_dependencies(curr_node);
