@@ -202,40 +202,40 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
         }
         else
         {
-            time_diff = difftime(next_node->target->timestamp, dag->dependencies[head_node_num]->target->timestamp);
-            if (time_diff > 0)
-            {
-                next_node->target->modify_build = 1;
-                dag->dependencies[head_node_num]->target->modify_build = 1;
-				if (dag->dependencies[node_num] != NULL)
-	                dag->dependencies[node_num]->target->modify_build = 1;
-				parent->modify_build = 1;
-            }
+	    if (dag->dependencies[head_node_num]->target->rules != NULL) {
+            	time_diff = difftime(next_node->target->timestamp, dag->dependencies[head_node_num]->target->timestamp);
+            	if (time_diff > 0)
+            	{
+                	next_node->target->modify_build = 1;
+                	dag->dependencies[head_node_num]->target->modify_build = 1;
+			parent->modify_build = 1;
+            	}
+	    }
             time_diff = difftime(next_node->target->timestamp, parent->timestamp);
-			if (time_diff > 0)
-			{
-				next_node->target->modify_build = 1;
-				dag->dependencies[head_node_num]->target->modify_build = 1;
-				if (dag->dependencies[node_num] != NULL)
-					dag->dependencies[node_num]->target->modify_build = 1;
-				parent->modify_build = 1;
-			}
+	    if (time_diff > 0)
+	    {
+	    	next_node->target->modify_build = 1;
+	    	dag->dependencies[head_node_num]->target->modify_build = 1;
+	    	if (dag->dependencies[node_num] != NULL)
+	    		dag->dependencies[node_num]->target->modify_build = 1;
+	    	parent->modify_build = 1;
+	    }
         }
         if (debug)
             printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %d \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
 		if (dag->dependencies[node_num] != NULL)
-	        parent = dag->dependencies[node_num]->target;
+	        	parent = dag->dependencies[node_num]->target;
         if (debug)
-			if (next_node_num != -1)
+		if (next_node_num != -1)
 	            printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
         if (next_node_num != -1 && node_visit_status[next_node_num] == 1) {
-			if (dag->dependencies[node_num] != NULL)
-		    	fprintf(stderr, "Cycle end vertex is %s\n", dag->dependencies[node_num]->target->name);
-            return 1;
-		}
+	       if (dag->dependencies[node_num] != NULL)
+	   	fprintf(stderr, "Cycle end vertex is %s\n", dag->dependencies[node_num]->target->name);
+               return 1;
+	}
         if (next_node_num != -1 && node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent, head_node_num)) {
             return 1;
-		}
+	}
         temp = temp->next;
     }
     node_visit_status[node_num] = 2;
