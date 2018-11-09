@@ -24,13 +24,27 @@ const int debug = 0;
 //This takes care of the bonus part - to pass any name for makefile through input
 char *options_processor (int argc, char *argv[]) 
 {
+	char *makefile_path = NULL;
+	// if no argument passed, return makefile or Makefile in the same order whichever exists. else, throw an error
 	if (argc <= 1) {
-		return "Makefile";
+		makefile_path = "makefile";
+		if (access(makefile_path, F_OK) != -1) {
+			return makefile_path;
+		}
+		else {
+			makefile_path = "Makefile";
+			if (access(makefile_path, F_OK) != -1) {
+				return makefile_path;
+			}
+			else {
+				fprintf(stderr, "Error 'makefile' or 'Makefile' doesn't exist.\n");
+				return NULL;
+			}
+		}
 	}
 
 	extern char *optarg;
 	extern int optopt;
-	char *makefile_path = NULL;
 
 	int c;
 	while ((c = getopt(argc, argv, "f:")) != -1) {
