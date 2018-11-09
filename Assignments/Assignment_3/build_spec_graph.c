@@ -229,10 +229,13 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
         parent = dag->dependencies[node_num]->target;
         if (debug)
             printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
-        if (node_visit_status[next_node_num] == 1)
+        if (node_visit_status[next_node_num] == 1) {
+	    printf("Cycle end vertex is %s\n", dag->dependencies[node_num]->target->name);
             return 1;
-        if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent, head_node_num))
+	}
+        if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent, head_node_num)) {
             return 1;
+	}
         temp = temp->next;
     }
     node_visit_status[node_num] = 2;
@@ -279,8 +282,10 @@ int is_dag_cyclic(directed_graph *dag, int head_node_num)
             temp = temp->next;
         }
         if (node_visit_status[i] == 0)
-            if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target, head_node_num) == 1)
+            if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target, head_node_num) == 1){
+		printf("Cycle start vertex is %s\n", dag->dependencies[i]->target->name);
                 return 1;
+	    }
     }
     return 0;
 }
