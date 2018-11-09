@@ -91,7 +91,9 @@ make_tokens *tokenize_makestring(char *input)
 		{
 			free(token);
 		}
-		curr = curr->next;
+		if (curr != NULL) {
+			curr = curr->next;
+		}
 	}
 	return result;
 }
@@ -146,7 +148,7 @@ char **tokenize_string(char *input)
 	size_t idx = 0;
 	temp = input;
 	i = 0;
-	while (*(temp + i) != '\0')
+	while ((temp + i) != NULL && *(temp + i) != '\0')
 	{
 		char *token = malloc(sizeof(char) * MAX_LINE_LEN);
 		int j = 0;
@@ -278,6 +280,7 @@ make_stats *read_input_makefile(hash_table *map, char *file_name)
 			}
 			else
 			{
+				free (line_struct);
 				break;
 			}
 		}
@@ -357,7 +360,7 @@ make_stats *read_input_makefile(hash_table *map, char *file_name)
 			break;
 		}
 		}
-		free(line_struct);
+		free (line_struct);
 	} while (line != NULL);
 
 	// If cmds_head is not null, create the last makenode

@@ -70,9 +70,6 @@ void delete_graph(directed_graph *graph, int num_nodes)
 void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
 {
     // Add an edge from target to dependency
-    graph_adj_list_node *target_node = NULL;
-    graph_adj_list_node *new_dependency_node = new_adj_list_node(dependency);
-    graph_adj_list_node *dependency_node = NULL;
     int i = 0;
     int src_node = -1;
     int dest_node = -1;
@@ -100,12 +97,11 @@ void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
 
     if (src_node == -1)
     {
-        target_node = new_adj_list_node(target);
         for (i = 0; i < dag->targets_and_dependencies; i++)
         {
             if (dag->dependencies[i] == NULL)
             {
-                dag->dependencies[i] = target_node;
+                dag->dependencies[i] = new_adj_list_node(target);
                 src_node = i;
                 break;
             }
@@ -114,12 +110,11 @@ void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
 
     if (dest_node == -1 && dependency != NULL)
     {
-        dependency_node = new_adj_list_node(dependency);
         for (i = 0; i < dag->targets_and_dependencies; i++)
         {
             if (dag->dependencies[i] == NULL)
             {
-                dag->dependencies[i] = dependency_node;
+                dag->dependencies[i] = new_adj_list_node(dependency);
                 //printf("\n\ndag %d head and target are %d and %d", i,  dag->dependencies[i].head, dependency_node->target);
                 break;
             }
@@ -133,7 +128,7 @@ void add_dependency(directed_graph *dag, MakeNode *target, MakeNode *dependency)
         {
             temp_node = temp_node->next;
         }
-        temp_node->next = new_dependency_node;
+        temp_node->next = new_adj_list_node(dependency);
     }
 }
 
@@ -187,16 +182,16 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
     if (debug)
         printf("Master Node target %s started and visited is %d\n", adj_list->target->name, node_visit_status[node_num]);
     graph_adj_list_node *temp = adj_list;
-    int next_node_num;
+    int next_node_num = -1;
     while (temp->next != NULL)
     {
         graph_adj_list_node *next_node = temp->next;
-        int time_diff;
+        int time_diff = 0;
         for (int i = 0; i < dag->targets_and_dependencies; i++)
         {
             if (dag->dependencies[i] == NULL)
                 break;
-            if (dag->dependencies[i]->target == next_node->target)
+            else if (dag->dependencies[i]->target == next_node->target)
             {
                 next_node_num = i;
             }
@@ -212,35 +207,39 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
             {
                 next_node->target->modify_build = 1;
                 dag->dependencies[head_node_num]->target->modify_build = 1;
-                dag->dependencies[node_num]->target->modify_build = 1;
-		parent->modify_build = 1;
+				if (dag->dependencies[node_num] != NULL)
+	                dag->dependencies[node_num]->target->modify_build = 1;
+				parent->modify_build = 1;
             }
             time_diff = difftime(next_node->target->timestamp, parent->timestamp);
-	    if (time_diff > 0)
-	    {
-                next_node->target->modify_build = 1;
-                dag->dependencies[head_node_num]->target->modify_build = 1;
-                dag->dependencies[node_num]->target->modify_build = 1;
-		parent->modify_build = 1;
-	    }
+			if (time_diff > 0)
+			{
+				next_node->target->modify_build = 1;
+				dag->dependencies[head_node_num]->target->modify_build = 1;
+				if (dag->dependencies[node_num] != NULL)
+					dag->dependencies[node_num]->target->modify_build = 1;
+				parent->modify_build = 1;
+			}
         }
         if (debug)
             printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %d \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
-        parent = dag->dependencies[node_num]->target;
+		if (dag->dependencies[node_num] != NULL)
+	        parent = dag->dependencies[node_num]->target;
         if (debug)
             printf("Dep Node target name %s and visited is %d\n", next_node->target->name, node_visit_status[next_node_num]);
         if (node_visit_status[next_node_num] == 1) {
-	    printf("Cycle end vertex is %s\n", dag->dependencies[node_num]->target->name);
+			if (dag->dependencies[node_num] != NULL)
+		    	fprintf(stderr, "Cycle end vertex is %s\n", dag->dependencies[node_num]->target->name);
             return 1;
-	}
+		}
         if (node_visit_status[next_node_num] == 0 && dfs_for_cycle(dag, next_node_num, node_visit_status, parent, head_node_num)) {
             return 1;
-	}
+		}
         temp = temp->next;
     }
     node_visit_status[node_num] = 2;
     if (debug)
-        printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
+		printf("Master Node target %s completed and visited is %d\n\n", adj_list->target->name, node_visit_status[node_num]);
     return 0;
 }
 
@@ -264,8 +263,6 @@ int is_dag_cyclic(directed_graph *dag, int head_node_num)
     int *node_visit_status = (int *)malloc(dag->targets_and_dependencies * (sizeof(int)));
     for (int i = 0; i < dag->targets_and_dependencies; i++)
     {
-        if (dag->dependencies[i] == NULL)
-            break;
         node_visit_status[i] = 0;
     }
     for (int i = 0; i < dag->targets_and_dependencies; i++)
@@ -282,11 +279,13 @@ int is_dag_cyclic(directed_graph *dag, int head_node_num)
             temp = temp->next;
         }
         if (node_visit_status[i] == 0)
-            if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target, head_node_num) == 1){
-		printf("Cycle start vertex is %s\n", dag->dependencies[i]->target->name);
-                return 1;
-	    }
+            if (dfs_for_cycle(dag, i, node_visit_status, dag->dependencies[i]->target, head_node_num) == 1) {
+				fprintf(stderr, "Cycle start vertex is %s\n", dag->dependencies[i]->target->name);
+				free (node_visit_status);
+				return 1;
+			}
     }
+	free (node_visit_status);
     return 0;
 }
 
@@ -295,7 +294,7 @@ int depth_first_topological_traversal(directed_graph *dag, int node_num, int n)
 {
     graph_adj_list_node *adj_list = dag->dependencies[node_num];
     graph_adj_list_node *temp = adj_list;
-    int next_node_num;
+    int next_node_num = -1;
     dag->visited_node[node_num] = 1;
     if (debug)
     {
