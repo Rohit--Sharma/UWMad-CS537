@@ -66,6 +66,7 @@ MakeNode *create_node(char *target_line, command *cmds_head)
 	makenode->name = target;
 	makenode->timestamp = file_stat.st_mtime;
 	makenode->rules = cmds_head;
+	makenode->modify_build = 0;
 	makenode->isLeafNode = 0;
 	makenode->children = mk_tokens;
 

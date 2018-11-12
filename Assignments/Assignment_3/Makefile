@@ -6,7 +6,7 @@ LIBS=-lpthread # if needed, add more libraries here
 
 # the -g flag at all gcc compilation stages ensures that you can use gdb to debug your code
 $(EXE): main.o build_spec_graph.o text_parsing.o build_spec_repr.o proc_creation_prog_exe.o
-	$(CC) -g -o $(EXE) main.o build_spec_graph.o text_parsing.o build_spec_repr.o proc_creation_prog_exe.o $(LIBS)
+	$(CC) -g -O0 -o $(EXE) main.o build_spec_graph.o text_parsing.o build_spec_repr.o proc_creation_prog_exe.o $(LIBS)
 
 main.o: main.c build_spec_graph.h text_parsing.h build_spec_repr.h proc_creation_prog_exe.h
 	$(CC) -g $(WARNING_FLAGS) -c main.c
