@@ -241,8 +241,8 @@ int main(int argc, char *argv[])
 	}
 
 	// Cleanup of memory
-	// delete_hash_table (my_map, HASH_TABLE_SIZE);
-	// delete_graph (dag, make_file_stats->nodes_count);
+	delete_hash_table(my_map, HASH_TABLE_SIZE);
+	// delete_graph(dag, make_file_stats->nodes_count);
 
 	free(make_file_stats->root);
 	free(make_file_stats);
