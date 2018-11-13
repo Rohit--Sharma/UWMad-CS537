@@ -166,9 +166,6 @@ int main(int argc, char *argv[])
 	int index_head = root != NULL ? index_head_node(dag, root) : -1;
 	if (index_head == -1) {
 		fprintf (stderr, "Target %s not found in the makefile.\n Exiting...\n", root);
-
-		free(make_file_stats->root);
-		free(make_file_stats);
 		exit(1);
 	}
 
@@ -185,10 +182,6 @@ int main(int argc, char *argv[])
 	if (cycle)
 	{
 		fprintf(stderr, "Makefile has a cyclic dependency. Aborting!\n");
-
-		free(make_file_stats->root);
-		free(make_file_stats);
-		make_file_stats = NULL;
 		exit(1);
 	}
 	else
@@ -243,10 +236,6 @@ int main(int argc, char *argv[])
 	// Cleanup of memory
 	delete_hash_table(my_map, HASH_TABLE_SIZE);
 	// delete_graph(dag, make_file_stats->nodes_count);
-
-	free(make_file_stats->root);
-	free(make_file_stats);
-	make_file_stats = NULL;
 
 	return 0;
 }
