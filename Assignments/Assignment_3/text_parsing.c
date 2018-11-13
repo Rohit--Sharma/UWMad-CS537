@@ -270,6 +270,10 @@ make_stats *read_input_makefile(hash_table *map, char *file_name)
 			//If line size exceeds buffer size, then line is discarded and message is printed to stderr
 			printf("The line exceeding buffer size is: %s\n", line_struct->read_str);
 			fprintf(stderr, "Error in parsing the Makefile. Line size exceeds the buffer size %zu\n", MAX_LINE_LEN);
+
+			free(make_file_stats->root);
+			free(make_file_stats);
+			free(line_struct);
 			exit(1); //break; ??
 		}
 		if (line_struct->has_eof == 1)
