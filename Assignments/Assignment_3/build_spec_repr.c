@@ -87,7 +87,6 @@ void delete_makenode(MakeNode *node)
 	{
 		temp = dependencies->next;
 		free(dependencies->token);
-		free(dependencies);
 		dependencies = temp;
 	}
 }
@@ -156,8 +155,6 @@ void delete_hash_table(hash_table *map, int size)
 		while (list)
 		{
 			temp = list->next;
-			free(list->key);
-			delete_makenode(list->val);
 			free(list);
 			list = temp;
 		}
