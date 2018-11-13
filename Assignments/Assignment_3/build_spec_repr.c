@@ -53,6 +53,7 @@ MakeNode *create_node(char *target_line, command *cmds_head)
 	mk_tokens = mk_tokens->next;
 
 	struct stat file_stat;
+	file_stat.st_mtime = 0;
 	if (stat(target, &file_stat) < 0)
 	{
 		// TODO: Display error info according to errno

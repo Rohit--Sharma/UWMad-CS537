@@ -186,7 +186,7 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
     while (temp->next != NULL)
     {
         graph_adj_list_node *next_node = temp->next;
-        int time_diff = 0;
+        float time_diff = 0;
         for (int i = 0; i < dag->targets_and_dependencies; i++)
         {
             if (dag->dependencies[i] == NULL)
@@ -211,7 +211,9 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
 			parent->modify_build = 1;
             	}
 	    }
-            time_diff = difftime(next_node->target->timestamp, parent->timestamp);
+	    time_t next_timestamp = next_node->target->timestamp;
+	    time_t parent_timestamp = parent->timestamp;
+            time_diff = difftime(next_timestamp,parent_timestamp);
 	    if (time_diff > 0)
 	    {
 	    	next_node->target->modify_build = 1;
@@ -335,13 +337,18 @@ graph_adj_list_node **topo_list(directed_graph *dag)
 {
     graph_adj_list_node **topologically_sorted_nodes;
     topologically_sorted_nodes = (graph_adj_list_node **)malloc((dag->targets_and_dependencies) * sizeof(graph_adj_list_node *));
+    for(int i = 0; i < dag->targets_and_dependencies; i++)
+    {
+    	topologically_sorted_nodes[i] = NULL;
+    }
     for (int i = 0; i < dag->targets_and_dependencies; i++)
     {
         if (dag->dependencies[i] != NULL)
         {
             if (debug)
                 printf("\nnode num is %d %d\n", dag->targets_and_dependencies, dag->topological_num[i]);
-            topologically_sorted_nodes[(dag->targets_and_dependencies) - (dag->topological_num[i])] = dag->dependencies[i];
+	    if (((dag->targets_and_dependencies - dag->topological_num[i]) >= 0) && ((dag->targets_and_dependencies - dag->topological_num[i]) < dag->targets_and_dependencies)) 
+            	topologically_sorted_nodes[(dag->targets_and_dependencies) - (dag->topological_num[i])] = dag->dependencies[i];
         }
     }
     return topologically_sorted_nodes;
