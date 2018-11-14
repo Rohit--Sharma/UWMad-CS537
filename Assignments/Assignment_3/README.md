@@ -91,7 +91,7 @@ The targets are build in order from bottom-up.
     by 0x10B1E1: read_input_makefile (text_parsing.c:369)
     by 0x10933D: main (main.c:139)
 
-Reason: tokenize_makestring tokenizes a line with different dependencies which are assigned to nodes that are used in building the graph later.
+Reason: tokenize_makestring tokenizes a line with different dependencies which are assigned to nodes that are used in building the dependency graph later.
  
 2.
  304 bytes in 19 blocks are definitely lost in loss record 7 of 30
@@ -102,7 +102,7 @@ Reason: tokenize_makestring tokenizes a line with different dependencies which a
     by 0x10B3F9: construct_graph_edges (text_parsing.c:431)
     by 0x1093BA: main (main.c:149)
 
-Reason: This is same reason as above but while constructing the graph edges between nodes.
+Reason: This is same reason as above but while constructing the dependency graph edges between nodes.
 
 3.
  320 bytes in 20 blocks are definitely lost in loss record 10 of 30
@@ -137,7 +137,7 @@ Reason: The created graph is used throughout the course of the program.
     by 0x10AFC4: read_input_makefile (text_parsing.c:267)
     by 0x10933D: main (main.c:139)
 
-Reason: Read line reads makefile line by line and detects targets, dependencies and commands which it assigns accordingly and are used in the makenode function.
+Reason: Read line reads makefile line by line and detects targets, dependencies and commands which it assigns accordingly and are used in the makenode function. These read buffers are directly used in creating the nodes of dependency graph, which is used throughout the course of the program.
 
 7.
  229,952 (16 direct, 229,936 indirect) bytes in 1 blocks are definitely lost in loss record 30 of 30

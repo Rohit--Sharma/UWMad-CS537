@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 	//If the file does not exist, build it.
 	//If the file exists, but needs to be rebuilt due to some dependency file being change, build it.
 	int i = 0;
-	while (topologically_sorted_nodes[i] != NULL)
+	while (i < dag->targets_and_dependencies && topologically_sorted_nodes[i] != NULL)
 	{
 		if (debug)
 			printf("Inside execute loop %d\n", i);
