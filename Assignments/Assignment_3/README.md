@@ -82,6 +82,40 @@ A graph is creating using these targets and dependencies which is checked for cy
 The targets are build in order from bottom-up.
 
 ###VALGRIND ISSUES AND FIXES
+#ERRORS
+1.
+Conditional jump or move depends on uninitialised value(s)
+   at 0x10A366: is_dag_cyclic (build_spec_graph.c:280)
+   by 0x1094F5: main (main.c:183)
+ Uninitialised value was created by a heap allocation
+   at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x10B5FD: create_node (build_spec_repr.c:65)
+   by 0x10B0C8: read_input_makefile (text_parsing.c:337)
+   by 0x10933D: main (main.c:139)
+
+Conditional jump or move depends on uninitialised value(s)
+   at 0x109E4F: dfs_for_cycle (build_spec_graph.c:199)
+   by 0x10A3EE: is_dag_cyclic (build_spec_graph.c:285)
+   by 0x1094F5: main (main.c:183)
+ Uninitialised value was created by a heap allocation
+   at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x10B5FD: create_node (build_spec_repr.c:65)
+   by 0x10B0C8: read_input_makefile (text_parsing.c:337)
+   by 0x10933D: main (main.c:139)
+
+Fix: modify_build field in every node was not being set to an initial value of 0 when it was being initialized. Fixed the code in create_node() under build_spec_graph.c and this issue was resolved.
+
+2.
+Conditional jump or move depends on uninitialised value(s)
+   at 0x1097C8: main (main.c:216)
+ Uninitialised value was created by a heap allocation
+   at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x10A686: topo_list (build_spec_graph.c:339)
+   by 0x109585: main (main.c:200)
+
+Fix: topologically_sorted_nodes is a dynamically allocated array of adj list nodes which was not initialized to NULL. After initializing it to NULL in topo_list(), the issue was resolved.
+
+#MEMORY LEAK ISSUES
 1.
  16 bytes in 1 blocks are definitely lost in loss record 1 of 30
     at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
