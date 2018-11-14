@@ -224,7 +224,7 @@ int dfs_for_cycle(directed_graph *dag, int node_num, int *node_visit_status, Mak
 	    }
         }
         if (debug)
-            printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %d \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
+            printf("Node is %s (modify_build is %d) - parent is %s (modify build is %d) and timediff is %f \n", next_node->target->name, next_node->target->modify_build, parent->name, parent->modify_build, time_diff);
 		if (dag->dependencies[node_num] != NULL)
 	        	parent = dag->dependencies[node_num]->target;
         if (debug)
