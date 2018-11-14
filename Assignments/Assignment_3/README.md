@@ -115,6 +115,16 @@ Conditional jump or move depends on uninitialised value(s)
 
 Fix: topologically_sorted_nodes is a dynamically allocated array of adj list nodes which was not initialized to NULL. After initializing it to NULL in topo_list(), the issue was resolved.
 
+3.
+Invalid read of size 8
+   at 0x1097B7: main (main.c:216)
+ Address 0x5462ff8 is 0 bytes after a block of size 8 alloc'd
+   at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x10A696: topo_list (build_spec_graph.c:339)
+   by 0x109585: main (main.c:200)
+
+Fix: In a loop in main, topo_list[1] was being accessed for a testcase even though there was only 1 element (topo_list[0]) and topo_list[1] was not allocated. So, added an extra check to only check for i < dag->targets_and_dependencies and this eliminates the problem.
+
 #MEMORY LEAK ISSUES
 1.
  16 bytes in 1 blocks are definitely lost in loss record 1 of 30

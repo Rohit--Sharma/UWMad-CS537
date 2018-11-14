@@ -194,6 +194,9 @@ read_line_val *read_line(int buff_size, FILE *fileptr)
 {
 	read_line_val *new_line_val = (read_line_val *)malloc(sizeof(read_line_val));
 	char *new_line = (char *)malloc(sizeof(char) * buff_size);
+	for (int i = 0; i < buff_size; i++){
+		new_line[i] = '\0';
+	}
 	if (errno == ENOMEM)
 	{
 		fprintf(stderr, "No enough memory for malloc\n");
