@@ -841,6 +841,100 @@ void rbtree_print() {
 	while (temp->children[LEFT_CHILD] != NULL) {
 		temp = temp->children[LEFT_CHILD];
 	}
-	
+
 	print_helper(root, 0, temp);
+}
+
+// Returns the number of black nodes in a subtree of the given node
+// or -1 if it is not a red black tree.
+int computeBlackHeight(RBNode* curr_node) {
+    // For an empty subtree the answer is obvious
+    if (curr_node == NULL)
+        return 0; 
+    // Computes the height for the left and right child recursively
+    int leftHeight = computeBlackHeight(curr_node->children[LEFT_CHILD]);
+    int rightHeight = computeBlackHeight(curr_node->children[RIGHT_CHILD]);
+    int add = curr_node->red == 0 ? 1 : 0;
+    // The current subtree is not a red black tree if and only if
+    // one or more of current node's children is a root of an invalid tree
+    // or they contain different number of black nodes on a path to a null node.
+    if (leftHeight == -1 || rightHeight == -1 || leftHeight != rightHeight)
+        return -1; 
+    else
+        return leftHeight + add;
+}
+
+int checkNoTwoAdjacentRedNodes(RBNode *curr_node) {
+	if (curr_node == NULL) {
+		return 1;
+	}
+
+	if (curr_node->red == 1) {
+		if (curr_node->children[LEFT_CHILD] != NULL && curr_node->children[LEFT_CHILD]->red == 1) {
+			return 0;
+		}
+		if (curr_node->children[RIGHT_CHILD] != NULL && curr_node->children[RIGHT_CHILD]->red == 1) {
+			return 0;
+		}
+	}
+
+	return checkNoTwoAdjacentRedNodes(curr_node->children[LEFT_CHILD]) && checkNoTwoAdjacentRedNodes(curr_node->children[RIGHT_CHILD]);
+}
+
+int isBST(RBNode *curr_node, RBNode *left_node, RBNode *right_node) {
+	// Base condition 
+    if (curr_node == NULL) 
+        return 1; 
+  
+    // if left node exist then check it has 
+    // correct data or not i.e. left node's data 
+    // should be less than root's data 
+    if (left_node != NULL && curr_node->ptr < left_node->ptr) 
+        return 0; 
+  
+    // if right node exist then check it has 
+    // correct data or not i.e. right node's data 
+    // should be greater than root's data 
+    if (right_node != NULL && curr_node->ptr > right_node->ptr) 
+        return 0; 
+  
+    // check recursively for every node. 
+    return isBST(curr_node->children[LEFT_CHILD], left_node, curr_node) && 
+           isBST(curr_node->children[RIGHT_CHILD], curr_node, right_node);
+}
+
+/**
+ * Returns 1 if red black tree properties are followed by the tree rooted at root, else 0
+ * Rules:
+ * 1) Every node has a color either red or black.
+ * 2) Root of tree is always black.
+ * 3) There are no two adjacent red nodes (A red node cannot have a red parent or red child).
+ * 4) Every path from a node (including root) to any of its descendant NULL node has the same number of black nodes.
+ */
+int isRedBlackTree() {
+	// Check BST
+	if (isBST(root, NULL, NULL) == 0) {
+		fprintf(stderr, "The red-black tree is not a binary SEARCH tree.\n");
+		return 0;
+	}
+
+	// Rule 2
+	if (root->red == 1) {
+		fprintf(stderr, "Root of a red-black tree must be Black.\n");
+		return 0;
+	}
+
+	// Rule 3
+	if (checkNoTwoAdjacentRedNodes(root) == 0) {
+		fprintf(stderr, "A red node cannot have a red child in a red-black tree.\n");
+		return 0;
+	}
+
+	// Rule 4
+	if (computeBlackHeight(root) == -1) {
+		fprintf(stderr, "The black height of left subtree and right subtree must be the same in a red-black tree.\n");
+		return 0;
+	}
+
+	return 1;
 }

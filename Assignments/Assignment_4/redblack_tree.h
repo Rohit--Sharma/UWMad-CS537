@@ -27,3 +27,4 @@ RBNode *rbtree_interval_search(void *ptr);
 RBNode *rbtree_range_search(void *ptr, size_t size);
 
 void rbtree_print();
+int isRedBlackTree();

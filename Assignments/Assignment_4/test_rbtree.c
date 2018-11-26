@@ -17,33 +17,33 @@ void test_insert(int *base_ptr) {
 void test_point_search(int *base_ptr) {
 	RBNode *searched_node = rbtree_point_search(base_ptr + 54);
 	if (searched_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", searched_node);
+		printf("Success! Address: %p\n", searched_node);
 	}
 	searched_node = rbtree_point_search(base_ptr + 20);
 	if (searched_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", searched_node);
+		printf("Success! Address: %p\n", searched_node);
 	}
 	searched_node = rbtree_point_search(base_ptr + 60);
 	if (searched_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", searched_node);
+		printf("Success! Address: %p\n", searched_node);
 	}
 	searched_node = rbtree_point_search(base_ptr + 40);
 	if (searched_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", searched_node);
+		printf("Failure! Address: %p\n", searched_node);
 	}
 	searched_node = rbtree_point_search(base_ptr + 92);
 	if (searched_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", searched_node);
+		printf("Failure! Address: %p\n", searched_node);
 	}
 }
 
@@ -51,39 +51,39 @@ void test_interval_search(int *base_ptr) {
 	printf("Testing interval_search()\n");
 	RBNode *itvl_node = rbtree_interval_search(base_ptr + 54);
 	if (itvl_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", itvl_node);
+		printf("Success! Address: %p\n", itvl_node);
 	}
 	itvl_node = rbtree_interval_search(base_ptr + 22);
 	if (itvl_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", itvl_node);
+		printf("Success! Address: %p\n", itvl_node);
 	}
 	itvl_node = rbtree_interval_search(base_ptr + 60);
 	if (itvl_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", itvl_node);
+		printf("Success! Address: %p\n", itvl_node);
 	}
 	itvl_node = rbtree_interval_search(base_ptr + 40);
 	if (itvl_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", itvl_node);
+		printf("Success! Address: %p\n", itvl_node);
 	}
 	itvl_node = rbtree_interval_search(base_ptr + 4);
 	if (itvl_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", itvl_node);
+		printf("Failure! Address: %p\n", itvl_node);
 	}
 	itvl_node = rbtree_interval_search(base_ptr + 92);
 	if (itvl_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", itvl_node);
+		printf("Failure! Address: %p\n", itvl_node);
 	}
 }
 
@@ -92,40 +92,40 @@ void test_range_search(int *base_ptr) {
 	rbtree_point_search(base_ptr + 54)->free = 1;
 	RBNode *range_node = rbtree_range_search(base_ptr + 52, sizeof(int) * 10);
 	if (range_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", range_node);
+		printf("Success! Address: %p\n", range_node);
 	}
 	rbtree_point_search(base_ptr + 35)->free = 1;
 	range_node = rbtree_range_search(base_ptr + 30, sizeof(int) * 16);
 	if (range_node == NULL) {
-		printf("Not found\n");
+		printf("Failure! Not found\n");
 	} else {
-		printf("Success\n Address: %p\n", range_node);
+		printf("Success! Address: %p\n", range_node);
 	}
 	range_node = rbtree_range_search(base_ptr + 47, sizeof(int) * 5);
 	if (range_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", range_node);
+		printf("Failure! Address: %p\n", range_node);
 	}
 	range_node = rbtree_range_search(base_ptr + 12, sizeof(int) * 5);
 	if (range_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", range_node);
+		printf("Failure! Address: %p\n", range_node);
 	}
 	range_node = rbtree_range_search(base_ptr + 92, sizeof(int) * 10);
 	if (range_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", range_node);
+		printf("Failure! Address: %p\n", range_node);
 	}
 	range_node = rbtree_range_search(base_ptr + 18, sizeof(int) * 5);
 	if (range_node == NULL) {
-		printf("Success\n Not found\n");
+		printf("Success! Not found\n");
 	} else {
-		printf("Address: %p\n", range_node);
+		printf("Failure! Address: %p\n", range_node);
 	}
 }
 
@@ -141,14 +141,17 @@ int main() {
 	int *base_ptr = temp;
 
 	test_insert(base_ptr);
+	printf("Is red-black after insertion: %d\n", isRedBlackTree());
 
 	// Test searching
 	test_point_search(base_ptr);
 	test_interval_search(base_ptr);
 	test_range_search(base_ptr);
+	printf("Is red-black after search: %d\n", isRedBlackTree());
 
 	// test deleting
 	test_delete_node(base_ptr);
+	printf("Is red-black after deletion: %d\n", isRedBlackTree());
 
 	return 0;
 }
