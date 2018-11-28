@@ -19,6 +19,7 @@ typedef struct rbtree_node {
 	int red;
 } rbtree_node;
 
+int rbtree_insert_node(void* ptr, size_t size);
 //int insert_node(void *ptr, size_t size);
 //int delete_node(void *ptr);
 
@@ -26,5 +27,6 @@ typedef struct rbtree_node {
 //rbtree_node *rbtree_interval_search(void *ptr);
 //rbtree_node *rbtree_range_search(void *ptr, size_t size);
 
+void rbtree_print();
 //void rbtree_print();
-//int isRedBlackTree();
+int isRedBlackTree();
