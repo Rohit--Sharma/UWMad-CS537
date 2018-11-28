@@ -183,7 +183,7 @@ void fix_rbtree_double_black(rbtree_node* node) {
 						rotate_rbtree_nodes(parent, LEFT_CHILD);
 					}
 				} else {
-					if (sibling == sibling->parent->children[RIGHT_CHILD]) {
+					if (sibling == sibling->parent->children[LEFT_CHILD]) {
 						sibling->children[RIGHT_CHILD]->red = parent->red;
 						rotate_rbtree_nodes(sibling, LEFT_CHILD);
 						rotate_rbtree_nodes(parent, RIGHT_CHILD);
@@ -717,3 +717,4 @@ int isRedBlackTree() {
 
 	return 1;
 }
+
