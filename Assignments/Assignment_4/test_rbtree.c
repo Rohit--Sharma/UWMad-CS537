@@ -1,22 +1,49 @@
 #include <stdio.h>
-#include "gfg_rbtree.h"
+#include "redblack_tree.h"
 
 void test_insert(int *base_ptr) {
 	// test insert
-	rbtree_insert_node(base_ptr + 47, sizeof(int) * 5);
-	rbtree_insert_node(base_ptr + 5, sizeof(int) * 5);
-	rbtree_insert_node(base_ptr + 60, sizeof(int) * 20);
-	rbtree_insert_node(base_ptr + 35, sizeof(int) * 10);
-	rbtree_insert_node(base_ptr + 85, sizeof(int) * 5);
-	rbtree_insert_node(base_ptr + 95, sizeof(int) * 5);
-	rbtree_insert_node(base_ptr + 20, sizeof(int) * 5);
-	rbtree_insert_node(base_ptr + 54, sizeof(int) * 6);
+	int a;
+	a = rbtree_insert(base_ptr + 47, sizeof(int) * 5);
+	printf("Node inserted successfully ? %d\n", a);
+	a = rbtree_insert(base_ptr + 5, sizeof(int) * 5);
+	printf("Node inserted successfully ? %d\n", a);
+	a = rbtree_insert(base_ptr + 60, sizeof(int) * 20);
+	printf("Node inserted successfully ? %d\n", a);
+	a = rbtree_insert(base_ptr + 35, sizeof(int) * 10);
+	printf("Node inserted successfully ? %d\n", a);
+	a = rbtree_insert(base_ptr + 85, sizeof(int) * 5);
+	printf("Node inserted successfully ? %d\n", a);
+	a = rbtree_insert(base_ptr + 95, sizeof(int) * 5);
+	printf("Node inserted successfully ? %d\n", a);
+	a = rbtree_insert(base_ptr + 20, sizeof(int) * 5);
+	printf("Node inserted successfully ? %d\n", a);
+	a = rbtree_insert(base_ptr + 54, sizeof(int) * 6);
+	printf("Node inserted successfully ? %d\n", a);
 	rbtree_print();
+	//int a;
+	//a = rbtree_insert_node(base_ptr + 47, sizeof(int) * 5);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert_node(base_ptr + 5, sizeof(int) * 5);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert_node(base_ptr + 60, sizeof(int) * 20);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert_node(base_ptr + 35, sizeof(int) * 10);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert_node(base_ptr + 85, sizeof(int) * 5);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert_node(base_ptr + 95, sizeof(int) * 5);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert_node(base_ptr + 20, sizeof(int) * 5);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert_node(base_ptr + 54, sizeof(int) * 6);
+	//printf("Node inserted successfully ? %d\n", a);
+	//rbtree_print();
 }
 
-/*
+
 void test_point_search(int *base_ptr) {
-	rbtree_node *searched_node = rbtree_point_search(base_ptr + 54);
+	RBNode *searched_node = rbtree_point_search(base_ptr + 54);
 	if (searched_node == NULL) {
 		printf("Failure! Not found\n");
 	} else {
@@ -129,7 +156,7 @@ void test_range_search(int *base_ptr) {
 		printf("Failure! Address: %p\n", range_node);
 	}
 }
-
+/*
 void test_delete_node(int *base_ptr) {
 	rbtree_delete_node(base_ptr + 60);
 	rbtree_print(); // doesn't behave properly. Tree is no longer BST in case of root (47) and no longer red black in case of deleting 60
@@ -146,16 +173,15 @@ int main() {
 	printf("Is red-black after insertion: %d\n", isRedBlackTree());
 
 	// Test searching
-	/*
+	
 	test_point_search(base_ptr);
 	test_interval_search(base_ptr);
 	test_range_search(base_ptr);
 	printf("Is red-black after search: %d\n", isRedBlackTree());
 
 	// test deleting
-	test_delete_node(base_ptr);
+	//test_delete_node(base_ptr);
 	printf("Is red-black after deletion: %d\n", isRedBlackTree());
-	*/
 
 	return 0;
 }

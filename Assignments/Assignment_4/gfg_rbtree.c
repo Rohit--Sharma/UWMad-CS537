@@ -266,7 +266,7 @@ rbtree_node* get_rbtree_root() {
 	return root;
 }
 
-rbtree_node* search_for_point_node(void *ptr, rbtree_node *node) {
+rbtree_node *search_for_node(void *ptr, rbtree_node *node) {
 	if (node == NULL) {
 		return NULL;
 	}
@@ -279,19 +279,28 @@ rbtree_node* search_for_point_node(void *ptr, rbtree_node *node) {
 	}
 	else if (node->ptr > ptr) {
 		if (node->children[LEFT_CHILD] != NULL) {
-			return search_for_point_node(ptr, node->children[LEFT_CHILD]);
+			return search_for_node(ptr, node->children[LEFT_CHILD]);
 		}
 	}
 	else {
 		if (node->children[RIGHT_CHILD] != NULL) {
-			return search_for_point_node(ptr, node->children[RIGHT_CHILD]);
+			return search_for_node(ptr, node->children[RIGHT_CHILD]);
 		}
 	}
 	return NULL;
 }
 
+rbtree_node *node_search_rbtree(void *ptr, rbtree_node *root) {
+	if (root == NULL) {
+		fprintf(stderr, "Root is NULL! No tree to search\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return search_for_node(ptr, root);
+}
+
 rbtree_node* create_rbtree_node(void *ptr, size_t size) {
-	rbtree_node* new_node = (rbtree_node *) malloc(sizeof(rbtree_node));
+	rbtree_node *new_node = (rbtree_node *) malloc(sizeof(rbtree_node));
 	
 	new_node->ptr = ptr;
 	new_node->size = size;
@@ -344,7 +353,7 @@ int insert_node(void *ptr, size_t size, rbtree_node *root, rbtree_node *new_node
 int is_still_rbtree(rbtree_node *new_node) {
 	rbtree_node *temp_node;
 	rbtree_node *grandparent;
-	int child = LEFT_CHILD;
+	int child = 0;
 
 	if ((new_node->parent == NULL) || (new_node->parent->red == 0))
 		return 1;
@@ -353,7 +362,7 @@ int is_still_rbtree(rbtree_node *new_node) {
 			return 1;
 		}
 
-		if ((new_node->parent->parent->children[LEFT_CHILD] != NULL) && (new_node->parent->parent->children[LEFT_CHILD]->red) && (new_node->parent->parent->children[RIGHT_CHILD] != NULL) && (new_node->parent->parent->children[RIGHT_CHILD]->red)) {
+		if ((new_node->parent->parent->children[LEFT_CHILD] != NULL) && (new_node->parent->parent->children[LEFT_CHILD]->red == 1) && (new_node->parent->parent->children[RIGHT_CHILD] != NULL) && (new_node->parent->parent->children[RIGHT_CHILD]->red == 1)) {
 			new_node->parent->parent->children[LEFT_CHILD]->red = 0;
 			new_node->parent->parent->children[RIGHT_CHILD]->red = 0;
 
@@ -398,7 +407,7 @@ int is_still_rbtree(rbtree_node *new_node) {
 			if (new_node->parent->parent->parent == NULL)
 				root = new_node->parent;
 			else
-				new_node->parent->parent->children[RIGHT_CHILD] = new_node->parent;
+				new_node->parent->parent->parent->children[RIGHT_CHILD] = new_node->parent;
 
 			/*TODO Do not know if this next line is valid. maybe???*/
 			new_node->parent->parent = new_node->parent->parent->parent;
@@ -421,10 +430,10 @@ int is_still_rbtree(rbtree_node *new_node) {
 			temp_node = new_node->parent->parent->parent;
 
 			if (new_node->parent->parent->parent->children[RIGHT_CHILD] == new_node->parent->parent)
-				child = RIGHT_CHILD;
+				child = 1;
 
 			new_node->parent->parent->children[LEFT_CHILD] = new_node->children[RIGHT_CHILD];
-			new_node->children[RIGHT_CHILD] = new_node->parent;
+			new_node->children[RIGHT_CHILD] = new_node->parent->parent;
 			new_node->children[RIGHT_CHILD]->parent = new_node;
 			if (new_node->children[RIGHT_CHILD]->children[LEFT_CHILD] != NULL)
 				new_node->children[RIGHT_CHILD]->children[LEFT_CHILD]->parent = new_node->children[RIGHT_CHILD];
@@ -456,10 +465,10 @@ int is_still_rbtree(rbtree_node *new_node) {
 			temp_node = new_node->parent->parent->parent;
 
 			if (new_node->parent->parent->parent->children[RIGHT_CHILD] == new_node->parent->parent)
-				child = RIGHT_CHILD;
+				child = 1;
 
 			new_node->parent->parent->children[RIGHT_CHILD] = new_node->children[LEFT_CHILD];
-			new_node->children[LEFT_CHILD] = new_node->parent;
+			new_node->children[LEFT_CHILD] = new_node->parent->parent;
 			new_node->children[LEFT_CHILD]->parent = new_node;
 			if (new_node->children[LEFT_CHILD]->children[RIGHT_CHILD] != NULL)
 				new_node->children[LEFT_CHILD]->children[RIGHT_CHILD]->parent = new_node->children[LEFT_CHILD];
@@ -487,7 +496,7 @@ int is_still_rbtree(rbtree_node *new_node) {
 	return 0;
 }
 
-int rbtree_insert_node(void* ptr, size_t size) {
+int rbtree_insert_node(void *ptr, size_t size) {
 	int insert_successful;
 	int rbtree_intact;
 
@@ -514,15 +523,15 @@ int rbtree_insert_node(void* ptr, size_t size) {
 	return 1;
 }
 
-rbtree_node* interval_search_rbtree(void* ptr, rbtree_node* root) {
+rbtree_node* interval_search_rbtree(void *ptr, rbtree_node *root) {
 	if (root == NULL) {
 		return NULL;
 	}
 
-	if ((ptr == root->ptr) && (root->free != 0))
+	if ((ptr == root->ptr) && (root->free == 0))
 		return root;
 	else if (ptr >= root->ptr) {
-		if ((size_t)ptr <= ((size_t)root->ptr + root->size) && (root->free != 0))
+		if ((size_t)ptr <= ((size_t)root->ptr + root->size) && (root->free == 0))
 			return root;
 		else {
 			if (root->children[RIGHT_CHILD] != NULL) {
@@ -544,7 +553,7 @@ rbtree_node* interval_search_rbtree(void* ptr, rbtree_node* root) {
 	return NULL;
 }
 
-rbtree_node* range_search_rbtree(void* ptr, size_t size, rbtree_node* root) {
+rbtree_node* range_search_rbtree(void *ptr, size_t size, rbtree_node *root) {
 	
 	if (root == NULL)
 		return NULL;
@@ -580,6 +589,7 @@ void print_helper(rbtree_node *root, int depth, rbtree_node *gl_root) {
 		print_helper(root->children[LEFT_CHILD], depth + 1, gl_root);
 
 		int curr_depth = depth;
+		printf("Current Depth is %d\n", curr_depth);
 		while (curr_depth--) {
 			printf(".");
 		}

@@ -19,13 +19,14 @@ typedef struct rbtree_node {
 	int red;
 } rbtree_node;
 
-int rbtree_insert_node(void* ptr, size_t size);
+int rbtree_insert_node(void *ptr, size_t size);
+void delete_rbtree_node(rbtree_node *node);
 //int insert_node(void *ptr, size_t size);
 //int delete_node(void *ptr);
-
-//rbtree_node *rbtree_point_search(void *ptr);
-//rbtree_node *rbtree_interval_search(void *ptr);
-//rbtree_node *rbtree_range_search(void *ptr, size_t size);
+rbtree_node *get_rbtree_root();
+rbtree_node *node_search_rbtree(void *ptr, rbtree_node *root);
+rbtree_node *interval_search_rbtree(void *ptr, rbtree_node *root);
+rbtree_node *range_search_rbtree(void *ptr, size_t size, rbtree_node *root);
 
 void rbtree_print();
 //void rbtree_print();
