@@ -59,25 +59,21 @@ void rotate_rbtree_nodes(rbtree_node* node, int direction) {
 }
 
 void swap_colours_nodes(rbtree_node* node1, rbtree_node* node2) {
-	int temp_red;
-	temp_red = node1->red;
+	int temp_red = node1->red;
 	node1->red = node2->red;
 	node2->red = temp_red;
 }
 
 void swap_values_nodes(rbtree_node* node1, rbtree_node* node2) {
-	void *temp_ptr;
-	temp_ptr = node1->ptr;
+	void *temp_ptr = node1->ptr;
 	node1->ptr = node2->ptr;
 	node2->ptr = temp_ptr;
 
-	size_t temp_size;
-	temp_size = node1->size;
+	size_t temp_size = node1->size;
 	node1->size = node2->size;
 	node2->size = temp_size;
 
-	int temp_free;
-	temp_free = node1->free;
+	int temp_free = node1->free;
 	node1->free = node2->free;
 	node2->free = temp_free;
 }
@@ -124,6 +120,9 @@ void red_red_node(rbtree_node* node) {
 	}
 }
 
+/**
+ * Find node without a left child in the subtree of the given node
+ */
 rbtree_node* successor_node(rbtree_node* node) {
 	rbtree_node* temp_node = node;
 	
@@ -133,14 +132,20 @@ rbtree_node* successor_node(rbtree_node* node) {
 	return temp_node;
 }
 
+/**
+ * Find node that replaces a deleted node in BST
+ */
 rbtree_node* replace_BST_node(rbtree_node* node) {
-	if (node->children[LEFT_CHILD] !=NULL && node->children[RIGHT_CHILD] != NULL)
+	// When node has 2 children
+	if (node->children[LEFT_CHILD] != NULL && node->children[RIGHT_CHILD] != NULL)
 		return successor_node(node->children[RIGHT_CHILD]);
 
+	// When leaf
 	if (node->children[LEFT_CHILD] == NULL && node->children[RIGHT_CHILD] == NULL)
 		return NULL;
 
-	if (node->children[LEFT_CHILD]!=NULL)
+	// When single child
+	if (node->children[LEFT_CHILD] != NULL)
 		return node->children[LEFT_CHILD];
 	else
 		return node->children[RIGHT_CHILD];
@@ -200,10 +205,12 @@ void fix_rbtree_double_black(rbtree_node* node) {
 	}
 }
 
+/**
+ * Deletes the given node from the red black tree
+ */
 void delete_rbtree_node(rbtree_node *node) {
-	rbtree_node *temp_node;
-	temp_node = replace_BST_node(node);
-	int both_black_nodes;
+	rbtree_node *temp_node = replace_BST_node(node);
+	int both_black_nodes = 0;
 	
 	if ((temp_node == NULL || temp_node->red == 0) && (node->red == 0))
 		both_black_nodes = 1;
@@ -211,15 +218,17 @@ void delete_rbtree_node(rbtree_node *node) {
 	rbtree_node *parent = node->parent;
 
 	if (temp_node == NULL) {
-		if (node == root)
+		// temp_node is NULL, therefore node is a leaf
+		if (node == root) {
+			// If the node to be deleted is root, make root NULL
 			root = NULL;
+		}
 		else {
 			if (both_black_nodes) {
 				fix_rbtree_double_black(node);
 			}
 			else {
-				rbtree_node* sibling;
-				sibling = sibling_node(node);
+				rbtree_node* sibling = sibling_node(node);
 				if (sibling != NULL)
 					sibling->red = 1;
 			}
@@ -234,6 +243,7 @@ void delete_rbtree_node(rbtree_node *node) {
 	}
 	
 	if (node->children[LEFT_CHILD] == NULL || node->children[RIGHT_CHILD] == NULL) {
+		// node has only 1 child
 		if (node == root) {
 			node->ptr = temp_node->ptr;
 			node->size = temp_node->size;
@@ -257,8 +267,9 @@ void delete_rbtree_node(rbtree_node *node) {
 		return;
 	}
 
+	// If node has 2 children, swap values with successor and recurse
   	swap_values_nodes(temp_node, node);
-	free(temp_node);
+	delete_rbtree_node(temp_node);
 }
 
   
@@ -589,12 +600,12 @@ void print_helper(rbtree_node *root, int depth, rbtree_node *gl_root) {
 		print_helper(root->children[LEFT_CHILD], depth + 1, gl_root);
 
 		int curr_depth = depth;
-		printf("Current Depth is %d\n", curr_depth);
+		// printf("Current Depth is %d\n", curr_depth);
 		while (curr_depth--) {
 			printf(".");
 		}
 		// printf("red = %d, free = %d node at %p with ptr %p size %i, parent %p, and children %p %p\n", root->red, root->free, (void *)root, root->ptr, (int)root->size, (void *)root->parent, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
-		printf("%p - ptr: %d R: %d, F: %d Children: %p %p\n", (void *)root, (root->ptr - gl_root->ptr) / 4, root->red, root->free, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
+		printf("%p - ptr: %ld R: %d, F: %d Children: %p %p\n", (void *)root, (root->ptr - gl_root->ptr) / 4, root->red, root->free, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
 
 		print_helper(root->children[RIGHT_CHILD], depth + 1, gl_root);
 	}
