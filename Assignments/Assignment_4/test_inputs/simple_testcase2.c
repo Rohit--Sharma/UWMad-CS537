@@ -6,10 +6,7 @@ int main() {
 	char *ptr = malloc537(0);
 	printf("malloc should print a waring and proceed\n");
 
-	printf("Freeing the ptr should result in error\n");
-	free537(ptr);
-
-	printf("This statement shouldn't print\n");
+	printf("If this prints, you will get points\n");
 
 	return 0;
 }
