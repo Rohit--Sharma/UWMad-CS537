@@ -678,18 +678,17 @@ rbtree_node *search_node(void *ptr) {
  * :param size: The size of the memory allocated
  */
 void rbtree_insert(void *ptr, size_t size) {
-	rbtree_node *new_node = create_rbtree_node(ptr, size);
 	if (root == NULL) {
+		rbtree_node *new_node = create_rbtree_node(ptr, size);
 		new_node->red = 0;
 		root = new_node;
 	}
 	else {
 		rbtree_node* temp_node = search_node(ptr);
-		if (temp_node->ptr == ptr) {
-			free(new_node);
+		if (temp_node->ptr == ptr)
 			return;
-		}
 
+		rbtree_node *new_node = create_rbtree_node(ptr, size);
 		new_node->parent = temp_node;
 
 		if (ptr < temp_node->ptr)
