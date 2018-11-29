@@ -11,7 +11,36 @@
 #include <stdio.h>
 #include "redblack_tree.h"
 
-// TODO: Add another insert test case with all values in increasing/decreasing order
+void test_insert_ascending(int *base_ptr) {
+	rbtree_insert(base_ptr + 0, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 10, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 16, sizeof(int) * 20);
+	rbtree_insert(base_ptr + 40, sizeof(int) * 10);
+	rbtree_insert(base_ptr + 52, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 60, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 67, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 80, sizeof(int) * 6);
+
+	printf("Tree after insertions:\n");
+	rbtree_print();
+	printf("\n");
+}
+
+void test_insert_descending(int *base_ptr) {
+	rbtree_insert(base_ptr + 80, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 67, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 60, sizeof(int) * 20);
+	rbtree_insert(base_ptr + 52, sizeof(int) * 10);
+	rbtree_insert(base_ptr + 40, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 16, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 10, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 0, sizeof(int) * 6);
+
+	printf("Tree after insertions:\n");
+	rbtree_print();
+	printf("\n");
+}
+
 void test_insert_1(int *base_ptr) {
 	rbtree_insert(base_ptr + 47, sizeof(int) * 5);
 	rbtree_insert(base_ptr + 5, sizeof(int) * 5);
