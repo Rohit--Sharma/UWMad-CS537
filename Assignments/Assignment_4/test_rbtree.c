@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "redblack_tree.h"
 
+// TODO: Add another insert test case with all values in increasing/decreasing order
 void test_insert_1(int *base_ptr) {
 	rbtree_insert(base_ptr + 47, sizeof(int) * 5);
 	rbtree_insert(base_ptr + 5, sizeof(int) * 5);

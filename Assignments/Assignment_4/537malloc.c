@@ -9,6 +9,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
+#include "redblack_tree.h"
 
 void *malloc537(size_t size) {
 	return NULL;
@@ -20,4 +21,8 @@ void free537(void *ptr) {
 
 void *realloc537(void *ptr, size_t size) {
 	return NULL;
+}
+
+void memcheck537(void *ptr, size_t size) {
+	return;
 }
