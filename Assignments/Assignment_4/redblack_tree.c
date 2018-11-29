@@ -402,8 +402,7 @@ rbtree_node *node_search_helper(void *ptr, rbtree_node *node) {
  */
 rbtree_node *rbtree_node_search(void *ptr) {
 	if (root == NULL) {
-		fprintf(stderr, "Root is NULL! No tree to search\n");
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
 
 	return node_search_helper(ptr, root);
