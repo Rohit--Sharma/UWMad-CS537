@@ -88,7 +88,7 @@ void red_red_node(rbtree_node* node) {
 	rbtree_node *grand_parent = parent->parent;
 	rbtree_node *uncle = uncle_node(node);
 
-	if (parent->red == 1) {
+	if (parent->red != 0	) {
 		if (uncle != NULL && uncle->red == 1) {
 			parent->red = 0;
 			uncle->red = 0;
@@ -96,7 +96,7 @@ void red_red_node(rbtree_node* node) {
 			red_red_node(grand_parent);
 		} 
 		else {
-			if (parent = parent->parent->children[LEFT_CHILD]) {
+			if (parent == parent->parent->children[LEFT_CHILD]) {
 				if (node == node->parent->children[LEFT_CHILD]) {
 					swap_colours_nodes(parent, grand_parent);
 				}
@@ -396,7 +396,9 @@ int is_still_rbtree(rbtree_node *new_node) {
 				new_node->parent->parent->parent->children[LEFT_CHILD] = new_node->parent;
 
 			/*TODO Do not know if this next line is valid. maybe???*/
+			printf("This TODO segment is being accessed\n");
 			new_node->parent->parent = new_node->parent->parent->parent;
+			printf("This TODO segment is done being accessed\n");
 			
 			grandparent->children[LEFT_CHILD] = new_node->parent->children[RIGHT_CHILD];
 			
@@ -512,7 +514,7 @@ int rbtree_insert_node(void *ptr, size_t size) {
 	int rbtree_intact;
 
 	rbtree_node *new_node = create_rbtree_node(ptr, size);
-
+	printf("New node being created for %p\n", (void*)ptr);
 	if (root == NULL) {
 		root = new_node;
 		root->red = 0;
@@ -520,6 +522,7 @@ int rbtree_insert_node(void *ptr, size_t size) {
 	}
 
 	insert_successful = insert_node(ptr, size, root, new_node);
+	fprintf(stdout, "insert successful %d\n", insert_successful);
 	if (insert_successful < 0) {
 		fprintf(stderr, "Could not insert node to red black tree! Exiting program...\n");
 		return insert_successful;
@@ -532,6 +535,46 @@ int rbtree_insert_node(void *ptr, size_t size) {
 	}
 	
 	return 1;
+}
+
+rbtree_node *search_node (void *ptr) {
+	rbtree_node *temp_node = root;
+	while (temp_node != NULL) 
+		if (ptr < temp_node->ptr)
+			if (temp_node->children[LEFT_CHILD] == NULL)
+				break;
+			else
+				temp_node = temp_node->children[LEFT_CHILD];
+		else if (ptr == temp_node->ptr)
+			break;
+		else
+			if (temp_node->children[RIGHT_CHILD] == NULL)
+				break;
+			else
+				temp_node = temp_node->children[RIGHT_CHILD];
+
+	return temp_node;
+}
+void rbtree_insert(void *ptr, size_t size) {
+	rbtree_node *new_node = create_rbtree_node(ptr, size);
+	if (root == NULL) {
+		new_node->red = 0;
+		root = new_node;
+	}
+	else {
+		rbtree_node* temp_node = search_node(ptr);
+		if (temp_node->ptr == ptr)
+			return;
+
+		new_node->parent  = temp_node;
+
+		if (ptr < temp_node->ptr)
+			temp_node->children[LEFT_CHILD] = new_node;
+		else
+			temp_node->children[RIGHT_CHILD] = new_node;
+
+		red_red_node(new_node);
+	}
 }
 
 rbtree_node* interval_search_rbtree(void *ptr, rbtree_node *root) {

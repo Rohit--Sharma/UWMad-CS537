@@ -2,94 +2,100 @@
 #include "gfg_rbtree.h"
 
 void test_insert(int *base_ptr) {
-	// test insert
 	//int a;
-	//a = rbtree_insert(base_ptr + 47, sizeof(int) * 5);
+	//a = rbtree_insert(base_ptr + 70, sizeof(int) * 5);
 	//printf("Node inserted successfully ? %d\n", a);
-	//a = rbtree_insert(base_ptr + 5, sizeof(int) * 5);
+	//a = rbtree_insert(base_ptr + 30, sizeof(int) * 5);
 	//printf("Node inserted successfully ? %d\n", a);
-	//a = rbtree_insert(base_ptr + 60, sizeof(int) * 20);
+	//a = rbtree_insert(base_ptr + 180, sizeof(int) * 20);
 	//printf("Node inserted successfully ? %d\n", a);
-	//a = rbtree_insert(base_ptr + 35, sizeof(int) * 10);
+	//a = rbtree_insert(base_ptr + 100, sizeof(int) * 10);
 	//printf("Node inserted successfully ? %d\n", a);
-	//a = rbtree_insert(base_ptr + 85, sizeof(int) * 5);
+	//a = rbtree_insert(base_ptr + 220, sizeof(int) * 5);
 	//printf("Node inserted successfully ? %d\n", a);
-	//a = rbtree_insert(base_ptr + 95, sizeof(int) * 5);
+	//a = rbtree_insert(base_ptr + 80, sizeof(int) * 5);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert(base_ptr + 110, sizeof(int) * 5);
+	//printf("Node inserted successfully ? %d\n", a);
+	//a = rbtree_insert(base_ptr + 260, sizeof(int) * 6);
 	//printf("Node inserted successfully ? %d\n", a);
 	//a = rbtree_insert(base_ptr + 20, sizeof(int) * 5);
 	//printf("Node inserted successfully ? %d\n", a);
-	//a = rbtree_insert(base_ptr + 54, sizeof(int) * 6);
+	//a = rbtree_insert(base_ptr + 60, sizeof(int) * 6);
 	//printf("Node inserted successfully ? %d\n", a);
 	//rbtree_print();
-	int a;
-	a = rbtree_insert_node(base_ptr + 70, sizeof(int) * 5);
+	//a = rbtree_insert(base_ptr + 130, sizeof(int) * 6);
+	//printf("Node inserted successfully ? %d\n", a);
+	//rbtree_print();
+	int a = 1;
+	rbtree_insert(base_ptr + 70, sizeof(int) * 5);
 	if (a != 1) {
 		printf("Could not insert 70\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 30, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 30, sizeof(int) * 5);
 	if (a != 1) {
 		printf("Could not insert 30\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 180, sizeof(int) * 8);
+	rbtree_insert(base_ptr + 180, sizeof(int) * 8);
 	if (a != 1) {
 		printf("Could not insert 180\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 100, sizeof(int) * 10);
+	rbtree_insert(base_ptr + 100, sizeof(int) * 10);
 	if (a != 1) {
 		printf("Could not insert 100\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 220, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 220, sizeof(int) * 5);
 	if (a != 1) {
 		printf("Could not insert 220\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 80, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 80, sizeof(int) * 5);
 	if (a != 1) {
 		printf("Could not insert 80\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 110, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 110, sizeof(int) * 5);
 	if (a != 1) {
 		printf("Could not insert 110\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 260, sizeof(int) * 6);
+	rbtree_insert(base_ptr + 260, sizeof(int) * 6);
 	if (a != 1) {
 		printf("Could not insert 260\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 20, sizeof(int) * 5);
+	rbtree_insert(base_ptr + 20, sizeof(int) * 5);
 	if (a != 1) {
 		printf("Could not insert 20\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 60, sizeof(int) * 6);
+	rbtree_insert(base_ptr + 60, sizeof(int) * 6);
 	if (a != 1) {
 		printf("Could not insert 60\n");
 		rbtree_print();
 		return;
 	}
-	a = rbtree_insert_node(base_ptr + 68, sizeof(int) * 6);
+	rbtree_insert(base_ptr + 130, sizeof(int) * 6);
 	if (a != 1) {
-		printf("Could not insert 68\n");
+		printf("Could not insert 130\n");
 		rbtree_print();
 		return;
 	}
 
-	//printf("Tree after insertions:\n");
+	printf("Tree after insertions:\n");
 	rbtree_print();
 	printf("\n");
 }
@@ -311,7 +317,7 @@ int main() {
 	
 	// test deleting
 	test_delete_node(base_ptr, root);
-	//printf("Is red-black after deletion: %d\n", isRedBlackTree());
+	printf("Is red-black after deletion: %d\n", isRedBlackTree());
 
 	return 0;
 }
