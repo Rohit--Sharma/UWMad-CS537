@@ -685,8 +685,10 @@ void rbtree_insert(void *ptr, size_t size) {
 	}
 	else {
 		rbtree_node* temp_node = search_node(ptr);
-		if (temp_node->ptr == ptr)
+		if (temp_node->ptr == ptr) {
+			free(new_node);
 			return;
+		}
 
 		new_node->parent = temp_node;
 
