@@ -6,6 +6,7 @@
 		"537ps_header.h": "c",
 		"typeinfo": "c",
 		"build_spec_graph.h": "c",
-		"stat.h": "c"
+		"stat.h": "c",
+		"redblack_tree.h": "c"
 	}
 }

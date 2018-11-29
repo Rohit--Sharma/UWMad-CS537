@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Authors:         Rohit Kumar Sharma, M. Giri Prasanna
-// NetID:           rsharma54, mugundakrish
-// CSLogin:         rsharma, mgiriprasanna
-// Email:           rsharma@cs.wisc.edu, mugundakrish@wisc.edu
-// Created on:      November 24, 2018
+// Authors:			Rohit Kumar Sharma, M. Giri Prasanna
+// NetID:			rsharma54, mugundakrish
+// CSLogin:			rsharma, mgiriprasanna
+// Email:			rsharma@cs.wisc.edu, mugundakrish@wisc.edu
+// Created on:		November 24, 2018
 //
 // Resources:		http://www.cs.auckland.ac.nz/software/AlgAnim/red_black.html
 //					https://www.geeksforgeeks.org/red-black-tree-set-1-introduction-2/
@@ -13,9 +13,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include "redblack_tree.h"
 
 /**
@@ -24,60 +24,57 @@
 #define LEFT_CHILD 0
 #define RIGHT_CHILD 1
 
-/**
- * This is the root of our tree!
- * Or maybe this should be in the malloc file???
- */
-RBNode *root;
+// The global root of the red black tree!
+rbtree_node *root;
 
 /**
- * Creates a new red black tree node.
- * Defaults: 
- * 	free: 0, color: red
- * :param ptr: The starting address of the memory location allocated
- * :param size: The size of memory allocated
- * :return: A new RBNode
+ * Returns pointer to uncle
  */
-RBNode *create_RBNode(void *ptr, size_t size) {
-	RBNode *new_node = (RBNode *) malloc(sizeof(RBNode));
-
-	new_node->ptr = ptr;
-	new_node->size = size;
-
-	new_node->red = 1;
-	new_node->free = 0;
-	new_node->parent = NULL;
-	new_node->children[LEFT_CHILD] = NULL;
-	new_node->children[RIGHT_CHILD] = NULL;
-
-	return new_node;
-}
-
-void print_node(RBNode *node) {
-	printf("Address: %p\n\tPointer: %p, Size: %d\n\tColor: %d\nFree: %d\n\n", (void *)node, node->ptr, node->size, node->red, node->free);
+rbtree_node* uncle_node(rbtree_node *node) {
+	// If no parent or grandparent, then no uncle
+	if (node->parent == NULL || node->parent->parent == NULL)
+		return NULL;
+	
+	// If the current node is a left chld, then uncle is on right, else left
+	if (node->parent == node->parent->parent->children[LEFT_CHILD])
+		return node->parent->parent->children[RIGHT_CHILD];
+	else
+		return node->parent->parent->children[LEFT_CHILD];
 }
 
 /**
- * Swaps the parent of old node with the parent of the new node
- * :param old: The red black tree node whose parent is to be swapped
- * :param new: The red black tree node whose parent is to be swapped with
+ * Returns pointer to sibling
  */
-void replace_rbtree_node(RBNode *old, RBNode *new) {
-	if (old->parent == NULL) {
-		root = new;
-	}
-	else {
-		if (old == old->parent->children[LEFT_CHILD]) {
-			old->parent->children[LEFT_CHILD] = new;
-		}
-		else {
-			old->parent->children[RIGHT_CHILD] = new;
-		}
-	}
+rbtree_node* sibling_node(rbtree_node* node) {
+	// No sibling if no parent
+	if (node->parent == NULL)
+		return NULL;
+	
+	if (node == node->parent->children[LEFT_CHILD])
+		return node->parent->children[RIGHT_CHILD];
+	else
+		return node->parent->children[LEFT_CHILD];
+}
 
-	if (new != NULL) {
-		new->parent = old->parent;
+/**
+ * Moves node down and moves given node in its place
+ */
+void move_node_down(rbtree_node* node, rbtree_node* new_parent) {
+  	if (node->parent != NULL) {
+		if (node == node->parent->children[LEFT_CHILD])
+			node->parent->children[LEFT_CHILD] = new_parent;
+		else
+			node->parent->children[RIGHT_CHILD] = new_parent;
 	}
+	new_parent->parent = node->parent;
+	node->parent = new_parent;
+}
+
+/**
+ * Returns if a given node has a red child
+ */
+int node_has_red_child(rbtree_node* node) {
+	return ((node->children[LEFT_CHILD] != NULL && node->children[LEFT_CHILD]->red) || (node->children[RIGHT_CHILD] != NULL && node->children[RIGHT_CHILD]->red));
 }
 
 /**
@@ -85,60 +82,314 @@ void replace_rbtree_node(RBNode *old, RBNode *new) {
  * :param node: The reference node from which the rotation is to be made
  * :param direction: LEFT_CHILD or RIGHT_CHILD. Rotates in the corresponding direction
  */
-void rotate_rbnodes(RBNode *node, int direction) {
-	RBNode *temp = node->children[(direction + 1) % 2];
-	replace_rbtree_node(node, temp);
-	node->children[(direction + 1) % 2] = temp->children[direction];
-	if (temp->children[direction] != NULL) {
-		temp->children[direction]->parent = node;
+void rotate_rbtree_nodes(rbtree_node* node, int direction) {
+	rbtree_node *temp_node = node->children[(direction + 1) % 2];
+	
+	// Update root if current node is the root
+	if (node == root)
+		root = temp_node;
+
+	move_node_down(node, temp_node);
+	
+	node->children[(direction + 1) % 2] = temp_node->children[direction];
+	
+	if (temp_node->children[direction] != NULL)
+		temp_node->children[direction]->parent = node;
+
+	temp_node->children[direction] = node;
+}
+
+void swap_colours_nodes(rbtree_node* node1, rbtree_node* node2) {
+	int temp_red = node1->red;
+	node1->red = node2->red;
+	node2->red = temp_red;
+}
+
+void swap_values_nodes(rbtree_node* node1, rbtree_node* node2) {
+	void *temp_ptr = node1->ptr;
+	node1->ptr = node2->ptr;
+	node2->ptr = temp_ptr;
+
+	size_t temp_size = node1->size;
+	node1->size = node2->size;
+	node2->size = temp_size;
+
+	int temp_free = node1->free;
+	node1->free = node2->free;
+	node2->free = temp_free;
+}
+
+/**
+ * Fix red red at given node
+ */
+void fix_red_red_node(rbtree_node* node) {
+	// If node is root, color it black and return
+	if (node == root) {
+		node->red = 0;
+		return;
 	}
-	temp->children[direction] = node;
-	node->parent = temp;
+	
+	// Initialize parent, grandparent and uncle
+	rbtree_node *parent = node->parent;
+	rbtree_node *grand_parent = parent->parent;
+	rbtree_node *uncle = uncle_node(node);
+
+	if (parent->red != 0) {
+		if (uncle != NULL && uncle->red == 1) {
+			// Uncle red, perform recoloring and recurse
+			parent->red = 0;
+			uncle->red = 0;
+			grand_parent->red = 1;
+			fix_red_red_node(grand_parent);
+		} 
+		else {
+			// else perform LR, LL, RL, RR
+			if (parent == parent->parent->children[LEFT_CHILD]) {
+				if (node == node->parent->children[LEFT_CHILD]) {
+					// for left right
+					swap_colours_nodes(parent, grand_parent);
+				}
+				else {
+					rotate_rbtree_nodes(parent, LEFT_CHILD);
+					swap_colours_nodes(node,grand_parent);
+				}
+				// for left left and left right
+				rotate_rbtree_nodes(grand_parent, RIGHT_CHILD);
+			}
+			else {
+				if (node == node->parent->children[LEFT_CHILD]) {
+					// for right left
+					rotate_rbtree_nodes(parent, RIGHT_CHILD);
+					swap_colours_nodes(node, grand_parent);
+				}
+				else {
+					swap_colours_nodes(parent, grand_parent);
+				}
+				// for right right and right left
+				rotate_rbtree_nodes(grand_parent, LEFT_CHILD);
+			}
+		}
+	}
+}
+
+/**
+ * Find node without a left child in the subtree of the given node
+ */
+rbtree_node* successor_node(rbtree_node* node) {
+	rbtree_node* temp_node = node;
+	
+	while(temp_node->children[LEFT_CHILD] != NULL)
+		temp_node = temp_node->children[LEFT_CHILD];
+ 
+	return temp_node;
+}
+
+/**
+ * Find node that replaces a deleted node in BST
+ */
+rbtree_node* replace_BST_node(rbtree_node* node) {
+	// When node has 2 children
+	if (node->children[LEFT_CHILD] != NULL && node->children[RIGHT_CHILD] != NULL)
+		return successor_node(node->children[RIGHT_CHILD]);
+
+	// When leaf
+	if (node->children[LEFT_CHILD] == NULL && node->children[RIGHT_CHILD] == NULL)
+		return NULL;
+
+	// When single child
+	if (node->children[LEFT_CHILD] != NULL)
+		return node->children[LEFT_CHILD];
+	else
+		return node->children[RIGHT_CHILD];
+}
+
+/**
+ * Fix a double black for a given node
+ */
+void fix_rbtree_double_black(rbtree_node* node) {
+	// return if reached root
+	if (node == root)
+		return;
+
+	rbtree_node* sibling = sibling_node(node);
+	rbtree_node* parent = node->parent;
+	
+	// If no sibling, double black pushed up, recurse for parent
+	if (sibling == NULL)
+		fix_rbtree_double_black(parent);
+	else {
+		// Red sibling
+		if (sibling->red == 1) {
+			parent->red = 1;
+			sibling->red = 0;
+			if (sibling == sibling->parent->children[LEFT_CHILD])
+				rotate_rbtree_nodes(parent, RIGHT_CHILD);
+			else
+				rotate_rbtree_nodes(parent, LEFT_CHILD);
+			fix_rbtree_double_black(node);
+		}
+		else {
+			// If at least 1 red child
+			if ((sibling->children[LEFT_CHILD] != NULL && sibling->children[LEFT_CHILD]->red == 1) || (sibling->children[RIGHT_CHILD] != NULL && sibling->children[RIGHT_CHILD]->red == 1)) {
+				if (sibling->children[LEFT_CHILD] != NULL && sibling->children[LEFT_CHILD]->red == 1) {
+					// If sibling is left child
+					if (sibling == sibling->parent->children[LEFT_CHILD]) {
+						// left left
+			    		sibling->children[LEFT_CHILD]->red = sibling->red;
+						sibling->red = parent->red;
+						rotate_rbtree_nodes(parent, RIGHT_CHILD);
+					}
+					// If sibling is right child
+					else {
+						// right left
+						sibling->children[LEFT_CHILD]->red = parent->red;
+						rotate_rbtree_nodes(sibling, RIGHT_CHILD);
+						rotate_rbtree_nodes(parent, LEFT_CHILD);
+					}
+				} else {
+					if (sibling == sibling->parent->children[LEFT_CHILD]) {
+						// left right
+						sibling->children[RIGHT_CHILD]->red = parent->red;
+						rotate_rbtree_nodes(sibling, LEFT_CHILD);
+						rotate_rbtree_nodes(parent, RIGHT_CHILD);
+					} else {
+						// right right
+						sibling->children[RIGHT_CHILD]->red = sibling->red;
+						sibling->red = parent->red;
+						rotate_rbtree_nodes(parent, LEFT_CHILD);
+					}
+				}
+				parent->red = 0;
+			} 
+			// 2 black children
+			else {
+  				sibling->red = 1;
+				if (parent->red == 0)
+					fix_rbtree_double_black(parent);
+				else
+					parent->red = 0;
+			}
+		}
+	}
+}
+
+/**
+ * Deletes the given node from the red black tree
+ */
+void delete_rbtree_node(rbtree_node *node) {
+	if (node == NULL) {
+		fprintf(stderr, "Cannot delete a NULL node! Exiting...\n");
+		exit(EXIT_FAILURE);
+	}
+
+	rbtree_node *temp_node = replace_BST_node(node);
+	int both_black_nodes = 0;
+	
+	if ((temp_node == NULL || temp_node->red == 0) && (node->red == 0))
+		both_black_nodes = 1;
+	
+	rbtree_node *parent = node->parent;
+
+	if (temp_node == NULL) {
+		// temp_node is NULL, therefore node is a leaf
+		if (node == root) {
+			// If the node to be deleted is root, make root NULL
+			root = NULL;
+		}
+		else {
+			if (both_black_nodes) {
+				fix_rbtree_double_black(node);
+			}
+			else {
+				rbtree_node* sibling = sibling_node(node);
+				if (sibling != NULL)
+					sibling->red = 1;
+			}
+			
+			if (node == node->parent->children[LEFT_CHILD])
+				parent->children[LEFT_CHILD] = NULL;
+			else
+				parent->children[RIGHT_CHILD] = NULL;
+		}
+		free(node);
+		return;
+	}
+	
+	if (node->children[LEFT_CHILD] == NULL || node->children[RIGHT_CHILD] == NULL) {
+		// node has only 1 child
+		if (node == root) {
+			node->ptr = temp_node->ptr;
+			node->size = temp_node->size;
+			node->free = temp_node->free;
+			node->children[LEFT_CHILD] = node->children[RIGHT_CHILD] = NULL;
+			free(temp_node);
+		}
+		else {
+			if (node == node->parent->children[LEFT_CHILD])
+				parent->children[LEFT_CHILD] = temp_node;
+			else
+				parent->children[RIGHT_CHILD] = temp_node;
+		
+			free(node);
+			temp_node->parent = parent;
+			if (both_black_nodes)
+				fix_rbtree_double_black(temp_node);
+			else
+				temp_node->red = 0;
+		}
+		return;
+	}
+
+	// If node has 2 children, swap values with successor and recurse
+  	swap_values_nodes(temp_node, node);
+	delete_rbtree_node(temp_node);
+}
+
+/**
+ * Deletes a node which starts at ptr and fixes the tree for red black properties
+ * :param ptr: The starting address of the node that is to be deleted
+ */
+void rbtree_delete_node(void *ptr) {
+	rbtree_node* node_to_delete = rbtree_node_search(ptr);
+	if (node_to_delete == NULL) {
+		fprintf(stderr, "Trying to delete a node that doesn't exist! Exiting...\n");
+		exit(EXIT_FAILURE);
+	}
+
+	delete_rbtree_node(node_to_delete);
+}
+
+rbtree_node* get_rbtree_root() {
+	return root;
 }
 
 /**
  * The helper method used by the rbtree_point_search() method
  * :param ptr: The address that is to be searched
- * :param parent: The root of the red black tree in which ptr is to be searched
+ * :param node: The root of the red black tree in which ptr is to be searched
  * :return: The RBNode that starts with ptr in the tree
  */
-RBNode *point_search_helper(void *ptr, RBNode *parent) {
-	/*
-	 * return the parent node if it's within the given ptr
-	 * and size!
-	 */
-
-	/* Sanity check. We shouldn't get a null node, but if we do, we can't find the node! */
-	if (parent == NULL) {
+rbtree_node *node_search_helper(void *ptr, rbtree_node *node) {
+	if (node == NULL) {
 		return NULL;
 	}
-	else if (parent->ptr == NULL) {
-		printf("bad node encountered.");
+	else if (node->ptr == NULL) {
+		fprintf(stderr, "Encountered a bad node\n");
 		return NULL;
 	}
-	else if ((parent->ptr == ptr)) {
-		return parent;
+	else if ((node->ptr == ptr)) {
+		return node;
 	}
-	/*
-	 * Call on the left (smaller) child if this node's ptr is too big!
-	 */
-	else if (parent->ptr > ptr) {
-		if (parent->children[LEFT_CHILD] != NULL) {
-			return point_search_helper(ptr, parent->children[LEFT_CHILD]);
+	else if (node->ptr > ptr) {
+		if (node->children[LEFT_CHILD] != NULL) {
+			return node_search_helper(ptr, node->children[LEFT_CHILD]);
 		}
 	}
-	/* 
-	 * Call on right (larger) child if this node's ptr is too small!
-	 */
 	else {
-		if (parent->children[RIGHT_CHILD] != NULL) {
-			return point_search_helper(ptr, parent->children[RIGHT_CHILD]);
+		if (node->children[RIGHT_CHILD] != NULL) {
+			return node_search_helper(ptr, node->children[RIGHT_CHILD]);
 		}
 	}
-
-	/*
-	 * If we get here, the node doesn't exist!
-	 */
 	return NULL;
 }
 
@@ -149,17 +400,303 @@ RBNode *point_search_helper(void *ptr, RBNode *parent) {
  * :return: The red black tree node that starts with ptr in the tree
  * 				or NULL if not found
  */
-RBNode *rbtree_point_search(void *ptr) {
-	/*
-	 * Just calls the recursive function
-	 * on the root of the tree.
-	 */
+rbtree_node *rbtree_node_search(void *ptr) {
 	if (root == NULL) {
-		fprintf(stderr, "root is null\n");
+		fprintf(stderr, "Root is NULL! No tree to search\n");
 		exit(EXIT_FAILURE);
 	}
 
-	return point_search_helper(ptr, root);
+	return node_search_helper(ptr, root);
+}
+
+/**
+ * Creates a new red black tree node.
+ * Defaults: 
+ * 	free: 0, color: red
+ * :param ptr: The starting address of the memory location allocated
+ * :param size: The size of memory allocated
+ * :return: A new RBNode
+ */
+rbtree_node* create_rbtree_node(void *ptr, size_t size) {
+	rbtree_node *new_node = (rbtree_node *) malloc(sizeof(rbtree_node));
+	
+	new_node->ptr = ptr;
+	new_node->size = size;
+	new_node->free = 0;
+	new_node->red = 1;
+	new_node->parent = NULL;
+	new_node->children[LEFT_CHILD] = NULL;
+	new_node->children[RIGHT_CHILD] = NULL;
+
+	return new_node;
+}
+
+/*
+int insert_node(void *ptr, size_t size, rbtree_node *root, rbtree_node *new_node) {
+	if (root->ptr == ptr) {
+		if (root->free) {
+			root->size = size;
+			root->free = 0;
+			return 1;
+		}
+		else {
+			fprintf(stderr, "Error on malloc537\nNode with address %p already exists and cannot be allocated there.\n", ptr);
+			return -1;
+		}
+	}
+	else if (root->ptr < ptr) {
+		if (root->children[RIGHT_CHILD] != NULL) {
+			return insert_node(ptr, size, root->children[RIGHT_CHILD], new_node);
+		}
+		else {
+			root->children[RIGHT_CHILD] = new_node;
+			new_node->parent = root;
+			return 1;
+		}
+	}
+	else if (root->ptr > ptr) {
+		if (root->children[LEFT_CHILD] != NULL) {
+			return insert_node(ptr, size, root->children[LEFT_CHILD], new_node);
+		}
+		else {
+			root->children[LEFT_CHILD] = new_node;
+			new_node->parent = root;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+*/
+
+/*
+int is_still_rbtree(rbtree_node *new_node) {
+	rbtree_node *temp_node;
+	rbtree_node *grandparent;
+	int child = 0;
+
+	if ((new_node->parent == NULL) || (new_node->parent->red == 0))
+		return 1;
+	else {
+		if (new_node->parent->parent == NULL) {
+			return 1;
+		}
+
+		if ((new_node->parent->parent->children[LEFT_CHILD] != NULL) && (new_node->parent->parent->children[LEFT_CHILD]->red == 1) && (new_node->parent->parent->children[RIGHT_CHILD] != NULL) && (new_node->parent->parent->children[RIGHT_CHILD]->red == 1)) {
+			new_node->parent->parent->children[LEFT_CHILD]->red = 0;
+			new_node->parent->parent->children[RIGHT_CHILD]->red = 0;
+
+			if (new_node->parent->parent->parent == NULL) 
+				return 1;
+			else {
+				new_node->parent->parent->red = 1;
+				return is_still_rbtree(new_node->parent->parent);
+			}
+		}
+
+		if ((new_node->parent->parent->children[LEFT_CHILD] != NULL) && (new_node->parent->children[LEFT_CHILD] != NULL) && (new_node->parent->parent->children[LEFT_CHILD] == new_node->parent) && (new_node == new_node->parent->children[LEFT_CHILD])) {
+			new_node->parent->red = 0;
+			new_node->parent->parent->red = 1;
+			grandparent = new_node->parent->parent;
+			
+			if (new_node->parent->parent->parent == NULL)
+				root = new_node->parent;
+			else
+				new_node->parent->parent->parent->children[LEFT_CHILD] = new_node->parent;
+
+			// TODO Do not know if this next line is valid. maybe???
+			printf("This TODO segment is being accessed\n");
+			new_node->parent->parent = new_node->parent->parent->parent;
+			printf("This TODO segment is done being accessed\n");
+			
+			grandparent->children[LEFT_CHILD] = new_node->parent->children[RIGHT_CHILD];
+			
+			if (new_node->parent->children[RIGHT_CHILD] != NULL)
+				new_node->parent->children[RIGHT_CHILD]->parent = grandparent;
+
+			new_node->parent->children[RIGHT_CHILD] = grandparent;
+			grandparent->parent = new_node->parent;
+			
+			return 1;
+		}
+
+		if ((new_node->parent->parent->children[RIGHT_CHILD] != NULL) && (new_node->parent->children[RIGHT_CHILD] != NULL) && (new_node->parent->parent->children[RIGHT_CHILD] == new_node->parent) && (new_node == new_node->parent->children[RIGHT_CHILD])) {
+			new_node->parent->red = 0;
+			new_node->parent->parent->red = 1;
+
+			grandparent = new_node->parent->parent;
+
+			if (new_node->parent->parent->parent == NULL)
+				root = new_node->parent;
+			else
+				new_node->parent->parent->parent->children[RIGHT_CHILD] = new_node->parent;
+
+			// TODO Do not know if this next line is valid. maybe???
+			new_node->parent->parent = new_node->parent->parent->parent;
+
+			grandparent->children[RIGHT_CHILD] = new_node->parent->children[LEFT_CHILD];
+
+			if (new_node->parent->children[LEFT_CHILD] != NULL)
+				new_node->parent->children[LEFT_CHILD]->parent = grandparent;
+			
+			new_node->parent->children[LEFT_CHILD] = grandparent;
+			grandparent->parent = new_node->parent;
+
+			return 1;
+		}
+
+		if ((new_node->parent->children[RIGHT_CHILD] != NULL) && (new_node->parent->parent->children[LEFT_CHILD] != NULL) && (new_node == new_node->parent->children[RIGHT_CHILD]) && (new_node->parent->parent->children[LEFT_CHILD] == new_node->parent)) {
+			new_node->red = 0;
+			new_node->parent->parent->red = 1;
+	
+			temp_node = new_node->parent->parent->parent;
+
+			if (new_node->parent->parent->parent->children[RIGHT_CHILD] == new_node->parent->parent)
+				child = 1;
+
+			new_node->parent->parent->children[LEFT_CHILD] = new_node->children[RIGHT_CHILD];
+			new_node->children[RIGHT_CHILD] = new_node->parent->parent;
+			new_node->children[RIGHT_CHILD]->parent = new_node;
+			if (new_node->children[RIGHT_CHILD]->children[LEFT_CHILD] != NULL)
+				new_node->children[RIGHT_CHILD]->children[LEFT_CHILD]->parent = new_node->children[RIGHT_CHILD];
+
+			new_node->parent->children[RIGHT_CHILD] = new_node->children[LEFT_CHILD];
+			new_node->children[LEFT_CHILD] = new_node->parent;
+			new_node->children[LEFT_CHILD]->parent = new_node;
+			if (new_node->children[LEFT_CHILD]->children[RIGHT_CHILD] != NULL)
+				new_node->children[LEFT_CHILD]->children[RIGHT_CHILD]->parent = new_node->children[LEFT_CHILD];
+
+			if (temp_node == NULL) {
+				new_node->parent = NULL;
+				root = new_node;
+			}
+
+			if (new_node != NULL) {
+				new_node->parent = temp_node;
+				temp_node->children[child] = new_node;
+			}
+			
+			return 1;
+		}
+
+
+		if ((new_node->parent->children[LEFT_CHILD] != NULL) && (new_node->parent->parent->children[RIGHT_CHILD] != NULL) && (new_node == new_node->parent->children[LEFT_CHILD]) && (new_node->parent->parent->children[RIGHT_CHILD] == new_node->parent)) {
+			new_node->red = 0;
+			new_node->parent->parent->red = 1;
+	
+			temp_node = new_node->parent->parent->parent;
+
+			if (new_node->parent->parent->parent->children[RIGHT_CHILD] == new_node->parent->parent)
+				child = 1;
+
+			new_node->parent->parent->children[RIGHT_CHILD] = new_node->children[LEFT_CHILD];
+			new_node->children[LEFT_CHILD] = new_node->parent->parent;
+			new_node->children[LEFT_CHILD]->parent = new_node;
+			if (new_node->children[LEFT_CHILD]->children[RIGHT_CHILD] != NULL)
+				new_node->children[LEFT_CHILD]->children[RIGHT_CHILD]->parent = new_node->children[LEFT_CHILD];
+
+			new_node->parent->children[LEFT_CHILD] = new_node->children[RIGHT_CHILD];
+			new_node->children[RIGHT_CHILD] = new_node->parent;
+			new_node->children[RIGHT_CHILD]->parent = new_node;
+			if (new_node->children[RIGHT_CHILD]->children[LEFT_CHILD] != NULL)
+				new_node->children[RIGHT_CHILD]->children[LEFT_CHILD]->parent = new_node->children[RIGHT_CHILD];
+
+			if (temp_node == NULL) {
+				new_node->parent = NULL;
+				root = new_node;
+			}
+
+			if (new_node != NULL) {
+				new_node->parent = temp_node;
+				temp_node->children[child] = new_node;
+			}
+			
+			return 1;
+		}
+	}
+
+	return 0;
+}
+*/
+
+/*
+int rbtree_insert_node(void *ptr, size_t size) {
+	int insert_successful;
+	int rbtree_intact;
+
+	rbtree_node *new_node = create_rbtree_node(ptr, size);
+	printf("New node being created for %p\n", (void*)ptr);
+	if (root == NULL) {
+		root = new_node;
+		root->red = 0;
+		return 1;
+	}
+
+	insert_successful = insert_node(ptr, size, root, new_node);
+	fprintf(stdout, "insert successful %d\n", insert_successful);
+	if (insert_successful < 0) {
+		fprintf(stderr, "Could not insert node to red black tree! Exiting program...\n");
+		return insert_successful;
+	}
+
+	rbtree_intact = is_still_rbtree(new_node);
+	if (rbtree_intact < 0) {
+		fprintf(stderr, "Error as the tree is no longer red black after insertion!\n");
+		return rbtree_intact;
+	}
+	
+	return 1;
+}
+*/
+
+rbtree_node *search_node(void *ptr) {
+	rbtree_node *temp_node = root;
+	while (temp_node != NULL) 
+		if (ptr < temp_node->ptr)
+			if (temp_node->children[LEFT_CHILD] == NULL)
+				break;
+			else
+				temp_node = temp_node->children[LEFT_CHILD];
+		else if (ptr == temp_node->ptr)
+			break;
+		else
+			if (temp_node->children[RIGHT_CHILD] == NULL)
+				break;
+			else
+				temp_node = temp_node->children[RIGHT_CHILD];
+
+	return temp_node;
+}
+
+/**
+ * Creates a new node for ptr and size and inserts it into the red black tree.
+ * The tree follows all the red black properties and hence remains balanced.
+ * The node is created only if no node pointing ptr in red black tree exists.
+ * If such a node exists, but has been freed, it is just updated.
+ * If a node which hasn't been freed exists, an error is returned.
+ * :param ptr: The starting address of the memory allocated to be inserted in the tree
+ * :param size: The size of the memory allocated
+ */
+void rbtree_insert(void *ptr, size_t size) {
+	rbtree_node *new_node = create_rbtree_node(ptr, size);
+	if (root == NULL) {
+		new_node->red = 0;
+		root = new_node;
+	}
+	else {
+		rbtree_node* temp_node = search_node(ptr);
+		if (temp_node->ptr == ptr)
+			return;
+
+		new_node->parent = temp_node;
+
+		if (ptr < temp_node->ptr)
+			temp_node->children[LEFT_CHILD] = new_node;
+		else
+			temp_node->children[RIGHT_CHILD] = new_node;
+
+		fix_red_red_node(new_node);
+	}
 }
 
 /**
@@ -169,51 +706,33 @@ RBNode *rbtree_point_search(void *ptr) {
  * :param parent: The root of the red black tree
  * :return: The RBNode in the red black tree whose interval contains ptr
  */
-RBNode *interval_search_helper(void *ptr, RBNode *parent) {
-	if (parent == NULL) {
+rbtree_node* interval_search_helper(void *ptr, rbtree_node *root) {
+	if (root == NULL) {
 		return NULL;
 	}
-	/*
-	 * If our ptr equals the parent's ptr, return the parent.
-	 */
-	// printf("interval_search_helper(%p)\n", (void *) parent);
-	if (ptr == parent->ptr && !(parent->free)) {
-		return parent;
-	}
-	/*
-	 * If the parent's ptr is smaller, check if we're inside the parent's space!
-	 * Return the parent if we are.
-	 * Otherwise, continue our search.
-	 */
-	else if (ptr >= parent->ptr) {
-		if ((size_t)ptr <= ((size_t)parent->ptr + parent->size) && !(parent->free)) {
-			return parent;
-		}
-		else {
-			/*
-			 * If the ptr is smaller and it's not contained,
-			 */
-			if (parent->children[RIGHT_CHILD] != NULL) {
-				RBNode *right_search = interval_search_helper(ptr, parent->children[RIGHT_CHILD]);
-				if (right_search != NULL) {
-					return right_search;
-				}
-			}
-			if (parent->children[LEFT_CHILD] != NULL) {
-				RBNode *left_search = interval_search_helper(ptr, parent->children[LEFT_CHILD]);
-				if (left_search != NULL) {
-					return left_search;
-				}
-			}
-		}
-	}
-	/*
-	 * If the parent's ptr is bigger, just keep on looking.
-	 */
-	else {
-		return interval_search_helper(ptr, parent->children[LEFT_CHILD]);
-	}
 
+	if ((ptr == root->ptr) && (root->free == 0))
+		return root;
+	else if (ptr >= root->ptr) {
+		if ((size_t)ptr <= ((size_t)root->ptr + root->size) && (root->free == 0))
+			return root;
+		else {
+			if (root->children[RIGHT_CHILD] != NULL) {
+				rbtree_node *search_right_side = interval_search_helper(ptr, root->children[RIGHT_CHILD]);
+				if (search_right_side != NULL)
+					return search_right_side;
+			}
+			if (root->children[LEFT_CHILD] != NULL) {
+				rbtree_node *search_left_side = interval_search_helper(ptr, root->children[LEFT_CHILD]);
+				if (search_left_side != NULL)
+					return search_left_side;
+			}
+		}
+	}
+	else {
+		return interval_search_helper(ptr, root->children[LEFT_CHILD]);
+	}
+	
 	return NULL;
 }
 
@@ -224,7 +743,7 @@ RBNode *interval_search_helper(void *ptr, RBNode *parent) {
  * :param ptr: The address that is to be searched for in an interval
  * :return: The RBNode in the red black tree whose interval contains ptr
  */
-RBNode *rbtree_interval_search(void *ptr) {
+rbtree_node *rbtree_interval_search(void *ptr) {
 	return interval_search_helper(ptr, root);
 }
 
@@ -233,71 +752,31 @@ RBNode *rbtree_interval_search(void *ptr) {
  * 		The inteval is defined by (ptr, ptr + size)
  * :param ptr: The address that is to be searched for in an interval
  * :param size: The size of the interval pointed by ptr
- * :param parent: The root of the red black tree
+ * :param root: The root of the red black tree
  * :return: The RBNode in the red black tree whose interval contains the interval (ptr, ptr + size)
  */
-RBNode *range_search_helper(void *ptr, size_t size, RBNode *parent) {
-	/*
-	 * If we somehow get a null node, return NULL.
-	 */
-	if (parent == NULL)
+rbtree_node* range_search_helper(void *ptr, size_t size, rbtree_node *root) {
+	if (root == NULL)
 		return NULL;
-	/*
-	 * If the current node's ptr is too small, look at the right child.
-	 */
-	/*
-	else if(((long)(parent->ptr) + parent->size) < (long)ptr)
-	{
-		
-		if(parent->children[RIGHT_CHILD] != NULL)
-		return range_search_helper(ptr, size, parent->children[RIGHT_CHILD]);
-		else
-		return NULL;
-	}
-	*/
-	/*
-	 * If the current node's ptr is too big, look at the left child.
-	 */
-	/*
-	else if(((long)(ptr) + size) < (long)parent->ptr)
-	{
-		if(parent->children[LEFT_CHILD] != NULL)
-		return range_search_helper(ptr, size, parent->children[LEFT_CHILD]);
-		else
-		return NULL;
-	}
-	*/
-	/*
-	 * If our node's ptr is in range, check the size and return if it's small enough and free.
-	 * Otherwise, check both children if the exist.
-	 */
-	else if (parent->ptr > ptr && ((long)parent->ptr + parent->size) < ((long)ptr + size) && (parent->free == 1)) {
-		// printf("Found\n");
-		return parent;
-	}
-	/*
-	 * Here we search both children, and return one of the results.
-	 * We prefer the left child arbitrarily.
-	 */
-	else {
-		RBNode *left_return = NULL;
-		RBNode *right_return = NULL;
+	else if (root->ptr > ptr && ((size_t)root->ptr + root->size) < ((long)ptr + size) && (root->free == 1)) {
+		return root;
+	} else {
+		rbtree_node* left_side_search = NULL; 
+		rbtree_node* right_side_search = NULL;
 
-		if (parent->children[LEFT_CHILD] != NULL) {
-			// printf("Calling left(%p)\n", (void *)parent);
-			left_return = range_search_helper(ptr, size, parent->children[LEFT_CHILD]);
-			if (left_return != NULL)
-				return left_return;
+		if (root->children[LEFT_CHILD] != NULL) {
+			left_side_search = range_search_helper(ptr, size, root->children[LEFT_CHILD]);
+			if (left_side_search != NULL)
+				return left_side_search;
 		}
-
-		if (parent->children[RIGHT_CHILD] != NULL) {
-			// printf("Calling right(%p)\n", (void *)parent);
-			right_return = range_search_helper(ptr, size, parent->children[RIGHT_CHILD]);
-			if (right_return != NULL)
-				return right_return;
+ 
+		if (root->children[RIGHT_CHILD] != NULL) {
+			right_side_search = range_search_helper(ptr, size, root->children[RIGHT_CHILD]);
+			if (right_side_search != NULL)
+				return right_side_search;
 		}
 	}
-
+	
 	return NULL;
 }
 
@@ -309,507 +788,8 @@ RBNode *range_search_helper(void *ptr, size_t size, RBNode *parent) {
  * :param size: The size of the interval pointed by ptr
  * :return: The RBNode in the red black tree whose interval contains the interval (ptr, ptr + size)
  */
-RBNode *rbtree_range_search(void *ptr, size_t size) {
+rbtree_node *rbtree_range_search(void *ptr, size_t size) {
 	return range_search_helper(ptr, size, root);
-}
-
-/**
- * This method ensures that the red black tree properties are satisfied after an insert call.
- * :param child: The node from where the red black tree properties are to be restored
- * :return:
- */
-int rbtreeify(RBNode *child) {
-	RBNode *tempNode;
-	RBNode *tempGparent;
-	int whichChild = 0;
-	/*
-	 * And here's the fun part!
-	 * Now we check for a violation of red-black tree properties!
-	 * Because we always insert red nodes, we only need to check
-	 * for violations of one of the properties!
-	 *
-	 * Modeled on CS 367 lecture notes
-	 */
-
-	/*
-	 * If the child's parent is black, we're fine!
-	 */
-
-	if ((child->parent == NULL) || !(child->parent->red)) {
-		return 1;
-	}
-	else {
-		/*	printf("red = %d node at %p with ptr %p size %i, parent %p, and children %p %p\n",root->red, (void *)root,root->ptr, (int)root->size, (void *)root->parent, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
-
-		 * If the child's parent and the parent's sibling is red, just change their color to black and
-		 * change the grandparent to red. If the grandparent is the root node, then just keep it
-		 * as black to keep the red/black properties
-	 	*/
-
-		/*
-		 * We need to handle insertion when the depth is low - i.e. we don't have enough nodes
-		 * to actually have grandparents/great grandparents.
-		 */
-
-		/*NEED TO CHECK IF A CHILD/PARENT EXISTS BEFORE USING IT!*/
-
-		if (child->parent->parent == NULL) {
-			return 1;
-		}
-
-		/* if the grandparent has two children, and they're both red*/
-		if ((child->parent->parent->children[LEFT_CHILD] != NULL) && (child->parent->parent->children[RIGHT_CHILD] != NULL) && (child->parent->parent->children[LEFT_CHILD]->red == 1) && (child->parent->parent->children[RIGHT_CHILD]->red == 1)) {
-			child->parent->parent->children[LEFT_CHILD]->red = 0;
-			child->parent->parent->children[RIGHT_CHILD]->red = 0;
-
-			/* if the grandparent is the root node, we're done!*/
-			if (child->parent->parent->parent == NULL) {
-
-				return 1;
-			}
-
-			/*otherwise we change the grandparent's color to red and do a recursive call on that node*/
-			else {
-
-				child->parent->parent->red = 1;
-				return rbtreeify(child->parent->parent);
-			}
-		}
-
-		/*If this node is the left child of a left child, then we need to restructure*/
-		if ((child->parent->parent->children[LEFT_CHILD] != NULL) && (child->parent->children[LEFT_CHILD] != NULL) && (child->parent->parent->children[LEFT_CHILD] == child->parent) && (child == child->parent->children[LEFT_CHILD])) {
-			child->parent->red = 0;
-			child->parent->parent->red = 1;
-
-			tempGparent = child->parent->parent;
-
-			/*If the grandparent's parent is null, it is the root*/
-			if (child->parent->parent->parent == NULL) {
-				root = child->parent;
-			}
-			/*Otherwise we set the great grandparents left child to the parent*/
-			else {
-				child->parent->parent->parent->children[LEFT_CHILD] = child->parent;
-			}
-
-			/*TODO Do not know if this next line is valid. maybe???*/
-			child->parent->parent = child->parent->parent->parent;
-			tempGparent->children[LEFT_CHILD] = child->parent->children[RIGHT_CHILD];
-			if (child->parent->children[RIGHT_CHILD] != NULL) {
-				child->parent->children[RIGHT_CHILD]->parent = tempGparent;
-			}
-
-			child->parent->children[RIGHT_CHILD] = tempGparent;
-			tempGparent->parent = child->parent;
-
-			return 1;
-		}
-
-		/*If this node is the right child of a right child, then we need to restructure*/
-		if ((child->parent->parent->children[RIGHT_CHILD] != NULL) && (child->parent->children[RIGHT_CHILD] != NULL) && (child->parent->parent->children[RIGHT_CHILD] == child->parent) && (child == child->parent->children[RIGHT_CHILD])) {
-			/*Set parent to black and grandparent to red*/
-			child->parent->red = 0;
-			child->parent->parent->red = 1;
-
-			tempGparent = child->parent->parent;
-
-			/*If the grandparent's parent is null, our parent becomes the root*/
-			if (child->parent->parent->parent == NULL) {
-				root = child->parent;
-				/*something heree???*/
-			}
-			/*Otherwise we set the great grandparents right child to the parent*/
-			else {
-				child->parent->parent->parent->children[RIGHT_CHILD] = child->parent;
-			}
-
-			/*TODO Do not know if this next line is valid. What I want to do is to
-			 	set the parent's parent field equal to the granparent's parent. this will
-				break the connection but will we get the information before it is lost?*/
-			child->parent->parent = child->parent->parent->parent;
-
-			/*Set the granparents right child to the parents left. RBT rules make this okay*/
-			tempGparent->children[RIGHT_CHILD] = child->parent->children[LEFT_CHILD];
-
-			/*If the parent's left child is not null, we set it's parent to the gparent*/
-			if (child->parent->children[LEFT_CHILD] != NULL) {
-				child->parent->children[LEFT_CHILD]->parent = tempGparent;
-			}
-			/*set parents left child to the grandparent*/
-			child->parent->children[LEFT_CHILD] = tempGparent;
-
-			/*Set the temporary grandparent's parent to the parent of our child*/
-			tempGparent->parent = child->parent;
-
-			return 1;
-		}
-		/*If the parent is a left child, and the child is a right child*/
-		if ((child->parent->children[RIGHT_CHILD] != NULL) && (child->parent->parent->children[LEFT_CHILD] != NULL) && (child == child->parent->children[RIGHT_CHILD]) && (child->parent->parent->children[LEFT_CHILD] == child->parent)) {
-			/*Change this node's color to black and set the granparent to red*/
-			child->red = 0;
-			child->parent->parent->red = 1;
-
-			/*Create temporary node to store grandparent's parent*/
-			tempNode = child->parent->parent->parent;
-
-			/*
-			 * Also need to find which child the grandparent was! 0 is left, 1 is right
-			 * This defaults to 0, so just set to 1 if it's a right child.
-			 */
-			if (child->parent->parent->parent->children[RIGHT_CHILD] == child->parent->parent)
-				whichChild = 1;
-
-			/*set the grandparent to the child's right child. Then we set the gparent's (now the child's child) left child to NULL and parent to child */
-			child->parent->parent->children[LEFT_CHILD] = child->children[RIGHT_CHILD];
-			child->children[RIGHT_CHILD] = child->parent->parent;
-			child->children[RIGHT_CHILD]->parent = child;
-			if (child->children[RIGHT_CHILD]->children[LEFT_CHILD] != NULL)
-				child->children[RIGHT_CHILD]->children[LEFT_CHILD]->parent = child->children[RIGHT_CHILD];
-
-			/*set the parent to the child's left child. Then we set the parents right child to NULL and it's parent to the child*/
-			child->parent->children[RIGHT_CHILD] = child->children[LEFT_CHILD];
-			child->children[LEFT_CHILD] = child->parent;
-			child->children[LEFT_CHILD]->parent = child;
-			if (child->children[LEFT_CHILD]->children[RIGHT_CHILD] != NULL)
-				child->children[LEFT_CHILD]->children[RIGHT_CHILD]->parent = child->children[LEFT_CHILD];
-
-			/*If the grandparent's parent was null, then we set the child to the root*/
-			if (tempNode == NULL) {
-				child->parent = NULL;
-				root = child;
-			}
-			/*Otherwise we set the child's parent to the grandparents parent*/
-			if (tempNode != NULL) {
-				child->parent = tempNode;
-				tempNode->children[whichChild] = child;
-			}
-
-			return 1;
-		}
-		/*If the parent is a right child and the child is a left child*/
-		if ((child->parent->children[LEFT_CHILD] != NULL) && (child->parent->parent->children[RIGHT_CHILD] != NULL) && (child == child->parent->children[LEFT_CHILD]) && (child->parent->parent->children[RIGHT_CHILD] == child->parent)) {
-			/*Change this node's color to black and set the granparent to red*/
-			child->red = 0;
-			child->parent->parent->red = 1;
-
-			/*Create temporary node to store grandparent's parent*/
-			tempNode = child->parent->parent->parent;
-
-			/*
-			 * Also need to find which child the grandparent was! 0 is left, 1 is right
-			 * This defaults to 0, so just set to 1 if it's a right child.
-			 */
-			if (child->parent->parent->parent->children[RIGHT_CHILD] == child->parent->parent)
-				whichChild = 1;
-
-			/*set the grandparent to the child's left child. Then we set the gparent's (now the child's child) right child to NULL and parent to child */
-			child->parent->parent->children[RIGHT_CHILD] = child->children[LEFT_CHILD];
-			child->children[LEFT_CHILD] = child->parent->parent;
-			child->children[LEFT_CHILD]->parent = child;
-			if (child->children[LEFT_CHILD]->children[RIGHT_CHILD] != NULL)
-				child->children[LEFT_CHILD]->children[RIGHT_CHILD]->parent = child->children[LEFT_CHILD];
-
-			/*set the parent to the child's right child. Then we set the parents left child to NULL and it's parent to the child*/
-
-			child->parent->children[LEFT_CHILD] = child->children[RIGHT_CHILD];
-			child->children[RIGHT_CHILD] = child->parent;
-			child->children[RIGHT_CHILD]->parent = child;
-			if (child->children[RIGHT_CHILD]->children[LEFT_CHILD] != NULL)
-				child->children[RIGHT_CHILD]->children[LEFT_CHILD]->parent = child->children[RIGHT_CHILD];
-
-			/*If the grandparent's parent was null, then we set the child to the root*/
-			if (tempNode == NULL) {
-				child->parent = NULL;
-				root = child;
-			}
-			/*Otherwise we set the child's parent to the grandparents parent*/
-			if (tempNode != NULL) {
-				child->parent = tempNode;
-				tempNode->children[whichChild] = child;
-			}
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-/**
- * Helper method used by rbtree_insert()
- * Inserts a node into the red black tree like a standard BST and then rbtreeifies for 
- * 		red-black tree properties.
- * :param ptr: The address that has been allocated and to be inserted
- * :param size: The size of the memory allocated to be inserted
- * :param rbtree_root: The pointer to the root of the red black tree
- * :param new_node: The new node to be inserted
- * :return:
- */
-int insert_helper(void *ptr, size_t size, RBNode *rbtree_root, RBNode *new_node) {
-	/*
-	 * We always want to insert at the
- 	 * bottom of the tree,
-	 * so we insert the node at the bottom first,
-	 * then fix problems!
-	 */
-
-	/*
-	 * Replace the already existing node
-	 * as long as it's been freed, otherwise
-	 * return -1 (error).
-	 */
-	if (rbtree_root->ptr == ptr) {
-		if (rbtree_root->free) {
-			rbtree_root->size = size;
-			rbtree_root->free = 0;
-			return 1;
-		}
-		else {
-			printf("Error on malloc537\nOccupied node with address %p already exists! How did this happen?\n", ptr);
-			return -1;
-		}
-	}
-	/*
-	 * If our ptr is bigger than the rbtree_root's ptr,
-	 * look at the right node. If it's empty,
-	 * make a new node and put it there.
-	 * Otherwise, call insert_r on that right node!
-	 * Recursion!
-	 */
-	else if (rbtree_root->ptr < ptr) {
-		if (rbtree_root->children[RIGHT_CHILD] != NULL) {
-			return insert_helper(ptr, size, rbtree_root->children[RIGHT_CHILD], new_node);
-		}
-		else {
-			rbtree_root->children[RIGHT_CHILD] = new_node;
-			new_node->parent = rbtree_root;
-			return 1;
-		}
-	}
-	/*
-	 * The only thing left is to check the left node!
-	 * Insert a new node if it's empty, or call insert_r
-	 * with the left node as rbtree_root.
-	 */
-	else if (rbtree_root->ptr > ptr) {
-		if (rbtree_root->children[LEFT_CHILD] != NULL) {
-			return insert_helper(ptr, size, rbtree_root->children[LEFT_CHILD], new_node);
-		}
-		else {
-			rbtree_root->children[LEFT_CHILD] = new_node;
-			new_node->parent = rbtree_root;
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-/**
- * Creates a new node for ptr and size and inserts it into the red black tree.
- * The tree follows all the red black properties and hence remains balanced.
- * The node is created only if no node pointing ptr in red black tree exists.
- * If such a node exists, but has been freed, it is just updated.
- * If a node which hasn't been freed exists, an error is returned.
- * :param ptr: The starting address of the memory allocated to be inserted in the tree
- * :param size: The size of the memory allocated
- * :return:
- */
-int rbtree_insert(void *ptr, size_t size) {
-	int insert_return;
-	int clean_tree_return;
-
-	/*
-	 * First we make our node.
-	 */
-	RBNode *temp = create_RBNode(ptr, size);
-
-	/*
-	 * Special ptr case:
-	 * empty tree!
-	 * For an empty tree, we create a black node,
-	 * and insert it as the tree's root!
-	 */
-	if (root == NULL) {
-		root = temp;
-		root->red = 0;
-		return 1;
-	}
-
-	/*
-	 * Otherwise, pass along our created node
-	 * to our recursive insert function.
-	 */
-	insert_return = insert_helper(ptr, size, root, temp);
-	if (insert_return < 0) {
-		fprintf(stderr, "Error while inserting a red black node! Exiting...\n");
-		return insert_return;
-	}
-
-	/*DEBUG - print the tree here. we're lazy.
-	print(root, 0); */
-
-	/*
-	 * And now, we clean up our messy tree!
-	 */
-	clean_tree_return = rbtreeify(temp);
-	if (clean_tree_return < 0) {
-		fprintf(stderr, "Error on clean_tree return!\n");
-		return clean_tree_return;
-	}
-
-	/*print the node we've added.
-	printf("red = %d node at %p with ptr %p size %i, parent %p, and children %p %p\n",temp->red, (void *)temp ,temp->ptr, (int)temp->size, (void *)temp->parent, (void *)temp->children[LEFT_CHILD], (void *)temp->children[RIGHT_CHILD]);
-	*/
-
-	/*
-	 * Return 1 on a success.
-	 */
-	return 1;
-}
-
-/**
- * rbtreeifies the tree after deleting a node by performing required rotations
- * :param node: The node that was deleted
- */
-void delete_rearrangement(RBNode *node) {
-	/*if the node has become the root, we are fine.*/
-
-	if (node == NULL || node->parent == NULL) {
-		return;
-	}
-
-	/*In these next two cases (mirror images of each other), node has a red sibling. We will change the
-	 *color of n's sibling and rotate around the parent of node. This will not fix the problem, but instead
-	 * it makes it so we can fix it later*/
-	if (node->parent->children[LEFT_CHILD] == node) {
-		if (node->parent->children[RIGHT_CHILD] != NULL && node->parent->children[RIGHT_CHILD]->red == 1) {
-			node->parent->children[RIGHT_CHILD]->red = 0;
-			node->parent->red = 1;
-			rotate_rbnodes(node->parent, LEFT_CHILD);
-		}
-	}
-	/*As mentioned above, this is a mirror image of the previous case*/
-	else if (node->parent->children[RIGHT_CHILD] == node) {
-		if (node->parent->children[LEFT_CHILD] != NULL && node->parent->children[LEFT_CHILD]->red == 1) {
-			node->parent->children[LEFT_CHILD]->red = 0;
-			node->parent->red = 1;
-			rotate_rbnodes(node->parent, RIGHT_CHILD);
-		}
-	}
-
-	/*The next two cases are mirror imgages of each other. If node's parent, sibling and siblings kids
-	 *are all black, we color it's sibling red and run a recursive call on N's parent*/
-	if (node->parent->children[LEFT_CHILD] == node) {
-		if ((node->parent->red == 0) && (node->parent->children[RIGHT_CHILD]->red == 0) && (node->parent->children[RIGHT_CHILD]->children[LEFT_CHILD]->red == 0) && (node->parent->children[RIGHT_CHILD]->children[RIGHT_CHILD]->red == 0)) {
-			node->parent->children[RIGHT_CHILD]->red = 1;
-			delete_rearrangement(node->parent);
-		}
-	}
-	/*Mirror image of the previous case*/
-	else if (node->parent->children[RIGHT_CHILD] == node) {
-		if ((node->parent->red == 0) && (node->parent->children[LEFT_CHILD]->red == 0) && (node->parent->children[LEFT_CHILD]->children[LEFT_CHILD]->red == 0) && (node->parent->children[LEFT_CHILD]->children[RIGHT_CHILD]->red == 0)) {
-			node->parent->children[LEFT_CHILD]->red = 1;
-			delete_rearrangement(node->parent);
-		}
-	}
-
-	/*The node's parent is red, and it's sibling, and sibling's children are black. We simply exchange the
-	 * color of the node's*/
-	if (node->parent->children[LEFT_CHILD] == node) {
-		if ((node->parent->red == 1) && node->parent->children[RIGHT_CHILD] != NULL && (node->parent->children[RIGHT_CHILD]->red == 0)) {
-			if ((node->parent->children[RIGHT_CHILD]->children[LEFT_CHILD] == NULL || (node->parent->children[RIGHT_CHILD]->children[LEFT_CHILD]->red == 0)) && (node->parent->children[RIGHT_CHILD]->children[LEFT_CHILD] == NULL || (node->parent->children[RIGHT_CHILD]->children[RIGHT_CHILD]->red == 0))) {
-				// TODO: Should this also be done when node->parent->children[RIGHT_CHILD] is NULL?
-				node->parent->red = 0;
-				node->parent->children[RIGHT_CHILD]->red = 1;
-			}
-		}
-	}
-	/*Mirror image*/
-	else if (node->parent->children[RIGHT_CHILD] == node) {
-		if ((node->parent->red == 1) && node->parent->children[LEFT_CHILD] != NULL && (node->parent->children[LEFT_CHILD]->red == 0) && (node->parent->children[LEFT_CHILD]->children[LEFT_CHILD]->red == 0) && (node->parent->children[LEFT_CHILD]->children[RIGHT_CHILD]->red == 0)) {
-			node->parent->red = 0;
-			node->parent->children[LEFT_CHILD]->red = 1;
-		}
-	}
-	/*The node's sibling is black, and it's(the child's sibling's) left child is red and right is black
-	 *We switch the color of the sibling and and its left sibling and rotate_r*/
-	if (node->parent->children[LEFT_CHILD] == node) {
-		if (node->parent->children[RIGHT_CHILD] != NULL && (node->parent->children[RIGHT_CHILD]->red == 0) && (node->parent->children[RIGHT_CHILD]->children[LEFT_CHILD]->red == 1) && (node->parent->children[RIGHT_CHILD]->children[RIGHT_CHILD]->red == 0)) {
-			node->parent->children[RIGHT_CHILD]->red = 1;
-			node->parent->children[RIGHT_CHILD]->children[LEFT_CHILD]->red = 0;
-			rotate_rbnodes(node->parent->children[RIGHT_CHILD], RIGHT_CHILD);
-			delete_rearrangement(node);
-		}
-	}
-	/*Mirror Image*/
-	if (node->parent->children[RIGHT_CHILD] == node) {
-		if (node->parent->children[LEFT_CHILD] != NULL && (node->parent->children[LEFT_CHILD]->red == 0) && (node->parent->children[LEFT_CHILD]->children[LEFT_CHILD]->red == 0) && (node->parent->children[LEFT_CHILD]->children[RIGHT_CHILD]->red == 1)) {
-			node->parent->children[LEFT_CHILD]->red = 1;
-			node->parent->children[LEFT_CHILD]->children[RIGHT_CHILD]->red = 0;
-			rotate_rbnodes(node->parent->children[LEFT_CHILD], LEFT_CHILD);
-			delete_rearrangement(node);
-		}
-	}
-	/*The node's sibling is balck and that's sibling's right child is red. In this case the node
-	 *to be deleted is the left child of it's parent. We switch the color of our nodes parent
-	 * and our nodes sibling and rotate_l at our node's parent.*/
-	if ((node->parent->children[LEFT_CHILD] == node) && node->parent->children[RIGHT_CHILD] != NULL && (node->parent->children[RIGHT_CHILD]->red == node->red)) {
-		node->parent->red = 0;
-		node->parent->children[RIGHT_CHILD]->red = 0;
-		rotate_rbnodes(node->parent, LEFT_CHILD);
-	}
-	/*mirror image of above*/
-	if ((node->parent->children[RIGHT_CHILD] == node) && node->parent->children[LEFT_CHILD] != NULL && (node->parent->children[LEFT_CHILD]->red == node->red)) {
-		node->parent->red = 0;
-		node->parent->children[LEFT_CHILD]->red = 0;
-		rotate_rbnodes(node->parent, RIGHT_CHILD);
-	}
-}
-
-/**
- * Deletes a node which starts at ptr and fixes the tree for red black properties
- * :param ptr: The starting address of the node that is to be deleted
- * :return:
- */
-int rbtree_delete_node(void *ptr) {
-	RBNode *temp = rbtree_point_search(ptr);
-	printf("Deleting node at %p\n", (void *)temp);
-	if (temp == NULL) {
-		printf("You cannot delete a node for a ptr that is not in the tree.\n");
-		return -1;
-	}
-	/*If node to be deleted has 2 children, give that node the value of its in order
- 	*predecessor. We will then delete that node.
- 	*/
-	if (temp->children[LEFT_CHILD] != NULL && temp->children[RIGHT_CHILD] != NULL) {
-		RBNode *predecessor = temp;
-		while (predecessor->children[RIGHT_CHILD] != NULL) {
-			predecessor = predecessor->children[RIGHT_CHILD];
-		}
-		temp->ptr = predecessor->ptr;
-		temp->size = predecessor->size;
-		temp = predecessor;
-	}
-	/*creating child node. We will repalce our temporary node with it later*/
-	RBNode *child = NULL;
-	if (temp->children[LEFT_CHILD] == NULL) {
-		child = temp->children[RIGHT_CHILD];
-	}
-
-	if (temp->children[RIGHT_CHILD] == NULL) {
-		child = temp->children[LEFT_CHILD];
-	}
-
-	/*If the node we are now deleting (temp) is red, we are finished. If it is black, we have to 
- 	**rearrange the tree*/
-	if (temp->red == 0 && child != NULL) {
-		temp->red = child->red;
-		delete_rearrangement(temp);
-	}
-
-	replace_rbtree_node(temp, child);
-	free(temp);
-	return 1;
 }
 
 /**
@@ -817,16 +797,17 @@ int rbtree_delete_node(void *ptr) {
  * :param root: The root of the red black tree to be printed
  * :param depth: The recursive depth parameter to print the .'s
  */
-void print_helper(RBNode *root, int depth, RBNode *gl_root) {
+void print_helper(rbtree_node *root, int depth, rbtree_node *gl_root) {
 	if (root != NULL) {
 		print_helper(root->children[LEFT_CHILD], depth + 1, gl_root);
 
 		int curr_depth = depth;
+		// printf("Current Depth is %d\n", curr_depth);
 		while (curr_depth--) {
 			printf(".");
 		}
 		// printf("red = %d, free = %d node at %p with ptr %p size %i, parent %p, and children %p %p\n", root->red, root->free, (void *)root, root->ptr, (int)root->size, (void *)root->parent, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
-		printf("%p - ptr: %d R: %d, F: %d Children: %p %p\n", (void *)root, (root->ptr - gl_root->ptr) / 4, root->red, root->free, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
+		printf("%p - ptr: %ld R: %d, F: %d Children: %p %p\n", (void *)root, (root->ptr - gl_root->ptr) / 4, root->red, root->free, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
 
 		print_helper(root->children[RIGHT_CHILD], depth + 1, gl_root);
 	}
@@ -837,7 +818,7 @@ void print_helper(RBNode *root, int depth, RBNode *gl_root) {
  */
 void rbtree_print() {
 	// Get the left most node so that the addresses printed are relative and easier to make sense
-	RBNode *temp = root;
+	rbtree_node *temp = root;
 	while (temp->children[LEFT_CHILD] != NULL) {
 		temp = temp->children[LEFT_CHILD];
 	}
@@ -847,13 +828,13 @@ void rbtree_print() {
 
 // Returns the number of black nodes in a subtree of the given node
 // or -1 if it is not a red black tree.
-int computeBlackHeight(RBNode* curr_node) {
+int compute_black_height(rbtree_node* curr_node) {
     // For an empty subtree the answer is obvious
     if (curr_node == NULL)
         return 0; 
     // Computes the height for the left and right child recursively
-    int leftHeight = computeBlackHeight(curr_node->children[LEFT_CHILD]);
-    int rightHeight = computeBlackHeight(curr_node->children[RIGHT_CHILD]);
+    int leftHeight = compute_black_height(curr_node->children[LEFT_CHILD]);
+    int rightHeight = compute_black_height(curr_node->children[RIGHT_CHILD]);
     int add = curr_node->red == 0 ? 1 : 0;
     // The current subtree is not a red black tree if and only if
     // one or more of current node's children is a root of an invalid tree
@@ -864,7 +845,10 @@ int computeBlackHeight(RBNode* curr_node) {
         return leftHeight + add;
 }
 
-int checkNoTwoAdjacentRedNodes(RBNode *curr_node) {
+/**
+ * Checks the red black tree property of no red node having a red child/parent
+ */
+int check_no_two_adj_red_nodes(rbtree_node *curr_node) {
 	if (curr_node == NULL) {
 		return 1;
 	}
@@ -878,10 +862,13 @@ int checkNoTwoAdjacentRedNodes(RBNode *curr_node) {
 		}
 	}
 
-	return checkNoTwoAdjacentRedNodes(curr_node->children[LEFT_CHILD]) && checkNoTwoAdjacentRedNodes(curr_node->children[RIGHT_CHILD]);
+	return check_no_two_adj_red_nodes(curr_node->children[LEFT_CHILD]) && check_no_two_adj_red_nodes(curr_node->children[RIGHT_CHILD]);
 }
 
-int isBST(RBNode *curr_node, RBNode *left_node, RBNode *right_node) {
+/**
+ * Checks if the tree rooted at curr_node is a binary search tree
+ */
+int is_bst(rbtree_node *curr_node, rbtree_node *left_node, rbtree_node *right_node) {
 	// Base condition 
     if (curr_node == NULL) 
         return 1; 
@@ -899,8 +886,8 @@ int isBST(RBNode *curr_node, RBNode *left_node, RBNode *right_node) {
         return 0; 
   
     // check recursively for every node. 
-    return isBST(curr_node->children[LEFT_CHILD], left_node, curr_node) && 
-           isBST(curr_node->children[RIGHT_CHILD], curr_node, right_node);
+    return is_bst(curr_node->children[LEFT_CHILD], left_node, curr_node) && 
+           is_bst(curr_node->children[RIGHT_CHILD], curr_node, right_node);
 }
 
 /**
@@ -911,9 +898,9 @@ int isBST(RBNode *curr_node, RBNode *left_node, RBNode *right_node) {
  * 3) There are no two adjacent red nodes (A red node cannot have a red parent or red child).
  * 4) Every path from a node (including root) to any of its descendant NULL node has the same number of black nodes.
  */
-int isRedBlackTree() {
+int is_red_black_tree() {
 	// Check BST
-	if (isBST(root, NULL, NULL) == 0) {
+	if (is_bst(root, NULL, NULL) == 0) {
 		fprintf(stderr, "The red-black tree is not a binary SEARCH tree.\n");
 		return 0;
 	}
@@ -925,13 +912,13 @@ int isRedBlackTree() {
 	}
 
 	// Rule 3
-	if (checkNoTwoAdjacentRedNodes(root) == 0) {
+	if (check_no_two_adj_red_nodes(root) == 0) {
 		fprintf(stderr, "A red node cannot have a red child in a red-black tree.\n");
 		return 0;
 	}
 
 	// Rule 4
-	if (computeBlackHeight(root) == -1) {
+	if (compute_black_height(root) == -1) {
 		fprintf(stderr, "The black height of left subtree and right subtree must be the same in a red-black tree.\n");
 		return 0;
 	}

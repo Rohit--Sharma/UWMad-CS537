@@ -10,21 +10,22 @@
 
 #include <sys/types.h>
 
-typedef struct RBNode {
-	struct RBNode *parent;
-	struct RBNode *children[2];
+typedef struct rbtree_node {
+	struct rbtree_node *parent;
+	struct rbtree_node *children[2];
 	void *ptr;
 	size_t size;
 	int free;
 	int red;
-} RBNode;
+} rbtree_node;
 
-int rbtree_insert(void *ptr, size_t size);
-int rbtree_delete_node(void *ptr);
+void rbtree_insert(void *ptr, size_t size);
+void rbtree_delete_node(void *ptr);
 
-RBNode *rbtree_point_search(void *ptr);
-RBNode *rbtree_interval_search(void *ptr);
-RBNode *rbtree_range_search(void *ptr, size_t size);
+rbtree_node *rbtree_node_search(void *ptr);
+rbtree_node *rbtree_interval_search(void *ptr);
+rbtree_node *rbtree_range_search(void *ptr, size_t size);
 
+// These are used just in the script testing red black tree
 void rbtree_print();
-int isRedBlackTree();
+int is_red_black_tree();
