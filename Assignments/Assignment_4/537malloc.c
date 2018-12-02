@@ -40,11 +40,23 @@ void *malloc537(size_t size) {
 }
 
 void free537(void *ptr) {
+	if (ptr == NULL) {
+		fprintf(stderr, "Error: Trying to free a NULL pointer! Exiting...\n");
+		exit(-1);
+	}
+
 	// TODO: Is this how to search the node? What if the ptr is in the middle of the node?
 	rbtree_node *node_to_free = rbtree_node_search(ptr);
 	if (node_to_free == NULL) {
-		fprintf(stderr, "Cannot free a memory location that hasn't been allocated. Exiting...\n");
-		exit(-1);
+		node_to_free = rbtree_interval_search(ptr);
+		if (node_to_free == NULL) {
+			fprintf(stderr, "Cannot free a memory location that hasn't been allocated. Exiting...\n");
+			exit(-1);
+		}
+		else {
+			fprintf(stderr, "Attempting to free memory at %p which is not a starting address. It is part of memory already allocated at %p with size %ld! Exiting...\n", ptr, node_to_free->ptr, node_to_free->size);
+			exit(-1);
+		}
 	}
 	else {
 		if (node_to_free->free) {
@@ -77,6 +89,7 @@ void *realloc537(void *ptr, size_t size) {
 		// TODO: verify if the below step is correct
 		rbtree_node *node_to_realloc = rbtree_node_search(ptr);
 		if (node_to_realloc != NULL) {
+			// TODO: Delete it or just mark it as free?
 			rbtree_delete_node(ptr);
 		}
 		void *new_ptr = realloc(ptr, size);
@@ -86,11 +99,18 @@ void *realloc537(void *ptr, size_t size) {
 }
 
 void memcheck537(void *ptr, size_t size) {
-	// TODO: Verify for all the nodes in the range
+	// TODO: Verify for all the nodes in the range? No, the answer in piazza #301 says only check the first one
 	rbtree_node *node_to_check = rbtree_interval_search(ptr);
 	if (node_to_check == NULL || node_to_check->free) {
 		fprintf(stderr, "Memory check failed. The node within the range is not allocated. Exiting...\n");
 		exit(-1);
+	}
+	else {
+		// Check if the bounds of ptr are within the allocated memory
+		if (ptr + size > node_to_check->ptr + node_to_check->size) {
+			fprintf(stderr, "Memory check failed. Not all the memory starting from %p with size %ld is allocated! Exiting...\n", ptr, size);
+			exit(-1);
+		}
 	}
 	return;
 }
