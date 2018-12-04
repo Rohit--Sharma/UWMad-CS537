@@ -15,8 +15,7 @@
 void *malloc537(size_t size) {
 	// If size is 0, report the error and continue
 	if (size == 0) {
-		fprintf(stderr, "Error: Cannot malloc memory of size 0.\n");
-		return NULL;
+		fprintf(stderr, "Warning: Calling malloc with size 0.\n");
 	}
 
 	// Allocate the memory by calling malloc
@@ -103,7 +102,7 @@ void *realloc537(void *ptr, size_t size) {
 		// Let free537 handle it
 		fprintf(stderr, "Warning: Trying to realloc with size 0. Freeing the memory instead.\n");
 		free537(ptr);
-		return NULL;	// TODO: Should you return back the ptr or NULL?
+		return malloc537(size);	// TODO: Should you return back the ptr or NULL?
 	}
 	else {
 		// Check if ptr is a valid starting address that has been previously allocated.
@@ -118,7 +117,7 @@ void *realloc537(void *ptr, size_t size) {
 			// Free the previous memory at ptr
 			node_to_realloc->free = 1;
 		}
-		
+
 		// Delete all the freed nodes whose address is contained in the newly allocated memory
 		// rbtree_node *prev_freed_in_range = rbtree_range_search(new_ptr, size);
 		// while (prev_freed_in_range != NULL) {
@@ -155,13 +154,13 @@ void memcheck537(void *ptr, size_t size) {
 	// TODO: Verify for all the nodes in the range? No, the answer in piazza #301 says only check the first one
 	rbtree_node *node_to_check = rbtree_interval_search(ptr, 0);
 	if (node_to_check == NULL || node_to_check->free) {
-		fprintf(stderr, "Memory check failed. The node within the range is not allocated. Exiting...\n");
+		fprintf(stderr, "Error: Memory check failed. The node within the range is not allocated or already freed. Exiting...\n");
 		exit(-1);
 	}
 	else {
 		// Check if the bounds of ptr are within the allocated memory
 		if ((size_t)ptr + size > (size_t)node_to_check->ptr + node_to_check->size) {
-			fprintf(stderr, "Memory check failed. Not all the memory starting from %p with size %ld is allocated! Exiting...\n", ptr, size);
+			fprintf(stderr, "Error: Memory check failed. Not all the memory starting from %p with size %ld is allocated! Exiting...\n", ptr, size);
 			exit(-1);
 		}
 	}

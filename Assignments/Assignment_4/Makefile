@@ -13,9 +13,9 @@ main.o: main.c
 	$(CC) $(WARNING_FLAGS) -c main.c
 
 # Include all your .o files in the below rule
-obj: 537malloc.o range_tree.o
+obj: 537malloc.o redblack_tree.o
 
-537malloc.o: 537malloc.c 537malloc.h redblack_tree.o
+537malloc.o: 537malloc.c 537malloc.h redblack_tree.h
 	$(CC) $(WARNING_FLAGS) -g -O0 -c 537malloc.c
 
 redblack_tree.o: redblack_tree.c redblack_tree.h

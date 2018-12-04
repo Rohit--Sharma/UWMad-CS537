@@ -28,5 +28,8 @@ int main()
 	ptr1 = realloc537(ptr1, 4);
 	printf("Realloc done at %p\n", (void *)ptr1);
 
+	ptr1 = realloc537(ptr1 + 2, 4);
+	printf("This should not be printed.\n");
+
 	return 0;
 }
