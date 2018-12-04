@@ -711,26 +711,17 @@ rbtree_node* interval_search_helper(void *ptr, rbtree_node *root, int free) {
 		return NULL;
 	}
 
-	if ((ptr == root->ptr) && (root->free == free))
-		return root;
-	else if (ptr >= root->ptr) {
-		if ((size_t)ptr <= ((size_t)root->ptr + root->size) && (root->free == free))
+	if (ptr >= root->ptr && (size_t)ptr <= ((size_t)root->ptr + root->size)) {
+		if (root->free == free)
 			return root;
-		else {
-			if (root->children[RIGHT_CHILD] != NULL) {
-				rbtree_node *search_right_side = interval_search_helper(ptr, root->children[RIGHT_CHILD], free);
-				if (search_right_side != NULL)
-					return search_right_side;
-			}
-			if (root->children[LEFT_CHILD] != NULL) {
-				rbtree_node *search_left_side = interval_search_helper(ptr, root->children[LEFT_CHILD], free);
-				if (search_left_side != NULL)
-					return search_left_side;
-			}
-		}
+		else
+			return NULL;
 	}
-	else {
+	else if (ptr < root->ptr) {
 		return interval_search_helper(ptr, root->children[LEFT_CHILD], free);
+	}
+	else if (ptr > ((size_t)root->ptr + root->size)) {
+		return interval_search_helper(ptr, root->children[RIGHT_CHILD], free);
 	}
 	
 	return NULL;
