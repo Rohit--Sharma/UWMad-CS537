@@ -720,7 +720,7 @@ rbtree_node* interval_search_helper(void *ptr, rbtree_node *root, int free) {
 	else if (ptr < root->ptr) {
 		return interval_search_helper(ptr, root->children[LEFT_CHILD], free);
 	}
-	else if (ptr > ((size_t)root->ptr + root->size)) {
+	else if ((size_t)ptr > ((size_t)root->ptr + root->size)) {
 		return interval_search_helper(ptr, root->children[RIGHT_CHILD], free);
 	}
 	

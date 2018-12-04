@@ -106,40 +106,26 @@ void *realloc537(void *ptr, size_t size) {
 		return NULL;	// TODO: Should you return back the ptr or NULL?
 	}
 	else {
-		void *new_ptr = realloc(ptr, size);
-		if (new_ptr == ptr) {
-			
+		// Check if ptr is a valid starting address that has been previously allocated.
+		rbtree_node *node_to_realloc = rbtree_node_search(ptr);
+		if (node_to_realloc == NULL) {
+			fprintf(stderr, "Cannot realloc a memory location that hasn't been allocated or isn't a starting address. Exiting...\n");
+			exit(-1);
 		}
-		else {
-			// Free the previous memory at ptr
-			// Split the free node which contains the newly allocated memory's start pointer into two nodes
-			rbtree_node *node_to_split = rbtree_interval_search(ptr, 0);
-			if (node_to_split != NULL) {
-				// Check if the newly allocated address is in middle and not the same as node_to_split's ptr
-				if (ptr > node_to_split->ptr) {
-					// Split the node here into first half allocated, rest freed
-					size_t old_size = node_to_split->size;
-					node_to_split->size = ((size_t)ptr - (size_t)node_to_split->ptr);
 
-					rbtree_insert(ptr, old_size - node_to_split->size);
-					// set the inserted node as free
-					rbtree_node *newly_inserted_node = rbtree_node_search(ptr);
-					if (newly_inserted_node == NULL) {
-						fprintf(stderr, "Unknown error occurred. Exiting...\n");
-						exit(-1);
-					}
-					else {
-						newly_inserted_node->free = 1;
-					}
-				}
-			}
+		void *new_ptr = realloc(ptr, size);
+		if (new_ptr != ptr) {
+			// Free the previous memory at ptr
+			node_to_realloc->free = 1;
 		}
+		
 		// Delete all the freed nodes whose address is contained in the newly allocated memory
-		rbtree_node *prev_freed_in_range = rbtree_range_search(new_ptr, size);
-		while (prev_freed_in_range != NULL) {
-			rbtree_delete_node(prev_freed_in_range->ptr);
-			prev_freed_in_range = rbtree_range_search(new_ptr, size);
-		}
+		// rbtree_node *prev_freed_in_range = rbtree_range_search(new_ptr, size);
+		// while (prev_freed_in_range != NULL) {
+		// 	rbtree_delete_node(prev_freed_in_range->ptr);
+		// 	prev_freed_in_range = rbtree_range_search(new_ptr, size);
+		// }
+		rbtree_delete_in_range(new_ptr, size);
 
 		// Split the free node which contains the newly allocated memory's start pointer into two nodes
 		rbtree_node *node_to_split = rbtree_interval_search(new_ptr, 1);
