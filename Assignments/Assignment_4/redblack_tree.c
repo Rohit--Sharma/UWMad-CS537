@@ -706,31 +706,31 @@ void rbtree_insert(void *ptr, size_t size) {
  * :param parent: The root of the red black tree
  * :return: The RBNode in the red black tree whose interval contains ptr
  */
-rbtree_node* interval_search_helper(void *ptr, rbtree_node *root) {
+rbtree_node* interval_search_helper(void *ptr, rbtree_node *root, int free) {
 	if (root == NULL) {
 		return NULL;
 	}
 
-	if ((ptr == root->ptr) && (root->free == 0))
+	if ((ptr == root->ptr) && (root->free == free))
 		return root;
 	else if (ptr >= root->ptr) {
-		if ((size_t)ptr <= ((size_t)root->ptr + root->size) && (root->free == 0))
+		if ((size_t)ptr <= ((size_t)root->ptr + root->size) && (root->free == free))
 			return root;
 		else {
 			if (root->children[RIGHT_CHILD] != NULL) {
-				rbtree_node *search_right_side = interval_search_helper(ptr, root->children[RIGHT_CHILD]);
+				rbtree_node *search_right_side = interval_search_helper(ptr, root->children[RIGHT_CHILD], free);
 				if (search_right_side != NULL)
 					return search_right_side;
 			}
 			if (root->children[LEFT_CHILD] != NULL) {
-				rbtree_node *search_left_side = interval_search_helper(ptr, root->children[LEFT_CHILD]);
+				rbtree_node *search_left_side = interval_search_helper(ptr, root->children[LEFT_CHILD], free);
 				if (search_left_side != NULL)
 					return search_left_side;
 			}
 		}
 	}
 	else {
-		return interval_search_helper(ptr, root->children[LEFT_CHILD]);
+		return interval_search_helper(ptr, root->children[LEFT_CHILD], free);
 	}
 	
 	return NULL;
@@ -743,8 +743,8 @@ rbtree_node* interval_search_helper(void *ptr, rbtree_node *root) {
  * :param ptr: The address that is to be searched for in an interval
  * :return: The RBNode in the red black tree whose interval contains ptr
  */
-rbtree_node *rbtree_interval_search(void *ptr) {
-	return interval_search_helper(ptr, root);
+rbtree_node *rbtree_interval_search(void *ptr, int free) {
+	return interval_search_helper(ptr, root, free);
 }
 
 /**
@@ -758,23 +758,15 @@ rbtree_node *rbtree_interval_search(void *ptr) {
 rbtree_node* range_search_helper(void *ptr, size_t size, rbtree_node *root) {
 	if (root == NULL)
 		return NULL;
-	else if (root->ptr > ptr && ((size_t)root->ptr + root->size) < ((long)ptr + size) && (root->free == 1)) {
+	
+	if (ptr < root->ptr && (size_t)root->ptr <= ((size_t)ptr + size) && root->free == 1) {
 		return root;
-	} else {
-		rbtree_node* left_side_search = NULL; 
-		rbtree_node* right_side_search = NULL;
-
-		if (root->children[LEFT_CHILD] != NULL) {
-			left_side_search = range_search_helper(ptr, size, root->children[LEFT_CHILD]);
-			if (left_side_search != NULL)
-				return left_side_search;
-		}
- 
-		if (root->children[RIGHT_CHILD] != NULL) {
-			right_side_search = range_search_helper(ptr, size, root->children[RIGHT_CHILD]);
-			if (right_side_search != NULL)
-				return right_side_search;
-		}
+	}
+	else if (ptr < root->ptr) {
+		return range_search_helper(ptr, size, root->children[LEFT_CHILD]);
+	}
+	else if (ptr > root->ptr) {
+		return range_search_helper(ptr, size, root->children[RIGHT_CHILD]);
 	}
 	
 	return NULL;
@@ -792,6 +784,27 @@ rbtree_node *rbtree_range_search(void *ptr, size_t size) {
 	return range_search_helper(ptr, size, root);
 }
 
+void rbtree_delete_in_range_helper(rbtree_node *node, void *ptr, size_t size) {
+	if (node == NULL)
+		return;
+	
+	if (ptr < node->ptr)
+		rbtree_delete_in_range_helper(node->children[LEFT_CHILD], ptr, size);
+	
+	if (ptr < node->ptr && ((size_t)ptr + size) >= (size_t)node->ptr && node->free == 1) {
+		// TODO: Remove this print stmt after testing
+		fprintf(stderr, "Deleting node while range query.\n");
+		delete_rbtree_node(node);
+	}
+	
+	if (node != NULL && ((size_t)ptr + size) > (size_t)node->ptr)
+		rbtree_delete_in_range_helper(node->children[RIGHT_CHILD], ptr, size);
+}
+
+void rbtree_delete_in_range(void *ptr, size_t size) {
+	rbtree_delete_in_range_helper(root, ptr, size);
+}
+
 /**
  * The helper method used by rbtree_print
  * :param root: The root of the red black tree to be printed
@@ -807,7 +820,7 @@ void print_helper(rbtree_node *root, int depth, rbtree_node *gl_root) {
 			printf(".");
 		}
 		// printf("red = %d, free = %d node at %p with ptr %p size %i, parent %p, and children %p %p\n", root->red, root->free, (void *)root, root->ptr, (int)root->size, (void *)root->parent, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
-		printf("%p - ptr: %ld R: %d, F: %d Children: %p %p\n", (void *)root, (root->ptr - gl_root->ptr) / 4, root->red, root->free, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
+		printf("%p - ptr: %ld R: %d, F: %d Children: %p %p\n", (void *)root, ((long)root->ptr - (long)gl_root->ptr) / 4, root->red, root->free, (void *)root->children[LEFT_CHILD], (void *)root->children[RIGHT_CHILD]);
 
 		print_helper(root->children[RIGHT_CHILD], depth + 1, gl_root);
 	}

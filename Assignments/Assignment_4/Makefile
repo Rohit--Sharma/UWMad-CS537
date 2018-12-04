@@ -16,7 +16,7 @@ main.o: main.c
 obj: 537malloc.o range_tree.o
 
 537malloc.o: 537malloc.c 537malloc.h redblack_tree.o
-	$(CC) $(WARNING_FLAGS) -g -O0 -c 537malloc.c redblack_tree.o
+	$(CC) $(WARNING_FLAGS) -g -O0 -c 537malloc.c
 
 redblack_tree.o: redblack_tree.c redblack_tree.h
 	$(CC) $(WARNING_FLAGS) -g -O0 -c redblack_tree.c
