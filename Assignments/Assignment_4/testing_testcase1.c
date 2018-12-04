@@ -17,7 +17,7 @@ int main()
 		printf("Memory allocation failed!\n");
 		exit(1);
 	}
-	printf("Allocated 50 bytes of Memory at %p\n", this_ptr1);
+	printf("Allocated 100 bytes of Memory at %p\n", this_ptr1);
 
 	printf("Allocating 50 bytes of Memory\n");
 	char *this_ptr2 = malloc537(sizeof(char) * 50);
@@ -44,39 +44,57 @@ int main()
 	free537(this_ptr2+20);
 	printf("Freeing memory : %p\n", this_ptr3);
 	free537(this_ptr3);
-    //printf("Trying to free 10 bytes from byte 20 to 30";
-	//// 1-B: Simple testcase - Memory check 1st 5 byts
-	//printf("Checking first 5 bytes of %p\n", this_ptr);
-	//memcheck537(this_ptr, 5);
+    
+	
+	printf("Allocating 100 bytes of Memory - part 1\n");
+	char *this_ptrA = malloc537(sizeof(char) * 100);
+	if(this_ptrA == NULL) {
+		printf("Memory allocation failed!\n");
+		exit(1);
+	}
+	printf("Allocated 100 bytes of Memory at %p\n", this_ptrA);
 
-	//strncpy(this_ptr, "hello world", 10);
-	//printf("Content : %s\n", this_ptr);
+	printf("Allocating 100 bytes of Memory - part 2\n");
+	char *this_ptrB = malloc537(sizeof(char) * 100);
+	if(this_ptrB == NULL) {
+		printf("Memory allocation failed!\n");
+		exit(1);
+	}
+	printf("Allocated 100 bytes of Memory at %p\n", this_ptrB);
 
-	//// 1-C: Simple testcase - Memory check last 5 bytes
-	//printf("Checking last 5 bytes of %p\n", this_ptr);
-	//memcheck537(this_ptr + 5, 5);
 
-	//printf("Freeing memory : %p\n", this_ptr);
-	//// 1-D: Correct Free
-	//free537(this_ptr);
-	//printf("Successfully freed memory!\n");
+	printf("Allocating 50 bytes of Memory - part 3\n");
+	char *this_ptrC = malloc537(sizeof(char) * 50);
+	if(this_ptrC == NULL) {
+		printf("Memory allocation failed!\n");
+		exit(1);
+	}
+	printf("Allocated 50 bytes of Memory at %p\n", this_ptrC);
 
-	//// 1-E: Same cases as above
-	//printf("Allocating memory for the struct\n");
-	//struct testNode *new_ptr = (struct testNode *)malloc537(sizeof(struct testNode));
-	//if(new_ptr == NULL) {
-	//	printf("Memory allocation failed!\n");
-	//	exit(1);
-	//}
-	//printf("Allocated Memory : %p\n", new_ptr);
-	//printf("Allocated size : %ld\n", sizeof(struct testNode));
+	
+	printf("Allocating 100 bytes of Memory - part 4\n");
+	char *this_ptrD = malloc537(sizeof(char) * 100);
+	if(this_ptrD == NULL) {
+		printf("Memory allocation failed!\n");
+		exit(1);
+	}
+	printf("Allocated 100 bytes of Memory at %p\n", this_ptrD);
+	
+	printf("free part 1\n");
+	free(this_ptrA);
 
-	//printf("Checking 1st 5 bytes of memory allocated\n");
-	//memcheck537(new_ptr, 5);
+	printf("Realloc Part A with 30 bytpes in the middle\n");
+	realloc537(this_ptrA, 30);
 
-	//printf("Freeing the structure pointer : %p\n", new_ptr);
-	//free(new_ptr);
+	printf("Now we free part 2,3,4 and then realloc 400 bytes frlom start of part 2\n");
+	free(this_ptrB);
+	free(this_ptrC);
+	free(this_ptrD);
 
-	//printf("If this prints, everything is success!\n");
+	realloc(this_ptrB, 400);
+
+	printf("Now we try freeing part 3 again\n");
+	free(this_ptrC);
+
 	return 0;
 }
