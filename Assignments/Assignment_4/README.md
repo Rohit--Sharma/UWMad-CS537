@@ -24,7 +24,7 @@ Now, running the binary will produce the following output for certain testcases 
 ```
 $ cat simple_testcase1.c
 
-nclude <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "537malloc.h"
@@ -120,7 +120,7 @@ $ make; ./output
 Allocated 1000 bytes @ 0x9a4010
 Memcheck at 0x9a4010 - 10 : Should fail - Invalid address!
 Error: Memory check failed. The node within the range is not allocated or already freed. Exiting...
-
+```
 ### Program Organization
 The program files are organized in the following manner:
 - proj4/
@@ -144,3 +144,4 @@ Everytime malloc537 is called with a size, it internally calls malloc which retu
 ### Assumption
 In case of realloc with size 0, we do a free537(ptr) followed by a malloc537(0). A warning is printed but the memory is freed as expected followed by the malloc.
 In case of realloc with NULL ptr, we do exactly what malloc() does for the case.
+In case of free(NULL), we just return as mentioned in the spec without throwing any error or warning.
