@@ -12,6 +12,10 @@
 #include <stdlib.h>
 #include "redblack_tree.h"
 
+
+/*This is a safe malloc that records a ptr and size in the rbtree for memory that has been allocated. 
+ptr is obtained from return of malloc and size is checked if its 0 and reported with a warning
+*/
 void *malloc537(size_t size) {
 	// If size is 0, report the error and continue
 	if (size == 0) {
@@ -60,7 +64,11 @@ void *malloc537(size_t size) {
 	return ptr;
 }
 
+/*This function checks if freeing the memory associated with ptr is correct and then invokes free() to do the actual free. 
+It verifies that the memory being freed was allocated with malloc537, that it is not the first byte of range of memory that was
+allocated and is not being double freed. Errors are reported if the conditions are violated.*/
 void free537(void *ptr) {
+	//If pointer is null, it is an error and the program exits.
 	if (ptr == NULL) {
 		fprintf(stderr, "Error: Trying to free a NULL pointer! Exiting...\n");
 		exit(-1);
@@ -93,6 +101,9 @@ void free537(void *ptr) {
 	}
 }
 
+/*This function reallocates memory. It checks if ptr is null and invokes malloc to handle it.
+If size is 0 and ptr is not NULL, then free is invoked. Realloc changes the memory location 
+and the function checks if a node exists with ptr and of length size. */
 void *realloc537(void *ptr, size_t size) {
 	if (ptr == NULL) {
 		// Let malloc537 handle it
@@ -150,6 +161,8 @@ void *realloc537(void *ptr, size_t size) {
 	}
 }
 
+/*This funtion checks if address range specified by ptr and size length are within range allocated by malloc537 and not
+ yet freed using free537. When error is deteched, it is reported and program is exited.*/
 void memcheck537(void *ptr, size_t size) {
 	// TODO: Verify for all the nodes in the range? No, the answer in piazza #301 says only check the first one
 	rbtree_node *node_to_check = rbtree_interval_search(ptr, 0);
