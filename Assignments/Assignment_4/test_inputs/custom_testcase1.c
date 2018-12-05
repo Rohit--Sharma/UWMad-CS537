@@ -4,24 +4,16 @@
 #include "redblack_tree.h"
 
 int main() {
-	printf("Calling malloc with size 0\n");
-	void *ptr = malloc537(0);
-	printf("Malloced 0 bytes at %p\n", ptr);
+	printf("Calling malloc with size 10\n");
+	void *ptr = malloc537(10);
+	printf("Malloced 10 bytes at %p\n", ptr);
 
-	// printf("Freeing the ptr\n");
-	// free537(ptr);
-	// printf("Successfully freed.\n");
-
-	// printf("Freeing the ptr\n");
-	// free537(ptr);
-	// printf("Successfully freed.\n");
-
-	printf("Reallocing the ptr\n");
+	printf("Reallocing the ptr with size 0\n");
 	ptr = realloc537(ptr, 0);
-	printf("Successfully realloced at %p.\n", ptr);
-
-	memcheck537(ptr, 0);
-	printf("Memcheck successful\n");
+	
+	printf("Trying to free the ptr at %p. It should fail\n", ptr);
+	free537(ptr);
+	printf("This should not be printed.\n");
 
 	return 0;
 }

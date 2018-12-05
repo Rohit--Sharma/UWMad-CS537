@@ -106,14 +106,85 @@ If size is 0 and ptr is not NULL, then free is invoked. Realloc changes the memo
 and the function checks if a node exists with ptr and of length size. */
 void *realloc537(void *ptr, size_t size) {
 	if (ptr == NULL) {
-		// Let malloc537 handle it
-		return malloc537(size);
+		// Do what we do in malloc537. But call realloc instead of malloc
+
+		// If size is 0, report the error and continue
+		if (size == 0) {
+			fprintf(stderr, "Warning: Calling realloc with size 0.\n");
+		}
+
+		// Allocate the memory by calling malloc
+		void *new_ptr = realloc(ptr, size);
+		
+		// Delete all the freed nodes whose address is contained in the newly allocated memory
+		// rbtree_node *prev_freed_in_range = rbtree_range_search(ptr, size);
+		// while (prev_freed_in_range != NULL) {
+		// 	rbtree_delete_node(prev_freed_in_range->ptr);
+		// 	prev_freed_in_range = rbtree_range_search(ptr, size);
+		// }
+		rbtree_delete_in_range(new_ptr, size);
+
+		// Split the free node which contains the newly allocated memory's start pointer into two nodes
+		rbtree_node *node_to_split = rbtree_interval_search(new_ptr, 1);
+		if (node_to_split != NULL) {
+			// Check if the newly allocated address is in middle and not the same as node_to_split's ptr
+			if (new_ptr > node_to_split->ptr) {
+				// Split the node here (Which is identical to just reducing the node's size and later inserting a new node)
+				node_to_split->size = ((size_t)new_ptr - (size_t)node_to_split->ptr);
+			}
+		}
+
+		rbtree_node *old_node = rbtree_node_search(new_ptr);
+		// If the node isn't in rbtree, insert it. Else, check if the memory was previously freed.
+		if (old_node == NULL) {
+			rbtree_insert(new_ptr, size);
+		}
+		else {
+			if (old_node->free == 1) {
+				// printf("The memory was previously freed.\n");
+				// TODO: What now? For now, just setting free to 0 and changing the size
+				old_node->free = 0;
+				old_node->size = size;
+			}
+			else {
+				fprintf(stderr, "Error: malloc() library call returned an address that was already allocated. Exiting...\n");
+				exit(-1);
+			}
+		}
+
+		return new_ptr;
 	}
 	else if (size == 0) {
-		// Let free537 handle it
+		// Do what we do in malloc537. But call realloc instead of free
 		fprintf(stderr, "Warning: Trying to realloc with size 0. Freeing the memory instead.\n");
-		free537(ptr);
-		return malloc537(size);	// TODO: Should you return back the ptr or NULL?
+
+		// TODO: Is this how to search the node? What if the ptr is in the middle of the node?
+		rbtree_node *node_to_free = rbtree_node_search(ptr);
+		if (node_to_free == NULL) {
+			// Check if the address that is being freed is somewhere in the middle to throw an error accordingly.
+			node_to_free = rbtree_interval_search(ptr, 0);
+			if (node_to_free == NULL) {
+				fprintf(stderr, "Error: Cannot realloc a memory location that hasn't been allocated. Exiting...\n");
+				exit(-1);
+			}
+			else {
+				fprintf(stderr, "Error: Attempting to realloc memory at %p which is not a starting address. It is part of memory already allocated at %p with size %ld! Exiting...\n", ptr, node_to_free->ptr, node_to_free->size);
+				exit(-1);
+			}
+		}
+		else {
+			void *new_ptr = realloc(ptr, size);
+			node_to_free->size = 0;
+			if (new_ptr == NULL) {
+				// Realloc returned NULL, mark the node in the tree as free
+				node_to_free->free = 1;
+			}
+			else {
+				node_to_free->free = 0;
+			}
+			
+			return new_ptr;
+		}
 	}
 	else {
 		// Check if ptr is a valid starting address that has been previously allocated.
