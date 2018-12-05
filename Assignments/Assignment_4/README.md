@@ -141,7 +141,3 @@ The *Makefile* contains the rules to compile and link all the source code files 
 ### Description
 Everytime malloc537 is called with a size, it internally calls malloc which returns a pointer after allocating memory starting at pointer of required size. This is inserted as a node into the redblack tree. In case of free537, it internally calls free and deletes the corresponding node from redblack tree. realloc537 takes care of the different corner cases as per POSIX standard and reallocates like realloc. memcheck verifies whether the memory range is a valid one that had been allocated with malloc537 and not freed by free537. All possible error test cases are taken care of. 
  
-### Assumption
-In case of realloc with size 0, we do a free537(ptr) followed by a malloc537(0). A warning is printed but the memory is freed as expected followed by the malloc.
-In case of realloc with NULL ptr, we do exactly what malloc() does for the case.
-In case of free(NULL), we throw an error and exit(-1) to be compatible with error_testcase1.c.
