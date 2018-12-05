@@ -309,7 +309,7 @@ void delete_rbtree_node(rbtree_node *node) {
 					sibling->red = 1;
 			}
 			
-			if (node->parent != NULL) {
+			if (node->parent != NULL && parent != NULL) {
 				if (node == node->parent->children[LEFT_CHILD])
 					parent->children[LEFT_CHILD] = NULL;
 				else
