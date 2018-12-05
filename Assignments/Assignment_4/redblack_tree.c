@@ -47,7 +47,7 @@ rbtree_node* uncle_node(rbtree_node *node) {
  */
 rbtree_node* sibling_node(rbtree_node* node) {
 	// No sibling if no parent
-	if (node->parent == NULL)
+	if (node == NULL || node->parent == NULL)
 		return NULL;
 	
 	if (node == node->parent->children[LEFT_CHILD])
@@ -207,6 +207,9 @@ rbtree_node* replace_BST_node(rbtree_node* node) {
  * Fix a double black for a given node
  */
 void fix_rbtree_double_black(rbtree_node* node) {
+	if (node == NULL)
+		return;
+	
 	// return if reached root
 	if (node == root)
 		return;
@@ -306,10 +309,12 @@ void delete_rbtree_node(rbtree_node *node) {
 					sibling->red = 1;
 			}
 			
-			if (node == node->parent->children[LEFT_CHILD])
-				parent->children[LEFT_CHILD] = NULL;
-			else
-				parent->children[RIGHT_CHILD] = NULL;
+			if (node->parent != NULL) {
+				if (node == node->parent->children[LEFT_CHILD])
+					parent->children[LEFT_CHILD] = NULL;
+				else
+					parent->children[RIGHT_CHILD] = NULL;
+			}
 		}
 		free(node);
 		return;
@@ -325,10 +330,12 @@ void delete_rbtree_node(rbtree_node *node) {
 			free(temp_node);
 		}
 		else {
-			if (node == node->parent->children[LEFT_CHILD])
-				parent->children[LEFT_CHILD] = temp_node;
-			else
-				parent->children[RIGHT_CHILD] = temp_node;
+			if (node->parent != NULL) {
+				if (node == node->parent->children[LEFT_CHILD])
+					parent->children[LEFT_CHILD] = temp_node;
+				else
+					parent->children[RIGHT_CHILD] = temp_node;
+			}
 		
 			free(node);
 			temp_node->parent = parent;
