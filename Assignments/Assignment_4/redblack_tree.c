@@ -564,13 +564,32 @@ void rbtree_delete_in_range_helper(rbtree_node *node, void *ptr, size_t size) {
 	if (ptr < node->ptr)
 		rbtree_delete_in_range_helper(node->children[LEFT_CHILD], ptr, size);
 	
+	// Determine if node is right child or left
+	int node_is_right = -1;		// If node is indeed a right child, this will be set to 1. if left, 0. if no parent, -1
+	rbtree_node *parent_node = node->parent;
+	if (parent_node != NULL) {
+		if (node == parent_node->children[RIGHT_CHILD]) {
+			node_is_right = 1;
+		}
+		else {
+			node_is_right = 0;
+		}
+	}
+
+	int deleted = 0;
 	if (ptr < node->ptr && ((size_t)ptr + size) >= (size_t)node->ptr && node->free == 1) {
-		// TODO: Remove this print stmt after testing
-		fprintf(stderr, "Deleting node while range query.\n");
+		deleted = 1;
 		delete_rbtree_node(node);
+
+		if (parent_node != NULL) {
+			rbtree_delete_in_range_helper(parent_node->children[node_is_right], ptr, size);
+		}
+		else if (root != NULL) {
+			rbtree_delete_in_range_helper(root, ptr, size);
+		}
 	}
 	
-	if (node != NULL && ((size_t)ptr + size) > (size_t)node->ptr)
+	if (deleted == 0 && node != NULL && ((size_t)ptr + size) > (size_t)node->ptr)
 		rbtree_delete_in_range_helper(node->children[RIGHT_CHILD], ptr, size);
 }
 

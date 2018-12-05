@@ -52,7 +52,7 @@ void *malloc537(size_t size) {
 			old_node->size = size;
 		}
 		else {
-			fprintf(stderr, "Error with malloc() library call. malloc returned an address that was already allocated. Exiting...\n");
+			fprintf(stderr, "Error: malloc() library call returned an address that was already allocated. Exiting...\n");
 			exit(-1);
 		}
 	}
@@ -72,17 +72,17 @@ void free537(void *ptr) {
 		// Check if the address that is being freed is somewhere in the middle to throw an error accordingly.
 		node_to_free = rbtree_interval_search(ptr, 0);
 		if (node_to_free == NULL) {
-			fprintf(stderr, "Cannot free a memory location that hasn't been allocated. Exiting...\n");
+			fprintf(stderr, "Error: Cannot free a memory location that hasn't been allocated. Exiting...\n");
 			exit(-1);
 		}
 		else {
-			fprintf(stderr, "Attempting to free memory at %p which is not a starting address. It is part of memory already allocated at %p with size %ld! Exiting...\n", ptr, node_to_free->ptr, node_to_free->size);
+			fprintf(stderr, "Error: Attempting to free memory at %p which is not a starting address. It is part of memory already allocated at %p with size %ld! Exiting...\n", ptr, node_to_free->ptr, node_to_free->size);
 			exit(-1);
 		}
 	}
 	else {
 		if (node_to_free->free) {
-			fprintf(stderr, "Trying to free a memory that has already been freed. Exiting...\n");
+			fprintf(stderr, "Error: Trying to free a memory that has already been freed. Exiting...\n");
 			exit(-1);
 		}
 		else {
@@ -108,7 +108,7 @@ void *realloc537(void *ptr, size_t size) {
 		// Check if ptr is a valid starting address that has been previously allocated.
 		rbtree_node *node_to_realloc = rbtree_node_search(ptr);
 		if (node_to_realloc == NULL) {
-			fprintf(stderr, "Cannot realloc a memory location that hasn't been allocated or isn't a starting address. Exiting...\n");
+			fprintf(stderr, "Error: Cannot realloc a memory location that hasn't been allocated or isn't a starting address. Exiting...\n");
 			exit(-1);
 		}
 
@@ -154,7 +154,7 @@ void memcheck537(void *ptr, size_t size) {
 	// TODO: Verify for all the nodes in the range? No, the answer in piazza #301 says only check the first one
 	rbtree_node *node_to_check = rbtree_interval_search(ptr, 0);
 	if (node_to_check == NULL || node_to_check->free) {
-		fprintf(stderr, "Error: Memory check failed. The node within the range is not allocated or already freed. Exiting...\n");
+		fprintf(stderr, "Error: Memory check failed. The memory within the range is either not allocated or already freed. Exiting...\n");
 		exit(-1);
 	}
 	else {
