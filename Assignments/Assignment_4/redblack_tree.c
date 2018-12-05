@@ -330,7 +330,7 @@ void delete_rbtree_node(rbtree_node *node) {
 			free(temp_node);
 		}
 		else {
-			if (node->parent != NULL) {
+			if (node->parent != NULL && parent != NULL) {
 				if (node == node->parent->children[LEFT_CHILD])
 					parent->children[LEFT_CHILD] = temp_node;
 				else
