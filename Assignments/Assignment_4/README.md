@@ -144,4 +144,4 @@ Everytime malloc537 is called with a size, it internally calls malloc which retu
 ### Assumption
 In case of realloc with size 0, we do a free537(ptr) followed by a malloc537(0). A warning is printed but the memory is freed as expected followed by the malloc.
 In case of realloc with NULL ptr, we do exactly what malloc() does for the case.
-In case of free(NULL), we just return as mentioned in the spec without throwing any error or warning.
+In case of free(NULL), we throw an error and exit(-1) to be compatible with error_testcase1.c.
