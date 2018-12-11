@@ -2,7 +2,7 @@
 ## University of Wisconsin-Madison
 ### Fall 2018 - Programming Assignments
 
-This repository consists of the programming assignments that were implemented as a part of CS537 course. They are written in C and targeted to run on UWMadison Linux workstations. 
+This repository consists of the programming assignments that were implemented as a part of CS537 course. They are written in `C` and targeted to run on UWMadison *Linux* workstations. 
 
 Below are details of individual assignments:
 
